@@ -377,3 +377,52 @@ holds 200 candidate links sampled with seed 20260912, with blank verdict columns
 Precision against it requires a human annotator. No precision figure is claimed
 here, and a figure computed by the same process that produced the links would not
 be an evaluation.
+
+## D13. Every relation in this graph is a fact about Debroy's English, 2026-09-12
+
+Phase 4 extracts relations by dependency parsing. The corpus contains no
+Sanskrit, so the parse runs on Bibek Debroy's translation and every triple is
+mediated by his word choices. This is not a caveat to bury in a limitations
+paragraph. It changes what the graph is a graph of.
+
+Three places where it is load-bearing:
+
+**Kinship is recovered mainly from the English genitive.** 629 of 660
+`hasBiologicalParent` triples come from `Shantanu's son Bhishma` or `son of
+Shantanu`. Sanskrit expresses this with a patronymic that is one word. Debroy
+sometimes translates the patronymic and sometimes transliterates it, so
+`Kounteya` and `Kunti's son` both appear and only the second is extractable.
+The graph therefore over-represents passages where the translator chose to
+unpack a patronymic.
+
+**`rules` is an artifact of the phrase "king of X".** Sanskrit uses a compound
+or a toponymic epithet. The English apposition is what makes the relation
+visible, and it is also what makes it wrong 18% of the time, because the same
+apposition appears inside comma lists of names.
+
+**The predicate boundaries are English verb senses.** `instruct` covers both
+teaching and giving an order and the two had to be separated by a syntactic
+test on the infinitive complement, not by anything in the source. A Sanskrit
+extraction would have split on different lines.
+
+The practical consequence for Phase 6 is that the embedding is trained on a
+translator-mediated graph and any claim about "the epic's structure" is really
+a claim about this translation of it.
+
+## D14. Precision judged by the author of the patterns, 2026-09-12
+
+The Phase 4 gate asks for precision on a 300-triple manual sample. The sample
+was drawn with a recorded seed and stratified by predicate, and every triple
+was judged against its cited sentence. The judge wrote the extraction patterns.
+
+This is reported as a precision measurement and never as agreement or as an
+independent evaluation. It answers "does the cited sentence assert this",
+which is checkable from the text, and it cannot answer "would another reader
+extract the same set", which is not. Weighted precision 0.931.
+
+Four patterns were changed after a first pass over the sample and the numbers
+above are from the sample redrawn against the fixed extractor, not from the
+run that revealed the errors. Reporting the pre-fix sample would have measured
+a version that no longer exists; reusing the post-fix judgements on the same
+seed keeps the sample honest because the seed selects rows from a rebuilt
+table and 71% of the sampled rows are different triples.

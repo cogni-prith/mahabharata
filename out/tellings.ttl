@@ -190,7 +190,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/897> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Souti> ;
-  mbh:narratee <http://example.org/mbh/e/Brahmana> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/7> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -301,7 +300,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/1075> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Jaratkaru> ;
-  mbh:narratee <http://example.org/mbh/e/Brahmana> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/13> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -1174,7 +1172,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/3084> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/61> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -1383,7 +1380,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/3884> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Shukra> ;
-  mbh:narratee <http://example.org/mbh/e/Brihaspati> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/71> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -2492,7 +2488,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/5530> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Kousalya> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/100> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -2589,7 +2584,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/5800> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vyasa> ;
-  mbh:narratee <http://example.org/mbh/e/Subala> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/107> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -2900,7 +2894,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/6739> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Arjuna> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/123> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -3132,7 +3125,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/7390> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Hidimba> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/141> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -3319,7 +3311,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/7877> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Brahmana> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/153> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -3594,7 +3585,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/8621> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Pulastya> ;
-  mbh:narratee <http://example.org/mbh/e/Partha> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/172> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -3885,7 +3875,7 @@
 
 <http://example.org/mbh/g/telling/01_Adi/9361> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Karna> ;
-  mbh:narratee <http://example.org/mbh/e/Radheya> ;
+  mbh:narratee <http://example.org/mbh/e/Duryodhana> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/194> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -4123,7 +4113,6 @@
 
 <http://example.org/mbh/g/telling/01_Adi/10252> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vasudeva> ;
-  mbh:narratee <http://example.org/mbh/e/Kunti> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/01_Adi/214> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -4363,7 +4352,6 @@
 
 <http://example.org/mbh/g/telling/02_Sabha/15> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Kounteya> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/02_Sabha/1> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -4599,7 +4587,6 @@
 
 <http://example.org/mbh/g/telling/02_Sabha/594> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Krishna> ;
-  mbh:narratee <http://example.org/mbh/e/Krishna> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/02_Sabha/16> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -4667,7 +4654,6 @@
 
 <http://example.org/mbh/g/telling/02_Sabha/906> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Krishna> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/02_Sabha/22> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -4886,7 +4872,6 @@
 
 <http://example.org/mbh/g/telling/02_Sabha/1670> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Janardana> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/02_Sabha/42> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -4918,7 +4903,6 @@
 
 <http://example.org/mbh/g/telling/02_Sabha/1782> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Duryodhana> ;
-  mbh:narratee <http://example.org/mbh/e/Duryodhana> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/02_Sabha/43> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -5079,7 +5063,6 @@
 
 <http://example.org/mbh/g/telling/02_Sabha/2158> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Dhritarashtra> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/02_Sabha/51> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -5346,7 +5329,7 @@
 
 <http://example.org/mbh/g/telling/02_Sabha/2470> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Kounteya> ;
+  mbh:narratee <http://example.org/mbh/e/Shakuni> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/02_Sabha/58> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -5771,7 +5754,6 @@
 
 <http://example.org/mbh/g/telling/02_Sabha/2961> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Dhananjaya> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/02_Sabha/64> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -6070,7 +6052,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/291> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vidura> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/5> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -6158,7 +6139,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/472> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vyasa> ;
-  mbh:narratee <http://example.org/mbh/e/Vichitravirya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/10> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -6294,7 +6274,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/919> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Krishna> ;
-  mbh:narratee <http://example.org/mbh/e/Krishna> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/15> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -6308,7 +6287,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/991> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vasudeva> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/17> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -6321,14 +6299,12 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/1076> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Souti> ;
-  mbh:narratee <http://example.org/mbh/e/Janardana> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/19> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/03_Aranyaka/1110> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vasudeva> ;
-  mbh:narratee <http://example.org/mbh/e/Rukmini> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/20> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -6452,7 +6428,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/2042> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Kounteya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/34> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -6521,7 +6496,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/2548> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/43> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -6866,14 +6840,12 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/3938> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Brihadashva> ;
-  mbh:narratee <http://example.org/mbh/e/Damayanti> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/68> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/03_Aranyaka/3979> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Brihadashva> ;
-  mbh:narratee <http://example.org/mbh/e/Bahuka> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/69> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -6942,7 +6914,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/4166> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Keshini> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/72> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -6974,7 +6945,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/4179> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bahuka> ;
-  mbh:narratee <http://example.org/mbh/e/Bahuka> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/72> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -7006,7 +6976,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/4264> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Damayanti> ;
-  mbh:narratee <http://example.org/mbh/e/Bahuka> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/74> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -7019,7 +6988,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/4295> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Brihadashva> ;
-  mbh:narratee <http://example.org/mbh/e/Nala> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/75> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -7093,7 +7061,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/4695> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Pulastya> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/81> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -7482,7 +7449,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/6425> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Rishyashringa> ;
-  mbh:narratee <http://example.org/mbh/e/Rishyashringa> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/111> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -7824,7 +7790,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/7348> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Lomasha> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/132> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -8019,7 +7984,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/7632> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yavakrita> ;
-  mbh:narratee <http://example.org/mbh/e/Yudhishthira> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/135> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -8136,7 +8100,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/7834> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Bhimasena> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/140> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -8601,7 +8564,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/10085> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/177> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -8692,7 +8654,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/10324> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Markandeya> ;
-  mbh:narratee <http://example.org/mbh/e/Bhargava> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/181> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -8915,7 +8876,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/11401> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vamadeva> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/190> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -10073,7 +10033,6 @@
 
 <http://example.org/mbh/g/telling/03_Aranyaka/16339> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Rama> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/03_Aranyaka/275> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -11050,7 +11009,6 @@
 
 <http://example.org/mbh/g/telling/04_Virata/43> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhima> ;
-  mbh:narratee <http://example.org/mbh/e/Vrikodara> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/2> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -11089,7 +11047,6 @@
 
 <http://example.org/mbh/g/telling/04_Virata/98> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sahadeva> ;
-  mbh:narratee <http://example.org/mbh/e/Sahadeva> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/3> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -11146,7 +11103,6 @@
 
 <http://example.org/mbh/g/telling/04_Virata/221> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/5> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -11196,7 +11152,6 @@
 
 <http://example.org/mbh/g/telling/04_Virata/317> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhima> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/7> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -11463,7 +11418,6 @@
 
 <http://example.org/mbh/g/telling/04_Virata/763> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Droupadi> ;
-  mbh:narratee <http://example.org/mbh/e/Bhima> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/18> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -11728,7 +11682,6 @@
 
 <http://example.org/mbh/g/telling/04_Virata/1633> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sairandhri> ;
-  mbh:narratee <http://example.org/mbh/e/Brihannada> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/35> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -11803,7 +11756,6 @@
 
 <http://example.org/mbh/g/telling/04_Virata/1765> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Uttara> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/38> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -11816,7 +11768,6 @@
 
 <http://example.org/mbh/g/telling/04_Virata/1783> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Brihannada> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/38> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -12163,21 +12114,18 @@
 
 <http://example.org/mbh/g/telling/04_Virata/2939> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Kanka> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/63> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/04_Virata/2950> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/63> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/04_Virata/2950> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Virata> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/04_Virata/63> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -12414,7 +12362,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/352> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/9> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -12439,7 +12386,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/418> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Indra> ;
-  mbh:narratee <http://example.org/mbh/e/Shakra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/9> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -12563,7 +12509,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/885> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Brihaspati> ;
-  mbh:narratee <http://example.org/mbh/e/Brihaspati> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/16> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -12854,14 +12799,13 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/2220> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Keshini> ;
-  mbh:narratee <http://example.org/mbh/e/Virochana> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/35> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/05_Udyoga/2220> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Virochana> ;
-  mbh:narratee <http://example.org/mbh/e/Virochana> ;
+  mbh:narratee <http://example.org/mbh/e/Keshini> ;
   mbh:diegeticDepth "4"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/35> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -12970,7 +12914,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/2271> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vidura> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/35> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -13293,7 +13236,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/3581> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/49> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -13374,7 +13316,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/4027> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/56> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -13504,7 +13445,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/4410> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/64> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -13695,7 +13635,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/4927> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Achyuta> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/74> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -13729,7 +13668,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/5075> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sahadeva> ;
-  mbh:narratee <http://example.org/mbh/e/Janardana> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/78> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -13883,7 +13821,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/5751> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Keshava> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/90> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -14192,7 +14129,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/6956> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Narada> ;
-  mbh:narratee <http://example.org/mbh/e/Galava> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/117> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -14390,7 +14326,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/8135> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/138> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -14505,14 +14440,12 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/8519> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vasudeva> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/145> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/05_Udyoga/8519> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/King_Suyodhana> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/145> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -14597,7 +14530,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/8956> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Achyuta> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/151> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -14694,7 +14626,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/9260> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/157> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -14763,7 +14694,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/9520> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Gandhari> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/162> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -14897,7 +14827,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/10147> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Akritavrana> ;
-  mbh:narratee <http://example.org/mbh/e/Akritavrana> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/175> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -15085,14 +15014,12 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/10589> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/183> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/05_Udyoga/10646> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/184> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -15148,7 +15075,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/10903> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/189> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -15215,7 +15141,6 @@
 
 <http://example.org/mbh/g/telling/05_Udyoga/11200> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/05_Udyoga/194> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -15318,7 +15243,6 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/229> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vyasa> ;
-  mbh:narratee <http://example.org/mbh/e/Vichitravirya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/4> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -15558,7 +15482,6 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/1206> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/20> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -15609,7 +15532,6 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/1322> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/23> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -15725,7 +15647,6 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/2139> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Hrishikesha> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/33> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -15758,7 +15679,6 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/2279> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Pandava> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/36> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -15778,7 +15698,7 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/2492> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Partha> ;
+  mbh:narratee <http://example.org/mbh/e/Achyuta> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/40> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -15791,14 +15711,12 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/2534> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/41> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/06_Bhishma/2534> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhimasena> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "4"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/41> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -16086,7 +16004,6 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/3281> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/49> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -16185,7 +16102,6 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/4303> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/61> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -16412,7 +16328,6 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/6313> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/87> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -16585,7 +16500,7 @@
 
 <http://example.org/mbh/g/telling/06_Bhishma/7813> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Krishna> ;
-  mbh:narratee <http://example.org/mbh/e/Krishna> ;
+  mbh:narratee <http://example.org/mbh/e/Jishnu> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/06_Bhishma/103> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -17179,7 +17094,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/2386> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/32> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -17234,7 +17148,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/2453> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Subhadra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/34> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -17327,7 +17240,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/2827> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/42> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -17521,7 +17433,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/4116> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Madhusudana> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/59> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -17600,7 +17511,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/4633> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Pandava> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/66> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -17699,7 +17609,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/5233> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/73> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -17781,7 +17690,7 @@
 
 <http://example.org/mbh/g/telling/07_Drona/5657> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Partha> ;
+  mbh:narratee <http://example.org/mbh/e/Krishna> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/78> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -17820,7 +17729,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/5845> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/81> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -18119,7 +18027,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/8067> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Kurus> ;
-  mbh:narratee <http://example.org/mbh/e/Kouravya> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/107> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -18249,7 +18156,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/8817> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Partha_Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Madhava> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/117> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -18262,7 +18168,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/8861> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Arjuna> ;
-  mbh:narratee <http://example.org/mbh/e/Shala> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/118> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -18460,7 +18365,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/9775> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/130> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -18601,7 +18505,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/10652> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/138> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -18833,7 +18736,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/12375> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/158> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -19129,7 +19031,6 @@
 
 <http://example.org/mbh/g/telling/07_Drona/14273> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/07_Drona/173> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -19618,7 +19519,6 @@
 
 <http://example.org/mbh/g/telling/08_Karna/4846> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Devaki> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/08_Karna/46> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -19866,7 +19766,6 @@
 
 <http://example.org/mbh/g/telling/09_Shalya/453> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Shalya> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/09_Shalya/6> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -19891,7 +19790,6 @@
 
 <http://example.org/mbh/g/telling/09_Shalya/535> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/09_Shalya/7> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -19941,7 +19839,6 @@
 
 <http://example.org/mbh/g/telling/09_Shalya/2124> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Madhava> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/09_Shalya/23> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -19990,7 +19887,6 @@
 
 <http://example.org/mbh/g/telling/09_Shalya/2744> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/09_Shalya/29> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -20039,7 +19935,6 @@
 
 <http://example.org/mbh/g/telling/09_Shalya/2973> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/09_Shalya/31> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -20059,7 +19954,7 @@
 
 <http://example.org/mbh/g/telling/09_Shalya/3016> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhisthira> ;
-  mbh:narratee <http://example.org/mbh/e/Gandhari> ;
+  mbh:narratee <http://example.org/mbh/e/Suyodhana> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/09_Shalya/31> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -20322,7 +20217,6 @@
 
 <http://example.org/mbh/g/telling/09_Shalya/4941> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/09_Shalya/54> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -20365,7 +20259,6 @@
 
 <http://example.org/mbh/g/telling/09_Shalya/5359> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/09_Shalya/59> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -20409,7 +20302,6 @@
 
 <http://example.org/mbh/g/telling/09_Shalya/5437> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/09_Shalya/60> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -20434,7 +20326,6 @@
 
 <http://example.org/mbh/g/telling/09_Shalya/5509> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vasudeva> ;
-  mbh:narratee <http://example.org/mbh/e/Gandhari> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/09_Shalya/60> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -20521,7 +20412,6 @@
 
 <http://example.org/mbh/g/telling/10_Souptika/42> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Sanjaya> ;
-  mbh:narratee <http://example.org/mbh/e/Sanjaya> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/10_Souptika/1> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -20937,7 +20827,6 @@
 
 <http://example.org/mbh/g/telling/11_Stri/605> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhimasena> ;
-  mbh:narratee <http://example.org/mbh/e/Vrikodara> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/11_Stri/14> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -21322,7 +21211,6 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/1439> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Senajit> ;
-  mbh:narratee <http://example.org/mbh/e/Yudhishthira> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/26> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -21606,7 +21494,6 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/2644> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/45> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -21777,7 +21664,6 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/3350> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vasudeva> ;
-  mbh:narratee <http://example.org/mbh/e/Govinda> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/54> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -22302,14 +22188,12 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/5150> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/80> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/12_Shanti/5150> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/80> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -22403,7 +22287,6 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/5523> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Shakra> ;
-  mbh:narratee <http://example.org/mbh/e/Shakra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/85> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -22423,14 +22306,12 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/5534> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/86> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/12_Shanti/5534> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/86> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -22600,7 +22481,6 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/6250> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Indra> ;
-  mbh:narratee <http://example.org/mbh/e/Shakra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/99> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -23550,7 +23430,6 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/10321> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/151> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -24263,7 +24142,6 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/13232> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Heaven> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/192> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -24366,7 +24244,6 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/13880> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Svayambhu> ;
-  mbh:narratee <http://example.org/mbh/e/Brahma> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/202> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -25257,7 +25134,6 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/18915> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vasishtha> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/272> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -25898,7 +25774,6 @@
 
 <http://example.org/mbh/g/telling/12_Shanti/23921> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/12_Shanti/326> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -26257,7 +26132,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/60> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Goutami> ;
-  mbh:narratee <http://example.org/mbh/e/Goutami> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/1> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -26342,7 +26216,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/386> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Richika> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/4> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -26486,7 +26359,7 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/1041> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vasudeva> ;
-  mbh:narratee <http://example.org/mbh/e/Indras> ;
+  mbh:narratee <http://example.org/mbh/e/Yudhishthira> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/14> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -26777,7 +26650,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/2420> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/23> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -26790,7 +26662,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/2424> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/23> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -26852,7 +26723,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/2611> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/25> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -27406,7 +27276,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/4304> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Chyavana> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/51> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -27917,7 +27786,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/7005> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/86> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -28484,7 +28352,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/7789> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Renuka> ;
-  mbh:narratee <http://example.org/mbh/e/Renuka> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/97> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -28715,7 +28582,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/8305> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Goutama> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/105> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -28916,7 +28782,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/9268> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Bhishma> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/112> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -28929,14 +28794,12 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/9277> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "1"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/112> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
 
 <http://example.org/mbh/g/telling/13_Anushasana/9277> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Brihaspati> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/112> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -29161,7 +29024,6 @@
 
 <http://example.org/mbh/g/telling/13_Anushasana/10364> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Maheshvara> ;
-  mbh:narratee <http://example.org/mbh/e/Maheshvara> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/13_Anushasana/127> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -29596,7 +29458,6 @@
 
 <http://example.org/mbh/g/telling/14_Ashvamedhika/41> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vidura> ;
-  mbh:narratee <http://example.org/mbh/e/Kounteya> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/14_Ashvamedhika/1> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -29633,7 +29494,6 @@
 
 <http://example.org/mbh/g/telling/14_Ashvamedhika/125> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Yudhishthira> ;
-  mbh:narratee <http://example.org/mbh/e/Partha> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/14_Ashvamedhika/3> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -29751,7 +29611,6 @@
 
 <http://example.org/mbh/g/telling/14_Ashvamedhika/337> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Samvarta> ;
-  mbh:narratee <http://example.org/mbh/e/Avikshit> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/14_Ashvamedhika/7> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -29764,7 +29623,6 @@
 
 <http://example.org/mbh/g/telling/14_Ashvamedhika/376> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Brihaspati> ;
-  mbh:narratee <http://example.org/mbh/e/Brihaspati> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/14_Ashvamedhika/9> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -29834,7 +29692,6 @@
 
 <http://example.org/mbh/g/telling/14_Ashvamedhika/404> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Agni> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/14_Ashvamedhika/9> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -29865,7 +29722,6 @@
 
 <http://example.org/mbh/g/telling/14_Ashvamedhika/425> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Agni> ;
-  mbh:narratee <http://example.org/mbh/e/Jataveda> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/14_Ashvamedhika/9> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -29946,7 +29802,6 @@
 
 <http://example.org/mbh/g/telling/14_Ashvamedhika/527> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Samvarta> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "2"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/14_Ashvamedhika/10> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -30209,7 +30064,6 @@
 
 <http://example.org/mbh/g/telling/14_Ashvamedhika/3033> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Vaishampayana> ;
-  mbh:narratee <http://example.org/mbh/e/Krishna> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/14_Ashvamedhika/50> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -30552,7 +30406,6 @@
 
 <http://example.org/mbh/g/telling/14_Ashvamedhika/4121> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Krishna_Dvaipayana> ;
-  mbh:narratee <http://example.org/mbh/e/Indra> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/14_Ashvamedhika/71> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -30578,7 +30431,6 @@
 
 <http://example.org/mbh/g/telling/14_Ashvamedhika/4302> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/King_Vajradatta> ;
-  mbh:narratee <http://example.org/mbh/e/Kouravya> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/14_Ashvamedhika/75> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .
@@ -31052,7 +30904,6 @@
 
 <http://example.org/mbh/g/telling/16_Mausala/302> a mbh:Telling ;
   mbh:narrator <http://example.org/mbh/e/Krishna> ;
-  mbh:narratee <http://example.org/mbh/e/Partha> ;
   mbh:diegeticDepth "0"^^xsd:integer ;
   mbh:inPassage <http://example.org/mbh/p/16_Mausala/7> ;
   mbh:citedAtChapterLevel "true"^^xsd:boolean .

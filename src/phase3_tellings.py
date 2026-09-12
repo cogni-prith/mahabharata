@@ -56,6 +56,39 @@ def strip_possessives(text):
     return POSS_PL.sub("s\u0000", text)
 
 
+# "O Indra among men" is a form of address meaning "foremost of men" and is not
+# the god Indra. "O Gandhari's son" names the addressee's parent, not the
+# addressee. Both were read as narratees and both were wrong.
+EPITHET_HEAD = re.compile(r"\bO\s+[A-Z][a-z]+(?:\s+among\b|\u0000s\b)")
+
+
+def narratee_of(text, start, narrator):
+    """The vocative addressee of this speech frame, or None.
+
+    Searched forward from the speech verb and stopped at the next open quote,
+    because a vocative inside an embedded speech belongs to the embedded
+    speaker. Taking the first vocative in the sentence attributed "O Damayanti"
+    to the outer narrator Brihadashva when Parnada said it.
+    """
+    # The quote mark right after the speech verb opens this frame, so it is not
+    # an embedded speech and the search starts inside it.
+    head = text[start:start + 4]
+    for i, ch in enumerate(head):
+        if ch in OPEN_Q:
+            start += i + 1
+            break
+    stop = min((text.find(c, start) for c in OPEN_Q if text.find(c, start) >= 0),
+               default=len(text))
+    window = text[start:stop]
+    for m in VOCATIVE.finditer(window):
+        if EPITHET_HEAD.match(window, m.start()):
+            continue
+        if m.group(1) == narrator:
+            continue          # self-address; the vocative is the other turn's
+        return m.group(1)
+    return None
+
+
 def extract(df):
     """Depth is the count of open quote marks preceding the speech opener."""
     tellings, stats = [], collections.Counter()
@@ -79,13 +112,13 @@ def extract(df):
                 depth = 0
             if depth > 6:
                 stats["depth_over_6"] += 1
-            voc = VOCATIVE.search(text)
+            voc = narratee_of(text, m.end(), m.group(1))
             tellings.append({
                 "parva": r.parva,
                 "adhyaya_ordinal": None if pd.isna(r.adhyaya_ordinal) else int(r.adhyaya_ordinal),
                 "sent_id": int(r.sent_id),
                 "narrator": m.group(1),
-                "narratee": voc.group(1) if voc else None,
+                "narratee": voc,
                 "depth": int(depth),
                 "cited": bool(r.chapter_cited),
             })

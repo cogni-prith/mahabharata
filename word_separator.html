@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentence/Word Splitter</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:#1a1208;
+  --parchment:#f5efd4;
+  --parchment3:#e4d8a8;
+  --gold:#b8862a;
+  --gold3:#f0c860;
+  --navy:#1a2845;
+  --crimson:#8b1a1a;
+  --muted:#7a6a45;
+  --border:#c8b07a;
+  --shadow:rgba(26,18,8,0.18);
+
+  --font-display:Georgia,'Times New Roman',serif;
+  --font-mono:Menlo,Consolas,'Courier New',monospace;
+}
+
+body{
+  font-family:var(--font-mono);
+  background:var(--parchment);
+  color:var(--ink);
+  min-height:100vh;
+}
+
+.header{
+  background:var(--navy);
+  border-bottom:3px solid var(--gold);
+  padding:1.1rem 2rem;
+}
+.header h1{
+  font-family:var(--font-display);
+  font-size:1.15rem;
+  font-weight:700;
+  letter-spacing:0.03em;
+  color:var(--gold3);
+}
+.header p{
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  color:rgba(240,200,96,0.6);
+  margin-top:3px;
+}
+
+.main{max-width:1100px;margin:0 auto;padding:1.8rem 1.6rem 6rem;}
+
+.upload-zone{
+  background:rgba(255,255,255,0.5);
+  border:1.5px dashed var(--border);
+  border-radius:6px;
+  padding:1.4rem;
+  text-align:center;
+  margin-bottom:1.3rem;
+}
+.upload-zone p{font-size:0.72rem;color:var(--muted);margin-bottom:0.7rem;}
+input[type="file"]{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+}
+
+.btn{
+  background:var(--navy);
+  color:var(--gold3);
+  border:1.5px solid var(--gold);
+  border-radius:4px;
+  padding:0.65rem 1.4rem;
+  font-family:var(--font-display);
+  font-size:0.74rem;
+  font-weight:700;
+  letter-spacing:0.06em;
+  cursor:pointer;
+  text-transform:uppercase;
+}
+.btn:hover{background:#2a3a5c;}
+.btn:disabled{opacity:0.35;cursor:not-allowed;}
+
+#status{
+  font-size:0.68rem;
+  color:var(--muted);
+  margin-bottom:1rem;
+  min-height:1em;
+}
+#status.err{color:var(--crimson);}
+
+.stats-row{
+  display:flex;gap:0.7rem;margin-bottom:1.2rem;flex-wrap:wrap;
+}
+.stat-card{
+  background:rgba(255,255,255,0.5);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:0.6rem 0.95rem;
+}
+.stat-label{font-size:0.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+.stat-value{font-family:var(--font-display);font-size:1.2rem;font-weight:700;}
+
+.tip-box{
+  background:rgba(184,134,42,0.08);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:0.7rem 0.95rem;
+  font-size:0.68rem;
+  color:var(--muted);
+  margin-bottom:1.2rem;
+  line-height:1.5;
+}
+.tip-box b{color:var(--ink);}
+
+.table-wrap{
+  background:rgba(255,255,255,0.4);
+  border:1.5px solid var(--border);
+  border-radius:6px;
+  overflow:hidden;
+  box-shadow:0 2px 14px var(--shadow);
+  max-height:480px;
+  overflow-y:auto;
+}
+table{width:100%;border-collapse:collapse;}
+thead th{
+  background:var(--parchment3);
+  text-align:left;
+  padding:0.55rem 0.8rem;
+  font-size:0.62rem;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  color:var(--muted);
+  border-bottom:2px solid var(--border);
+  position:sticky;top:0;
+}
+tbody td{
+  padding:0.4rem 0.8rem;
+  font-size:0.74rem;
+  border-bottom:1px solid rgba(200,176,122,0.35);
+  vertical-align:top;
+}
+.col-no{width:3.5rem;color:var(--muted);font-size:0.65rem;}
+.col-sentence{
+  width:50%;
+  font-family:var(--font-display);
+  font-style:italic;
+  border-left:3px solid var(--gold);
+}
+.col-word{font-weight:700;}
+.col-tag{color:var(--muted);font-style:italic;}
+
+.empty-state{
+  text-align:center;
+  padding:3rem 1rem;
+  color:var(--muted);
+  font-family:var(--font-display);
+  font-style:italic;
+  font-size:0.85rem;
+}
+
+.download-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--navy);
+  border-top:3px solid var(--gold);
+  padding:0.85rem 2rem;
+  display:flex;align-items:center;justify-content:center;gap:1rem;
+}
+.download-bar span{font-size:0.65rem;color:rgba(240,200,96,0.7);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Sentence / Word Splitter</h1>
+  <p>Load cleaned verses &middot; auto-split into word rows &middot; download CSV</p>
+</div>
+
+<div class="main">
+
+  <div class="upload-zone">
+    <p>Upload the cleaned output from <b>preprocess_pdf.py</b> &mdash; either the .json file it produces, or a plain .txt file with one sentence per line.</p>
+    <input type="file" id="file-input" accept=".json,.txt">
+  </div>
+
+  <div id="status"></div>
+
+  <div class="stats-row" id="stats-row" style="display:none;">
+    <div class="stat-card"><div class="stat-label">Sentences</div><div class="stat-value" id="stat-sentences">0</div></div>
+    <div class="stat-card"><div class="stat-label">Words</div><div class="stat-value" id="stat-words">0</div></div>
+  </div>
+
+  <div class="tip-box" id="tip-box" style="display:none;">
+    The CSV already includes an empty <b>tag</b> column. In Google Sheets: select that column &rarr;
+    <b>Data &rarr; Data validation</b> &rarr; Criteria: <b>Dropdown</b> (or "List of items") &rarr;
+    paste in your tag list (O, B-PERSON, I-PERSON, B-GPE, I-GPE, B-DYNASTY, I-DYNASTY, B-WEAPON, I-WEAPON,
+    B-CONCEPT, I-CONCEPT, B-EVENT, I-EVENT, B-SACRED_TEXT, I-SACRED_TEXT, B-NORP, I-NORP) &rarr; Done.
+  </div>
+
+  <div class="table-wrap">
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th class="col-no">#</th>
+          <th class="col-sentence">Sentence</th>
+          <th class="col-word">Word</th>
+          <th class="col-tag">Tag</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr><td colspan="4"><div class="empty-state">Upload a file above to begin.</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="download-bar" id="download-bar" style="display:none;">
+  <button class="btn" id="btn-download">Download CSV</button>
+  <span id="download-hint"></span>
+</div>
+
+<script>
+// sentences: [{ seqNo, sentence, words: [string, string, ...] }]
+let sentences = [];
+
+document.getElementById('file-input').addEventListener('change', handleFileUpload);
+document.getElementById('btn-download').addEventListener('click', downloadCSV);
+
+async function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const statusEl = document.getElementById('status');
+  statusEl.className = '';
+  statusEl.textContent = `Reading ${file.name}…`;
+
+  try {
+    const text = await file.text();
+    let rawSentences;
+
+    if (file.name.toLowerCase().endsWith('.json')) {
+      const parsed = JSON.parse(text);
+      if (!Array.isArray(parsed)) {
+        throw new Error('Expected a JSON array of sentence strings.');
+      }
+      rawSentences = parsed;
+    } else {
+      rawSentences = text.split('\n');
+    }
+
+    rawSentences = rawSentences.map(s => String(s).trim()).filter(s => s.length > 0);
+
+    if (rawSentences.length === 0) {
+      throw new Error('No sentences found in this file.');
+    }
+
+    buildSentenceModel(rawSentences);
+    renderTable();
+    updateStats();
+
+    statusEl.textContent = `Loaded ${sentences.length} sentences — ready to download.`;
+    document.getElementById('stats-row').style.display = 'flex';
+    document.getElementById('tip-box').style.display = 'block';
+    document.getElementById('download-bar').style.display = 'flex';
+
+  } catch (err) {
+    statusEl.className = 'err';
+    statusEl.textContent = `Could not load file: ${err.message}`;
+    console.error(err);
+  } finally {
+    e.target.value = '';
+  }
+}
+
+// Splits each sentence into individual words. The trailing period
+// (preserved by preprocess_pdf.py as the sentence boundary) is stripped
+// before splitting, so it never shows up as its own word row — the full
+// sentence text (with its period) is still kept for the Sentence column
+// and the CSV export.
+function buildSentenceModel(rawSentences) {
+  sentences = rawSentences.map((sentence, i) => {
+    const withoutTrailingPeriod = sentence.endsWith('.')
+      ? sentence.slice(0, -1)
+      : sentence;
+    const words = withoutTrailingPeriod
+      .split(/\s+/)
+      .filter(w => w.length > 0);
+
+    return { seqNo: i + 1, sentence, words };
+  });
+}
+
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  const rowsHtml = [];
+
+  sentences.forEach(group => {
+    group.words.forEach((word, wIdx) => {
+      rowsHtml.push(`
+        <tr>
+          ${wIdx === 0
+            ? `<td class="col-no" rowspan="${group.words.length}">#${group.seqNo}</td>
+               <td class="col-sentence" rowspan="${group.words.length}">${escapeHtml(group.sentence)}</td>`
+            : ''
+          }
+          <td class="col-word">${escapeHtml(word)}</td>
+          <td class="col-tag">&mdash;</td>
+        </tr>
+      `);
+    });
+  });
+
+  tbody.innerHTML = rowsHtml.join('');
+}
+
+function updateStats() {
+  let totalWords = 0;
+  sentences.forEach(group => totalWords += group.words.length);
+
+  document.getElementById('stat-sentences').textContent = sentences.length;
+  document.getElementById('stat-words').textContent = totalWords;
+  document.getElementById('download-hint').textContent =
+    `${totalWords} word${totalWords === 1 ? '' : 's'} across ${sentences.length} sentence${sentences.length === 1 ? '' : 's'}`;
+}
+
+// Same CSV-escaping rule used in validator.html: only quote a field
+// (and double any embedded quotes) when it actually contains a comma,
+// quote, or newline — keeps the file clean for fields that don't need it.
+function csvEscape(value) {
+  const str = value === null || value === undefined ? '' : String(value);
+  if (/[",\n]/.test(str)) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function downloadCSV() {
+  // The "tag" column header is present but every cell is left blank —
+  // ready for a dropdown/data-validation rule to be applied to it
+  // directly in Google Sheets, rather than this tool making any tagging
+  // decisions itself.
+  let csv = 'sentence_no,sentence,word,tag\n';
+
+  sentences.forEach(group => {
+    group.words.forEach(word => {
+      csv += [
+        csvEscape(group.seqNo),
+        csvEscape(group.sentence),
+        csvEscape(word),
+        ''
+      ].join(',');
+      csv += '\n';
+    });
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'word_split.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>

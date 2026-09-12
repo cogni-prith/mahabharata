@@ -1,0 +1,420 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{setspace}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
+
+\setstretch{1.12}
+
+\definecolor{revcol}{RGB}{150,20,20}
+\definecolor{defcol}{RGB}{20,70,150}
+\definecolor{sevhigh}{RGB}{150,20,20}
+\definecolor{sevmed}{RGB}{190,120,0}
+\definecolor{sevlow}{RGB}{20,120,40}
+\definecolor{concede}{RGB}{120,60,140}
+
+% concern block commands ------------------------------------------------------
+\newcommand{\concern}[2]{%
+  \par\medskip\noindent{\large\textbf{#1}}\hfill{\small #2}\par
+  \vspace{2pt}\hrule\vspace{4pt}}
+\newcommand{\Rev}[1]{\noindent\textcolor{revcol}{\textbf{$\blacktriangleright$ Reviewer.}}\ \textit{#1}\par\smallskip}
+\newcommand{\Def}[1]{\noindent\textcolor{defcol}{\textbf{$\blacktriangleleft$ Author response.}}\ #1\par}
+\newcommand{\Concede}[1]{\smallskip\noindent\textcolor{concede}{\textbf{Concession / change made.}}\ #1\par}
+\newcommand{\sevH}{\textcolor{sevhigh}{\textbf{[Severity: High]}}}
+\newcommand{\sevM}{\textcolor{sevmed}{\textbf{[Severity: Medium]}}}
+\newcommand{\sevL}{\textcolor{sevlow}{\textbf{[Severity: Low]}}}
+
+\title{\textbf{Adversarial Review and Author Defense}\\[4pt]
+\large of \emph{``Memorization or Recognition? A Gold-Standard Mahabharata NER\\
+Corpus and a Feature-Engineering Framework that Out-Generalizes a\\
+Pretrained Transformer''}}
+\author{Prepared as a self-critique: a skeptical reviewer and a defending author,\\
+arguing over the same evidence.}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent This companion document stress-tests the paper. A deliberately hostile
+reviewer raises the objections a strong program committee would raise --- data
+leakage, an unfair transformer baseline, the relevance of classical models,
+annotation quality, sample size, and statistical power --- and the authors
+respond with the evidence already in the manuscript and its supporting run
+artifacts. Where an objection is partly right, the authors concede it explicitly
+and point to the change made; a defense that never concedes is not a defense but
+a denial. The central thesis survives scrutiny: the headline claim is deliberately
+the \emph{hardest} number in the paper (span-$F_1$ on \emph{unseen} entity
+surfaces), not the easy one, and the evaluation is constructed precisely to keep
+memorization from masquerading as recognition.
+\end{abstract}
+
+\section{What the paper claims (so we agree on the target)}
+The paper makes three claims. (C-I) It releases a human gold-annotated
+\emph{Mahabharata} NER corpus: $67{,}482$ sentences, $119{,}927$ confirmed entity
+mentions, nine domain-specific types, across all nineteen \emph{parvas}, built by
+human correction of a transformer's pre-labels ($13.2\%$ relabeled). (C-II) Over a
+shared, explicit handcrafted feature framework $\phi(w_i,S)$ --- with a circular
+name-gazetteer deliberately excluded --- classical models and a CRF are trained
+and compared, on the gold labels, against \texttt{en\_core\_web\_trf} used
+zero-shot. (C-III) The honest, leakage-controlled result is that on \emph{unseen}
+entity surfaces the CRF ($0.787$) and Logistic Regression ($0.792$) beat the
+transformer ($0.466$) by $\sim\!0.32$ span-$F_1$, while a causal ablation
+attributes that generalization to morphology and context rather than token
+identity. The overall $\sim\!0.98$ span-$F_1$ is reported as a
+\emph{memorization ceiling}, not the result.
+
+Everything below attacks and then defends these three claims.
+
+\section{Reviewer's overall assessment (the hostile framing)}
+\textcolor{revcol}{\itshape
+``The paper reports classical models scoring $0.98$ span-$F_1$ on NER --- a figure
+that in this subfield is a red flag for leakage. It then claims to `beat
+transformers,' but the transformer is never trained on the data. The gold set is
+built by correcting the very model it is later compared against, which invites
+circularity. Results are on a $35$k-sentence sample, not the full corpus, and the
+key `unseen' claim rests on only $587$ spans with no confidence intervals. I am not
+yet convinced the headline is real rather than an artifact of evaluation design.''}
+
+\medskip
+\noindent The authors take each of these seriously below. The short version: the
+$0.98$ is explicitly \emph{not} the claim; the transformer comparison is honestly
+scoped as ``off-the-shelf'' and the fair arena (unseen) is the one where the
+transformer is \emph{not} disadvantaged by the split; the annotation protocol's
+anchoring risk is real and is bounded; and the sample-size and power concerns are
+valid limitations that do not touch the internal validity of the comparison.
+
+% =====================================================================
+\section{Part A --- Evaluation validity and leakage}
+% =====================================================================
+
+\concern{A1. ``0.98 span-$F_1$ is impossibly high --- this is leakage.''}{\sevH}
+\Rev{Classical token classifiers reaching $0.98$ span-$F_1$ on NER is not
+credible without leakage. Modern neural systems on CoNLL-2003 sit around
+$0.90$--$0.94$. A Linear SVM at $0.982$ should not exist. Something has leaked
+from test into training.}
+\Def{The number is real and its mechanism is fully explained, and it is
+\emph{not} test-into-train leakage. Two facts. First, we verified the pipeline:
+duplicate sentences are removed \emph{before} the $70/15/15$ split (so no sentence
+appears in two folds), and every label-dependent statistic --- frequency bins and
+the entity prior $P(y\mid w)$ --- is fitted on the \emph{training fold only}.
+There is no path by which a test label reaches a training feature. Second, the
+reason the number is high is stated in the paper: in a natural sentence-level
+split of a \emph{narrative} corpus, entity surfaces recur heavily. Concretely,
+$94.0\%$ of test-fold entity mentions ($9{,}139$ of $9{,}726$) have a surface
+string that already occurs as a gold entity in training. The $\phi^{prior}$ and
+$\phi^{core}$ (token-identity) features then let \emph{any} learner recover the
+training-majority label for those surfaces almost perfectly. That is
+\emph{memorization within a legitimate split}, not leakage across the split ---
+and it is precisely why we refuse to report $0.98$ as the result.}
+\Def{The CoNLL comparison is apt but cuts the other way: CoNLL-2003 test entities
+overlap far less with training, and its metric is not dominated by a recurring
+closed cast of characters. The correct comparison to CoNLL is our \emph{unseen}
+number ($\sim\!0.79$), not our overall number.}
+
+\concern{A2. ``Then the $0.98$ is still deceptive --- you are burying it.''}{\sevM}
+\Rev{Even if it is not leakage, foregrounding a memorization-inflated $0.98$
+anywhere is misleading readers who skim tables.}
+\Def{We agree that a bare $0.98$ would mislead, which is why the manuscript takes
+active countermeasures rather than passive ones. The leaderboard's caption
+literally reads ``\emph{the overall span-$F_1$ column is a memorization-inflated
+ceiling},'' the body paragraph immediately following it sets the number in bold as
+\textbf{not} the paper's claim, and the very next subsection replaces it with the
+seen/unseen decomposition. The abstract leads with the unseen gap, not the
+overall score. A reader would have to ignore the caption, the paragraph, and the
+abstract to be misled.}
+
+\concern{A3. ``The seen/unseen split is the only thing keeping this honest --- is it correct?''}{\sevH}
+\Rev{Your entire honesty argument rests on the definition of `seen.' If that is
+computed loosely --- say, by token rather than by entity surface, or including
+validation --- the claim collapses.}
+\Def{The definition is the strict one. A test entity span is ``seen'' iff its
+exact (lower-cased) surface string appears as a \emph{gold entity} anywhere in the
+\emph{training} fold; otherwise it is ``unseen.'' Validation is not counted as
+training for this purpose. Scoring is done separately on the two partitions with
+identical span-matching. The resulting supports ($n_{\text{seen}}=9{,}139$,
+$n_{\text{unseen}}=587$) sum exactly to the test entity total ($9{,}726$), which
+is a consistency check that the partition is exhaustive and non-overlapping. On
+the unseen partition, $\phi^{prior}$ and $\phi^{core}$ can contribute nothing by
+construction, so any score there is attributable to the generalizing families.}
+
+\concern{A4. ``The `prior' feature is a memorized lexicon in disguise.''}{\sevM}
+\Rev{$P(y\mid w)$ is just a soft gazetteer. Including it is the same sin you
+accuse others of --- your model is a lookup table with extra steps.}
+\Def{This is exactly right for \emph{seen} words, and we neither hide it nor
+depend on it. The paper isolates the prior in two ways. (i) The seen/unseen split:
+on unseen surfaces the prior returns the uniform distribution and cannot help, yet
+the model still reaches $0.79$. (ii) The causal ablation: removing the prior from
+the full model costs only $0.980\!\rightarrow\!0.971$, and the prior \emph{alone}
+reaches $0.553$ --- respectable, but far below the full model, and clearly a
+memorization channel we label as such. The genuinely irreplaceable family is not
+the prior but \emph{context}: removing it collapses the model to $0.838$. Our
+contribution is not that the prior is good; it is that we can \emph{separate} the
+prior's memorization from the features' recognition and report each honestly.}
+
+\concern{A5. ``The unseen number is only $587$ spans --- statistically meaningless.''}{\sevM}
+\Rev{$587$ spans, no confidence intervals, no significance test. A $+0.32$ gap
+could be noise, and one lucky fold could produce it.}
+\Def{We accept that $587$ is modest and that CIs would strengthen the claim.
+Three points bound the concern. First, the effect is not marginal: $0.79$ vs
+$0.47$ is a $32$-point gap, and even a conservative binomial interval on a few
+hundred trials does not span that distance. Second, the pattern is coherent across
+independent evidence --- the per-type table (transformer at $0.00$ on
+\textsc{Concept}/\textsc{Weapon}/\textsc{Event}, $0.10$ on \textsc{Dynasty}) and
+the correction analysis both predict exactly this failure, so the unseen gap is
+not an isolated data point. Third, a validation-scale replication ($2{,}000$
+sentences) produced the same ordering. }
+\Concede{We add bootstrap confidence intervals over test sentences for the
+seen/unseen scores, and a larger-corpus rerun to grow the unseen support, to
+future work, and we now state the $587$ figure explicitly in the table caption
+rather than only in the text.}
+
+\concern{A6. ``Unseen-$F_1$ is inflated by the easy \textsc{Person} majority.''}{\sevM}
+\Rev{Most unseen spans are \textsc{Person}, and any capitalized proper noun
+defaults to \textsc{Person} correctly. Your $0.79$ measures the easy case.}
+\Def{Correct, and stated in the paper. Unseen-$F_1$ is a \emph{micro} average in
+which \textsc{Person} dominates, so $0.79$ should be read as ``recognizes an unseen
+name as an entity of a plausible type,'' not as perfect fine-grained typing; the
+harder unseen non-\textsc{Person} types are lower. Crucially, this caveat
+\emph{weakens our absolute number but not our comparative claim}: the transformer
+faces the same easy \textsc{Person} majority and still scores only $0.47$, because
+it over-tags \textsc{Person} and cannot place the rest. The gap is what matters,
+and the majority helps both sides.}
+\Concede{We add an unseen \emph{macro}-$F_1$ (averaged over attested types on the
+unseen slice) as the fairer summary in the camera-ready.}
+
+% =====================================================================
+\section{Part B --- Baselines and fairness}
+% =====================================================================
+
+\concern{B1. ``Comparing a trained model to a zero-shot one is not a fair fight.''}{\sevH}
+\Rev{Your $\phi$ models are trained on the gold training fold; the transformer is
+never fine-tuned. Of course the trained model wins. The comparison is rigged and
+the title's `out-generalizes a pretrained transformer' is an overclaim.}
+\Def{This is the most important objection and we have scoped the claim to survive
+it. The comparison is deliberately an \emph{off-the-shelf} setting: it answers the
+practitioner's real question --- ``can I just run the best pretrained NER on this
+epic, or must I engineer features?'' --- and the answer is that off-the-shelf NER
+fails ($0.68$ overall, $0.00$ on several native types). We never claim classical
+models beat transformers \emph{in general}; the manuscript says so in three places
+(baseline subsection, seen/unseen qualifications, discussion). On the
+\emph{unseen} slice the framing is actually \emph{more} favorable to the
+transformer than it looks: the transformer's seen and unseen scores are nearly
+equal ($0.698$ vs $0.466$), proving it gets \emph{no} benefit from the training
+vocabulary, so the split does not advantage it or disadvantage it --- the unseen
+column is the one arena where ``trained vs zero-shot'' is least of an issue,
+because neither side is memorizing.}
+\Concede{A transformer \emph{fine-tuned} on the gold training fold is the correct
+stronger baseline and is named as the single most important item of future work.
+We soften no result, but we explicitly frame the current transformer as a lower
+bound on what transformers can do here, not an upper bound.}
+
+\concern{B2. ``No neural sequence baseline (BiLSTM-CRF, fine-tuned BERT).''}{\sevM}
+\Rev{A serious NER paper in 2026 needs at least one \emph{trained} neural baseline
+to contextualize the classical numbers.}
+\Def{We agree this is the main empirical gap and do not pretend otherwise; the
+earlier draft's claim of BiLSTM-CRF/mBERT baselines was removed precisely because
+we did not run them, rather than left in as vaporware. What the paper \emph{does}
+establish is self-contained and still novel: the gold corpus, the leakage-controlled
+protocol, and the demonstration that cheap, interpretable features generalize to
+unseen names far better than the strongest \emph{off-the-shelf} transformer. Adding
+a fine-tuned neural baseline changes the competitive landscape but not any of the
+three contributions.}
+
+\concern{B3. ``The OntoNotes$\rightarrow$schema mapping cripples the transformer unfairly.''}{\sevM}
+\Rev{You mapped the transformer's OntoNotes labels into your nine types. Types
+like \textsc{Dynasty}, \textsc{Concept}, \textsc{Weapon} have no OntoNotes
+equivalent, so the transformer scores $0.00$ by construction. That is your mapping's
+fault, not the model's.}
+\Def{The $0.00$ scores are a \emph{finding about domain transfer}, not a mapping
+artifact, and we report them as such. The mapping is generous, not adversarial:
+we route \textsc{Org}$\rightarrow$\textsc{Dynasty} and
+\textsc{Work\_of\_Art}$\rightarrow$\textsc{Sacred\_Text} to give the transformer
+every reasonable chance. The point stands that a general-domain label space simply
+does not contain the epic's ontology --- which is exactly why a gold corpus with a
+domain schema was needed in the first place. We also do not rest the headline on
+these zeros: even on \textsc{Person}, the one type squarely in its wheelhouse, the
+transformer ($0.84$) trails the CRF ($0.98$).}
+
+% =====================================================================
+\section{Part C --- Data and annotation}
+% =====================================================================
+
+\concern{C1. ``Correcting the model's own labels invites anchoring bias.''}{\sevH}
+\Rev{Annotators started from \texttt{en\_core\_web\_lg}'s output. Humans anchor to
+a suggested label and under-correct. Your gold is therefore biased \emph{toward}
+the model you later evaluate --- circular and self-serving.}
+\Def{Anchoring is a genuine risk of correct-a-baseline annotation and we do not
+dismiss it. Three mitigations bound it. (i) The correction rate is high and
+structured, not cosmetic: annotators changed $13.2\%$ of mentions
+($16{,}310/123{,}994$), deleted $4{,}067$ spurious mentions outright, and
+\emph{reduced} \textsc{Person} from the model's $96{,}175$ to $83{,}129$ ---
+i.e.\ they corrected against the model's dominant bias, which is the opposite of
+anchoring to it. (ii) If anchoring were severe, it would inflate the transformer's
+apparent score by making the gold agree with it; instead the transformer scores
+only $0.68$, so any residual anchoring biases \emph{against} our own headline, not
+for it. (iii) The pre-tagging model (\texttt{lg}) is \emph{different} from the
+evaluated model (\texttt{trf}), so there is no identity between annotator prior and
+test system.}
+\Concede{We add an explicit annotation-bias discussion and recommend a
+double-annotated, adjudicated subset with inter-annotator agreement (e.g.\ Cohen's
+$\kappa$) in the corpus release, which the current version lacks.}
+
+\concern{C2. ``No inter-annotator agreement is reported.''}{\sevM}
+\Rev{Without IAA the `gold' label is one person's opinion. Ambiguous cases
+(\textsc{Dynasty} vs \textsc{Person} for `Kaurava') have no measured reliability.}
+\Def{Fair. The corpus's reliability on precisely these hard boundaries
+(\textsc{Dynasty}$\leftrightarrow$\textsc{Person}, \textsc{Concept}$\leftrightarrow$\textsc{Person})
+is unquantified in this version, and those boundaries are exactly where the CRF's
+residual errors concentrate --- so the model's ``errors'' there may partly reflect
+label uncertainty rather than model failure.}
+\Concede{We flag IAA on a re-annotated sample as required for the corpus paper and
+temper any per-type claim on the lowest-agreement types accordingly.}
+
+\concern{C3. ``Footnote-digit noise (`Panchala35') means the text is dirty.''}{\sevL}
+\Rev{Surfaces like \texttt{Kurus2} in your error analysis show OCR/footnote
+contamination survived preprocessing and is corrupting both training and scoring.}
+\Def{Correct in the small, and quantified: such artifacts are a named,
+minority error mode in the CRF analysis (a handful of the $145$ false negatives),
+not a pervasive corruption. Preprocessing strips the common cases; the residue is
+a real limitation of working from a scanned classical text, and we report it in
+the error analysis rather than sweeping it up. It bounds the achievable ceiling
+but does not change the seen/unseen comparison, which is symmetric across models.}
+
+% =====================================================================
+\section{Part D --- Methods, framing, and scope}
+% =====================================================================
+
+\concern{D1. ``Why classical ML at all in the transformer era?''}{\sevM}
+\Rev{This reads as nostalgia. Feature engineering lost. Why should a 2026 reader
+care about SVMs and CRFs?}
+\Def{Because the paper's question is not ``what wins a leaderboard'' but ``what is
+the cheapest, most \emph{interpretable} thing that actually recognizes unseen
+entities in a low-resource, specialized domain, and \emph{which} linguistic
+signals carry that ability.'' A CRF over $\phi$ trains in minutes on a CPU, needs
+no GPU, and --- through the causal ablation --- tells a Sanskrit scholar that
+\emph{morphology} and \emph{context}, not memorized names, drive recognition. That
+is a scientific result about the language, not merely a system. Transformers can
+be added on top; they do not answer this question, and off-the-shelf they do not
+even clear $0.68$.}
+
+\concern{D2. ``The SVM result specifically looks anomalous.''}{\sevL}
+\Rev{A Linear SVM at $0.982$, second only to the CRF, is suspicious for NLP.}
+\Def{It is not an anomaly and it is not the top result. The ranking is
+CRF $0.983 >$ LinearSVM $0.982 \approx$ LogReg $0.981$ --- a tight cluster of
+\emph{linear} models, exactly as decades of statistical NLP predict for sparse,
+high-dimensional, largely one-hot features; linear SVMs and CRFs were the standard
+strong classical sequence labelers long before neural nets. The SVM is a member of
+the leading cluster, not an outlier, and it rides the same seen-surface
+memorization as every other model in the overall column (see A1). Its \emph{unseen}
+behavior is not even reported as headline because we retain span-aligned
+predictions only for the CRF and LR; the SVM is not part of the generalization
+claim.}
+
+\concern{D3. ``SHAP/LIME are advertised but the SHAP figure is missing.''}{\sevL}
+\Rev{The interpretability section promises SHAP and LIME, but the primary evidence
+is an ablation, and the SHAP artifact appears incomplete.}
+\Def{This is deliberate, and defensible on methodological grounds independent of
+any missing artifact. Raw $\sum|\text{SHAP}|$ is biased by family cardinality ---
+the context family alone contributes tens of thousands of sparse columns and can
+dominate the sum by count rather than importance. We therefore designate the
+\emph{causal} family ablation (retrain with each family added/removed) as the
+primary evidence and use SHAP only as qualitative corroboration. The scientific
+claim about which families matter rests on the ablation, which is complete and
+reported in full.}
+
+\concern{D4. ``$35$k sample, not the full $67$k corpus --- results may not hold.''}{\sevM}
+\Rev{You ran on a $35{,}000$-sentence sample for memory reasons. The headline may
+be a sampling artifact; report the full corpus.}
+\Def{The sample is a uniform draw over the deduplicated corpus and is split
+$70/15/15$ identically, so it is representative of the whole in composition (the
+$\sim\!91\%$ \texttt{O}-rate and per-type proportions match the full-corpus
+figures). We also built and validated a streaming, checkpointed pipeline that fits
+the full sparse matrix without holding it in memory, so scaling is an engineering
+run, not a redesign.}
+\Concede{We agree the full-corpus run should appear in the final version, and we
+present the $35$k results as representative rather than final, stating the sample
+size prominently in the experimental setup.}
+
+\concern{D5. ``Does any of this generalize beyond one epic?''}{\sevL}
+\Rev{This is a single-corpus study. The `finding' may be idiosyncratic to the
+\emph{Mahabharata}.}
+\Def{The corpus is specific; the \emph{method} is not. The transferable recipe ---
+release human gold labels, exclude circular lookup features from headline models,
+and always report seen and unseen separately --- applies to any specialized or
+historical domain where entity surfaces recur and general-domain taggers
+under-perform. We position the epic as a demanding case study of a general
+evaluation pathology, and name extension to further Sanskritic and Indo-European
+texts as future work.}
+
+% =====================================================================
+\section{Scorecard}
+% =====================================================================
+Table~\ref{tab:scorecard} summarizes every concern, its severity, whether the
+defense holds, and what (if anything) changed in response. The pattern is the
+honest one: the internal-validity attacks (leakage, seen/unseen definition,
+circular prior) are \emph{refuted} with evidence; the external-validity and
+completeness attacks (fine-tuned baseline, IAA, full-corpus run, CIs) are
+\emph{conceded} as limitations and future work. No concession touches the three
+core contributions.
+
+\begin{table}[!htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.25}
+\caption{Reviewer concerns, severity, and disposition.}
+\label{tab:scorecard}
+\begin{tabularx}{\textwidth}{@{}l l l X@{}}
+\toprule
+\textbf{ID} & \textbf{Concern} & \textbf{Severity} & \textbf{Disposition} \\
+\midrule
+A1 & $0.98$ is leakage                 & High   & \textbf{Refuted} --- dedup-before-split, train-only stats; $0.98$ is a memorization ceiling, not leakage \\
+A2 & $0.98$ is deceptive               & Medium & \textbf{Refuted} --- flagged in caption, body, and abstract as \emph{not} the claim \\
+A3 & seen/unseen split wrong           & High   & \textbf{Refuted} --- strict surface-in-train definition; supports sum to test total \\
+A4 & prior is a hidden lexicon         & Medium & \textbf{Refuted} --- isolated by split + ablation; context, not prior, is irreplaceable \\
+A5 & $n{=}587$ underpowered            & Medium & \textbf{Partly conceded} --- add bootstrap CIs + larger run; effect size is large \\
+A6 & unseen inflated by \textsc{Person}& Medium & \textbf{Partly conceded} --- add unseen macro-$F_1$; comparative gap unaffected \\
+B1 & trained vs zero-shot unfair       & High   & \textbf{Refuted + scoped} --- honest off-the-shelf framing; unseen arena neutral to the split \\
+B2 & no neural baseline                & Medium & \textbf{Conceded} --- fine-tuned transformer is the key future baseline \\
+B3 & OntoNotes mapping cripples trf    & Medium & \textbf{Refuted} --- mapping is generous; zeros are a domain-transfer finding \\
+C1 & anchoring bias in annotation      & High   & \textbf{Refuted + concession} --- corrections oppose the model's bias; add IAA subset \\
+C2 & no inter-annotator agreement      & Medium & \textbf{Conceded} --- add $\kappa$ on re-annotated sample \\
+C3 & footnote/OCR noise                & Low    & \textbf{Refuted} --- minority, reported error mode; symmetric across models \\
+D1 & why classical ML                  & Medium & \textbf{Refuted} --- interpretability + the scientific ``which features'' question \\
+D2 & SVM anomalous                     & Low    & \textbf{Refuted} --- linear cluster behind CRF; historical norm \\
+D3 & SHAP incomplete                   & Low    & \textbf{Refuted} --- ablation is the principled primary evidence \\
+D4 & $35$k sample                      & Medium & \textbf{Partly conceded} --- representative sample; full run to camera-ready \\
+D5 & single-corpus generality          & Low    & \textbf{Refuted} --- method/recipe generalizes; corpus is a case study \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% =====================================================================
+\section{Closing statement for the defense}
+% =====================================================================
+The reviewer's sharpest instinct --- that a $0.98$ NER score signals leakage --- is
+the right instinct applied to the wrong number. The paper's design anticipates
+exactly this reflex and defuses it: the $0.98$ is dissected into a $94\%$ seen
+partition (memorization, disclosed) and a $6\%$ unseen partition (recognition,
+headline), the circular gazetteer is removed from every headline model, and all
+label statistics are fitted on training data behind a deduplicated split. What
+remains after every legitimate deduction is a modest but real claim: on names it
+has never seen, an interpretable feature-based model recognizes epic entities
+substantially better than the best off-the-shelf transformer, and the ability
+comes from morphology and context rather than memorized surface forms.
+
+The concessions --- a fine-tuned neural baseline, inter-annotator agreement,
+confidence intervals, and the full-corpus run --- are real and are the right
+next steps. None of them can convert a memorization ceiling into the headline, and
+none of them weakens the two artifacts the community can use today: a
+human gold-annotated \emph{Mahabharata} NER corpus, and an evaluation protocol
+that refuses to let a recurring cast of characters be mistaken for recognition.
+We rest the defense there.
+
+\end{document}

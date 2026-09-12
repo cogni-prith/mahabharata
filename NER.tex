@@ -1,0 +1,919 @@
+%%%%%%%%%%%%%%%%%%%% NER.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% IEEE conference paper (IEEEtran, two-column conference format)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+% to typeset URLs, URIs, and DOIs
+\usepackage{url}
+
+\usepackage{graphicx}        % standard LaTeX graphics tool
+% when including figure files
+%\usepackage[bottom]{footmisc}% places footnotes at page bottom
+%\usepackage{subcaption}
+%\usepackage{subcaption}
+\usepackage{amsmath}
+%\usepackage[options ]{algorithm2e}
+%\usepackage{algorithm2e}
+%\usepackage{algorithm}
+%\usepackage{algorithmicx}
+%\usepackage{algpseudocode}
+% Packages
+\usepackage{amsmath, amssymb}
+%\usepackage{tikz}
+%\usetikzlibrary{shapes.geometric, arrows}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+
+% TikZ styles
+%\tikzstyle{process} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=blue!20]
+%\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!20]
+%\tikzstyle{arrow} = [thick,->,>=stealth]
+
+
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{corollary}{Corollary}[theorem]
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{definition}{Definition}
+%\definecolor{listinggray}{gray}{0.9}
+%\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
+%\lstset{language=C++, basicstyle=\small\sffamily, numberstyle=\tiny, stepnumber=1, frame=tb,columns=fullflexible, showstringspaces=false, backgroundcolor=\color{black!5},     basicstyle=\footnotesize,stringstyle=\color{red}, keywordstyle=\color[rgb]{0,0,1},commentstyle=\color{red}, identifierstyle=\ttfamily, stringstyle=\color[rgb]{0.627,0.126,0.941}, numberstyle=\color[rgb]{0.205, 0.142, 0.73}, }
+
+
+\makeatletter
+\def\munderbar#1{\underline{\sbox\tw@{$#1$}\dp\tw@\z@\box\tw@}}
+\makeatother
+
+\makeatletter
+\newcommand{\thickbar}{\mathpalette\@thickbar}
+\newcommand{\@thickbar}[2]{{#1\mkern1.5mu\vbox{
+			\sbox\z@{$#1\mkern-1.5mu#2\mkern-1.5mu$}%
+			\sbox\tw@{$#1\overline{#2}$}%
+			\dimen@=\dimexpr\ht\tw@-\ht\z@-.8\p@\relax
+			\hrule\@height.8\p@ % adjust for the desired rule thickness
+			\vskip\dimen@
+			\box\z@}\mkern1.5mu}
+}
+\makeatother
+
+
+\DeclareMathOperator{\Tr}{Tr}
+
+\begin{document}
+%
+\title{Memorization or Recognition? A Gold-Standard Mahabharata NER Corpus and a Feature-Engineering Framework that Out-Generalizes a Pretrained Transformer
+}
+%
+\author{
+\IEEEauthorblockN{Prithwish Ghosh, Rahul Singh, Swarup Kr Ghosh and Sayani Mondal}
+\IEEEauthorblockA{Department of Computer Science and Engineering, Sister Nivedita University,\\
+Kolkata, 700156, India}
+}
+
+\maketitle              % typeset the title of the contribution
+
+\begin{abstract}
+Named Entity Recognition (NER) models pre-trained on general-domain corpora perform poorly on specialised, transliterated literary texts such as the English \emph{Mahabharata}, and prior work on this corpus has scored models against silver, gazetteer-derived labels --- figures inflated both by the $\sim$91\% \texttt{O}-tag majority and by the circularity of the labels themselves. This paper makes two contributions. First, we release a \textbf{human gold-annotated Mahabharata NER corpus}: 67{,}482 sentences spanning all 19 \emph{parvas} and 119{,}927 entity mentions across nine domain-specific types. Annotators revised 13.2\% of a strong transformer's pre-labels; the corrections show that an off-the-shelf tagger over-predicts \textsc{Person} and cannot separate the dynasties, peoples and places central to the epic. Second, over a shared handcrafted feature framework $\phi(w_i,S)$ --- with a circular name-gazetteer held out to ablation --- we train classical token classifiers and a Conditional Random Field (CRF) and benchmark them on the gold labels against \texttt{en\_core\_web\_trf}, spaCy's best pretrained transformer NER. The CRF reaches span-$F_1$ $0.983$ versus the transformer's $0.679$; on genuinely \emph{unseen} entity surfaces it scores $0.79$ against $0.47$ --- a $+0.32$ generalisation gap --- while the near-perfect \emph{seen}-entity score ($0.996$) is reported separately as a memorisation ceiling, not as the headline. A leave-one-out ablation localises the transferable signal: removing context collapses span-$F_1$ from $0.98$ to $0.84$, and morphology alone reaches $0.69$, whereas token identity alone reaches only $0.22$. Feature engineering, not lexical memory, is what recognises unseen entities in the epic.
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+Named Entity Recognition (NER), Gold-Standard Corpus, Mahabharata NLP, Feature Engineering, Conditional Random Fields (CRF), Pretrained Transformer Baseline, Seen/Unseen Generalisation, Feature Ablation, Digital Humanities
+\end{IEEEkeywords}
+
+
+\section{Introduction}
+\label{sec-1}
+Named Entity Recognition (NER) is a cornerstone of modern NLP, serving as a first step for information extraction, knowledge-graph construction, and character-network analysis. Contemporary NER systems achieve high accuracy on newswire and web text, but their performance drops sharply on ancient, domain-specific literature, where vocabulary, entity inventory, and orthography diverge from the data on which they were trained. The English translation of the \emph{Mahabharata} is a demanding case: it is filled with transliterated Sanskrit names, dense genealogies, dynasties and peoples, sacred texts, mythological weapons, and abstract personifications, few of which appear in the web data behind pretrained models. Our initial tests confirmed the difficulty: a strong pretrained tagger reflexively labels almost every capitalised token \textsc{Person}, conflating dynasties (\emph{Kaurava}), peoples (\emph{Panchala}), and places (\emph{Hastinapura}) that the narrative treats as distinct. This raises a methodological question that has not been answered honestly for this corpus: \emph{on a specialised epic, does careful, interpretable feature engineering over classical models actually recognise entities better than an off-the-shelf transformer --- or does it merely memorise the names it has already seen?}
+
+Answering this requires two things prior work lacks. The first is a \textbf{gold standard}: earlier studies score models against silver labels produced by the very gazetteers or taggers being evaluated, so a high score can reflect lexicon replication rather than recognition. We therefore release a human-annotated gold corpus (Section~\ref{sec:dataset}) in which annotators corrected a transformer's pre-labels; the corrections themselves quantify where generic NER fails on the epic. The second is an \textbf{honest evaluation protocol}: because a closed-vocabulary feature model enjoys an unfair advantage on entity surfaces seen in training, we report every span-level score separately for \emph{seen} and \emph{unseen} entities, treating the seen number as a memorisation ceiling and the unseen number as the true measure of generalisation. Within this protocol we study a shared feature framework $\phi(w_i,S)$ (Section~\ref{sec:features}) that deliberately excludes any name-lookup gazetteer, feed it to classical token classifiers and a Conditional Random Field (Section~\ref{sec:models}), and benchmark against \texttt{en\_core\_web\_trf}, spaCy's strongest pretrained transformer, evaluated zero-shot on the gold labels. Because digital-humanities scholars need to know \emph{which} cue drove each decision, we complement the leaderboard with a causal feature-family ablation and SHAP/LIME attributions.
+
+Our contributions are:
+\begin{enumerate}
+    \item A \textbf{human gold-annotated Mahabharata NER corpus} --- 67{,}482 sentences, 119{,}927 mentions, nine entity types, all 19 \emph{parvas} --- with an analysis of the 13.2\% of transformer pre-labels that annotators corrected.
+    \item An explicit, reproducible \textbf{feature-engineering framework} $\phi(w_i,S)$ that keeps circular name-lookup features out of the headline models.
+    \item A \textbf{leakage-controlled evaluation} decomposing span-$F_1$ into seen and unseen entities: $\phi$-based models beat a strong pretrained transformer overall ($0.983$ vs.\ $0.679$) and by $+0.32$ span-$F_1$ on genuinely unseen names, with an ablation identifying morphology and context as the carriers of that generalisation.
+\end{enumerate}
+
+
+% \textcolor{red}{To write}
+% Inspired from Intuitionistic fuzzy set theory~\cite{Atanassov1999} and rough-fuzzy c-means~\cite{majir}, we have proposed an Intuitionistic fuzzy set based clustering method in the domain of multigranulation rough set (called IFSMR) to handle high dimensional and noisy data. The proposed clustering algorithm has been applied on microarray gene expression databases for human diabetes patient. The contributions of this paper can be summarized as follows:
+
+% \begin{itemize}
+% 	\item  We have designed an efficient intuitionistic fuzzy set based biomarker identification using multigranulation rough set in human diabetes (type-2) microarray gene expression data. The proposed model is used to better interpret the gene profiles in diabetes gene identification and provide an accurate judgment about diabetes in the treatment by a clinical expert without any subjective effort.
+	
+% 	\item  A new intuitionistic fuzzy-rough sets multigranulation has been adopted for gene identification and used rough fuzzy c-means clustering to minimizing the uncertainty of patterns selection and reduce the misclassification errors in microarray data classification. 
+	
+% %	\item  We combined together with the extracted outcomes from the complementary and original gene information by fuzzy rules that provide a small set of inference to enhanced classification performance for gene data via svm classifier. 
+	
+% 	\item  Experimental results and validation using F-score are demonstrated that the suggested model is efficient to identify genes from microarray database which are responsible for diabetes (type-2) in human body.
+% \end{itemize}
+
+% The rest of this paper is organized as follows: In Section 2, we brief preliminaries behind the proposed model. In Section 3, we present the designed scheme are described in details. In Section 4, we give empirical results and discussions. Conclusions and perspectives are given in Section 5.
+
+% \section{Preliminaries}
+% \label{sec:2}
+% \vspace{-2mm}
+% This section draws the general frameworks basic mathematical preliminaries of the proposed model and design issues of the proposed intuitionistic fuzzy set and multigranulation rough set based clustering (IFSMR) model to resolve clustering problem on gene expression data.
+
+% \subsection{Construction of Intuitionistic fuzzy set}
+% Let $\mathbf{G}$ be a gene expression matrix of size $M \times N$, having $x\in \Re$  can be viewed as an array of fuzzy singletons~\cite{Zadeh1965,Klir1995}, where $M$ and $N$ are the number of sample and gene identifier, respectively. Each element in the array is the membership value of the corresponding gene expression value. In fuzzy set theory, a gene expression microarray $\mathbf{G}$ is written as below:
+% \begin{equation}
+% \mathbf{X}=\left\lbrace \frac{\mu_{X}\left(x_{pq}\right)}{x_{pq}} ,~p=1,2,\cdots, M, q=1,2,\cdots,N\right\rbrace 
+% \end{equation}
+% where $\mu_{X} (x_{ij})$ denotes the membership of corresponding gene expression value $x_{pq}$ with respect to the sample and gene identifier of matrix $G$. 
+% %Several heuristic membership functions like `triangular', `trapezoidal', `Gaussian' etc are used to initialize the membership function $\mu_{X}$~\cite{Klir1995} in the fuzzification stage. 
+% Here, `Triangular' and `Gaussian' membership functions have been used to quantify the highest vagueness from microarray.
+% The triangular membership function computes fuzzy membership values using a given set of parameters. The triangular membership function $\mu_{X}(x;a,b,c)$ for each $x$ over parameters $(a,b,c|a\leq b\leq c)$ is defined as 
+% \begin{equation}\label{tri}
+% \mu_{X}(x;a,b,c)=\max\left(\min\left(\frac{x-a}{b-a},\frac{c-x}{c-b} \right), 0\right)
+% \end{equation}
+% where $(a,b,c|a\leq b\leq c)$ are parameters. This function computes fuzzy membership values and it has a maximum value that is $1$.
+% Similarly, the `Gaussian' membership function express as~\cite{Zadeh1965,Klir1995}: 
+% \begin{equation}\label{gau}
+% \mu_{X}(x;\sigma,c)=\exp\big\lbrace \frac{-(x-c)^2}{2\sigma^2}\big\rbrace
+% \end{equation}
+% where, $\sigma$ specify the standard deviation, $c$ is mean act as control parameter for the Gaussian function. 
+% %This function computes fuzzy membership values and it has a maximum value that is $1$.
+
+% In order to construct intuitionistic fuzzy set (IFS), we derive it from a fuzzy set (FS) $\mu_X(x)|x\in X$. The intuitionistic fuzzy set (IFS) consists of  both membership $\mu_X(x)$ and non-membership $\nu_X(x)$ functions~\cite{Atanassov1999}. An intuitionistic fuzzy set $\mathbf{X}$ in $\mathbf{G}$, is given as
+% %\begin{equation*}
+% $\mathbf{X}=\big \lbrace x,\mu_X(x),\nu_X(x)|x\in\mathbf{G}\big\rbrace$~\cite{Atanassov1999,Montes2014}.
+% %\end{equation*}
+% where $ \mu_X(x) \rightarrow [0,1]$, $\nu_X(x) \rightarrow [0,1]$ represent membership and non-membership degrees of an element $x$ in the set $\mathbf{X}$ with respect to the constraint
+% %\begin{equation*}
+% $\left[0\leq x,\mu_X(x),\nu_X(x)\leq 1|x\in\mathbf{G}\right]$
+% %\end{equation*}
+% If $\nu_X(x) = 1–\mu_X(x)$ $\forall$ $x$ $\in \mathbf{X}$, then $\mathbf{X}$ turn into a fuzzy set. Atanassov has indicated the hesitation degree of an IFS  $\pi_X(x)$, is the lack of knowledge occur to define a membership degree of each element $x$ in set $\mathbf{X}$ and it is defined as~\cite{Atanassov1999}:
+% \begin{equation}\label{eqx0}
+% \pi_X(x)=1-\mu_X(x)-\nu_X(x)|x\in\mathbf{G}
+% \end{equation}
+% The membership values belong to the interval $ \left[\mu_X(x), \mu_X(x)+\pi_X(x)|x\in\mathbf{G}\right]$ so , $0 \leq \pi_X(x) \leq 1$.
+
+% A continuous increasing and decreasing function $g(x)\rightarrow[0,1]$ is called continuous increasing and decreasing intuitionistic fuzzy generator~\cite{Montes2014} if:
+% \begin{equation}\label{eqx1}
+% g(x)\leq\left(1-x\right)|\forall x\in[0,1]~\text{and}~g(0)\leq 1; g(1)\leq 0
+% \end{equation}
+
+% The Yager generating function is utilized to define the intuitionistic fuzzy generator  as~\cite{Montes2014}:
+% \begin{equation}\label{eqx2}
+% T(\mu(x))=h^{-1}\left(h(1)-h(\mu(x))\right)
+% \end{equation}
+% where $h(\cdot)$ is an increasing function such that $h:[0,1] \rightarrow [0,1]$.
+% The Yager function is generated using Eq.~\eqref{eqx2} as:
+% \begin{equation}\label{eqx3}
+% h(x)=x^{\alpha}
+% \end{equation}
+% Thus, Yager's intuitionistic fuzzy generator can be rewritten as~\cite{Atanassov1999}:
+% \begin{equation}\label{eqx4}
+% T(x)=(1-x^{\alpha})^{1/{\alpha}}
+% \end{equation}
+% where $\alpha>0$ and $T(1) = 0$, $T(0) = 1$, respectively.
+% %Non-membership values are calculated from Yager’s intuitionistic fuzzy complement $N(x)$. 
+% Thus, we can define IFS using Yager's intuitionistic fuzzy complement~\cite{Atanassov1999,Montes2014} as:
+% \begin{equation}\label{eqx5}
+% \mathbf{X}=\big\lbrace x,\mu_X(x),(1-\mu_X(x)^{\alpha})^{1/{\alpha}}|x\in \mathbf{G}\big\rbrace
+% \end{equation}
+% and the hesitation degree is determined as~\cite{Atanassov1999}:
+% \begin{equation}\label{eqx6}
+% \pi_X(x)=1-\mu_X(x)-(1-\mu_X(x)^{\alpha})^{1/{\alpha}}
+% \end{equation}
+
+% \subsection{Rough set model for Microarray}
+% %A detailed description of the model is found  in Wong et al. [], Yao et al. [] and Pei and Xu[].
+
+% %\begin{definition}{(\cite{})}\label{the1}
+% %	Let $\mathbf{U}$ and $\mathbf{V}$ be two universes, and $\mathbf{R}$ be a binary relation from $\mathbf{U}$ to $\mathbf{V}$, i.e. a subset of $\mathbf{U} \times \mathbf{V}$. $\mathbf{R}$ is said to be compatible, or a compatibility relation, if, for any $u \in \mathbf{U}$
+% %\end{definition}
+
+% \begin{definition}\label{the2}
+% 	Let $\mathbf{U_1}$, $\mathbf{U_2}$ be two universes of closer, and $\mathbf{R}$ be a compatibility relation from $U_1$ to $U_2$. The function $\mathbf{F}: \mathbf{U_1} \rightarrow 2^{v}$, $u\mapsto\lbrace v\in\mathbf{U_2}|(u,v)\in\mathbf{R}\rbrace$ is said to be mapping induced by $\mathbf{R}$~\cite{pawlak}.
+% \end{definition}
+% %Then the rough set over two universes is defined as follows:Let $\mathbf{U}$ and $\mathbf{V}$ be two universes, and $\mathbf{R}$ be a compatibility relation from $\mathbf{U}$ to $\mathbf{V}$. 
+% The approximation space is defined from ordered triple $(\mathbf{U_1}, \mathbf{U_2}, \mathbf{R})$. The lower and upper approximations of $\mathbf{Z}\subseteq\mathbf{U_2}$ are given as follows~\cite{pawlak}:
+% \begin{gather*}
+% \munderbar{\Psi}_{\mathbf{F}}(\mathbf{Z})=\lbrace x\in \mathbf{U_1} \big|\mathbf{F}(x)\subseteq\mathbf{Z}\rbrace \text{ and }
+% \thickbar{\Psi}_{\mathbf{F}}(\mathbf{Z})=\lbrace x\in \mathbf{U_1} \big|\mathbf{F}(x)\cap\mathbf{Z}\neq\emptyset\rbrace
+% \end{gather*}
+% The ordered set-pair $(\munderbar{\Psi}_{\mathbf{F}}(\mathbf{Z}),\thickbar{\Psi}_{\mathbf{F}}(\mathbf{Z}))$ is called a generalized rough set. 
+% %and the ordered operator-pair $(\munderbar{\Psi}_{\mathbf{F}},\thickbar{\Psi}_{\mathbf{F}})$ is an interval structure.
+
+% \begin{definition}\label{the3}
+% 	Let $(\mathbf{U_1}, \mathbf{U_2}, \mathbf{R})$ be multigranulation approximation space over two universes and $\mathbf{X} \in \mathbf{F}(\mathbf{U_2})$. The optimistic lower approximation $\munderbar{\Psi}_{\sum\limits_{i=1}^m\mathbf{R}_i}(\mathbf{X})$ and upper approximation $\thickbar{\Psi}_{\sum\limits_{i=1}^m\mathbf{R}_i}(\mathbf{X})$ of fuzzy set $X$ in $(\mathbf{U_1}, \mathbf{U_2}, \mathbf{R})$ are defined as follows~\cite{pawlak,maji}:
+% 	\begin{gather}
+% 	\munderbar{\Psi}_{\sum\limits_{i=1}^m\mathbf{R}_i}(\mathbf{X})(x)=\min\lbrace\mathbf{X}(y)\big|\bigvee\limits_{i=1}^m \mathbf{F}_{i}(x),y\in\mathbf{U_2}  \rbrace,x\in\mathbf{U_1}\label{ex3}\\
+% 	\thickbar{\Psi}_{\sum\limits_{i=1}^m\mathbf{R}_i}(\mathbf{X})(x)=\max\lbrace\mathbf{X}(y)\big|\bigvee\limits_{i=1}^m \mathbf{F}_{i}(x),y\in\mathbf{U_2}  \rbrace,x\in\mathbf{U_1}\label{ex4}
+% 	\end{gather} 
+% \end{definition}
+
+% where $\bigvee\limits_{i=1}^m \mathbf{F}_{i}(x)=\mathbf{F}_{1}(x)\vee\cdots\vee\mathbf{F}_{m}(x)$ and then $y\in\mathbf{F}_{1}(x)\vee\mathbf{F}_{2}(x)$.
+
+
+% \begin{definition}\label{the4}
+% 	Let $(\mathbf{U}, \mathbf{V}, \mathbf{R})$ be multigranulation approximation space over two universes. For any $\mathbf{X} \in\mathbf{F}(\mathbf{V})$ and $\alpha$ and $\beta$ are parameters such that $0 < \beta \leq \alpha \leq 1$~\cite{pawlak,majir}. 
+% \end{definition}
+% The accuracy $\rho$ and the roughness $\sigma$ of $\mathbf{X}$ with respect to multigranulation approximation space over two universes are calculated as:	
+% \begin{gather}\label{acc}
+% \rho_{X}(\alpha,\beta)=\frac{\big|\munderbar{\Psi}_{\sum\limits_{i=1}^m\mathbf{R}_i}(\mathbf{X}_{\alpha})\big|}{\big|\thickbar{\Psi}_{\sum\limits_{i=1}^m\mathbf{R}_i}(\mathbf{X}_{\beta})\big|} \text{ and } 
+% \sigma(\alpha,\beta)=1-\rho_{X}(\alpha,\beta)
+% \end{gather}
+% %Note that if $\rho_{X}(\alpha,\beta)=1$ then $\thickbar{\Psi}_{\sum\limits_{i=1}^m\mathbf{R}_i}(\mathbf{X}_{\beta})=\emptyset$. 
+% %It is easy to know the method of defining the accuracy of any target set in multigranulation approximation space over two universes is similar to the general relation-based rough fuzzy set [].
+
+% The intuitionistic fuzzy rough approximations positive regions $POS(C_j)$ and the boundary regions $BOU(C_j)$ can be expressed as:
+% \begin{align}\label{eqpr}
+% x_i = \begin{cases}
+% POS(C_j); if~ x_i\in \munderbar{R} (\pi(x_i))\\
+% BOU(C_j); if~  x_i\in \thickbar{R}(\pi(x_i))- \munderbar{R} (\pi(x_i)) 
+% \end{cases}
+% \end{align}	
+
+% %Now, if the degree of an expression value is within $\thickbar{R}(\pi(x_i))$ and then the value is placed in boundary region; or else if the elements are having greater value than $\munderbar{R}(\pi(x_i))$ then the value is present in positive region. Once the boundary and the positive regions are obtained. 
+% The new centroids are calculated based on positive and boundary regions using the bias field $b_i$ as follows:
+% \begin{gather}\label{eqce}
+% C_k=\frac{\sum\limits_{x_i \in POS(C_k)}x_ib_i}{\sum\limits_{x_i \in POS(C_k)}b_i^2} +\frac{\sum\limits_{x_i \in BOU(C_k)}(\pi_{ij})^m x_i b_i}{\sum\limits_{x_i \in BOU(C_k)}(\pi_{ij})^m  x_i b_i^2}
+% \end{gather}
+%With these new centroids the updated membership values for the expression values are calculated. 
+
+% \begin{figure}[!th]
+% 	\setlength{\fboxsep}{0pt}
+% 	\setlength{\fboxrule}{0pt}	
+% 	\centering
+% 	\includegraphics[width=0.90\textwidth]{bd.eps}
+% 	\caption{Schematic diagram the  proposed  Method} 
+% 	\label{bd}
+% 	\vspace{-3mm}
+% \end{figure}
+
+% \section{Proposed Methodology}
+% \label{sec:3}
+% The proposed clustering based pattern analysis on microarray gene expression data determines some human genes and their expressions pattern that are correlated with diabetes patients. Basically, microarray gene databases consist of imprecise and vague information, hence it is very difficult to predict genes correlated with deadly diseases such as cancer or diabetes. Conventional clustering algorithm such as k-means, hierarchical based clustering, fuzzy c-means, rough c-means algorithms are failed to achieve good accuracy in microarry databases due to ambiguous nature of data. Here we have proposed an intuitionistic fuzzy set (IFS) based clustering algorithm in the framework of multigranulation rough set (\textsf{IFSMR}) for the pattern analysis on microarray databases of human diabetes patients. The proposed work divides into three parts, firstly, fuzzify the microarray using IFS (Yager function) through the hesitant score calculation. Secondly, map microarray from fuzzy plane to multigranulation space under the closer of two universes which reduces the dimension of the data. Finally, apply rough-fuzzy c-means clustering algorithm of the data into two clusters viz. diabetes and controlled through roughness and accuracy measurement. The schematic diagram of the proposed model is shown in Fig.~\ref{bd}. 
+
+% \subsection{Preprocessing}
+% Data pre-processing is a crucial step for the microarray gene expression data since it contains null values and outliers. To remove null value, we have utilized mean and hot-decking imputation in this article~\cite{little}. Outliers have been removed using some statistical methods like coefficient of variance (CV), and standard deviation. Finally, normalization has done on the matrix $G$ as $G=\frac{x-x_{min}}{x_{max}-x_{min}}$.
+
+% \subsection{Conversion to Fuzzy and IFS plane}
+% Now, the process matrix $G$ convert into two fuzzy planes using triangular and Gaussian membership function separately using Eq.~\eqref{tri} and Eq.~\eqref{gau} respectively~\cite{Zadeh1965,Klir1995}. To construct IFS of the matrix $\mathbf{X}$ as $\mathbf{X}=\big \lbrace x,\mu_X(x),\nu_X(x)|x\in\mathbf{G}\big\rbrace$, we calculate non-membership function $\nu_X(x)=1-\mu_X(x)$ and hesitant degree using Eq.~\eqref{eqx0}in this investigation. The gene expression microarray consists of more uncertain or vague information due to nature of the data. The Yager's IFS generating functions (Eq.~\eqref{eqx3} and Eq.~\eqref{eqx4}) have been used to calculate Yager's IFS complement using Eq.~\eqref{eqx5} to handle such kind of uncertainty~\cite{Atanassov1999,Montes2014}. Finally, we reduce the volume of data using Eq.~\eqref{eqx6}, the generated IFS hesitant degree.
+
+% \subsection{Multigranulation Rough-Fuzzy c-means Clustering}
+% In the next step of the proposed clustering model, we convert data into rough fuzzy space such as lower and upper approximation, considering two universes of closer using Eq.~\eqref{ex3} and Eq.~\eqref{ex4}. Roughness and accuracy measurement are two crucial phases for the clustering  to reduce the volume of the database. So we have measured the accuracy ($\rho_{A}$) and roughness ($\sigma$) using Eq.~\eqref{acc}.
+% Sometimes clusters may overlap among each other for the fuzzy based clustering. A cluster is illustrated by a fuzzy upper approximation and a fuzzy lower approximation known as rough-fuzzy c-means (RFCM)~\cite{pawlak,maji,majir}. 
+
+% In order to cluster the microarray $\lbrace x_1, x_2,\cdots, x_n \rbrace$ into two fuzzy clusters $\lbrace c_0, c_1 \rbrace$, (where $c_0~\text{and}~c_1$ refer the controlled state and diabetes state respectively) the criterion for updating centroids in RFCM is summarized as follows~\cite{majir}:
+% \begin{gather}
+% v_{i}=\begin{cases}
+% \mathbf{S}_1, & \text{if $\munderbar {\mathbf{R}}\left(c_k\right)\neq \emptyset,\mathbf{BOU}\left(c_k\right)= \emptyset $}.\\
+% \mathbf{S}_2, & \text{if $\munderbar {\mathbf{R}}\left(c_k\right)= \emptyset,\mathbf{BOU}\left(c_k\right)\neq \emptyset $}.\\
+% \mathbf{w}\star\mathbf{S}_1+\mathbf{w^{\prime}}\star\mathbf{S}_2, & \text{if $\munderbar {\mathbf{R}}\left(c_k\right)\neq \emptyset,\mathbf{BOU}\left(c_k\right)\neq \emptyset $}.
+% \end{cases}\label{eqqfrc}
+% \end{gather}
+% %where
+% \vspace{-3mm}
+% \begin{gather*}
+% \mathbf{S}_1=\frac{1}{|\mathbf {\munderbar{R}}(c_i)|}\sum\limits_{x_k\in\mathbf {\munderbar{R}}(c_i)} x_k,~
+% \mathbf{S}_2=\frac{1}{n_k}\sum\limits_{x_i\in \mathbf{BOU}\left(c_k\right)}\left(\mu_{ik}\right)^m \left( x_k\right) \\
+% n_k=\sum\limits_{x_i\in \mathbf{BOU}\left(c_k\right)}\left(\mu_{ik}\right)^m,~
+% %\mu_{ik}=\frac{1}{\sum\limits_{l=1}^c\left(\frac{d_{ik}}{d_{il}} \right)^{2/m-1}}\\
+% %\mathbf{BOU}\left(c_k\right)=\mathbf{\thickbar{R}}\left( c_k\right) -\mathbf{\munderbar{R}}\left( c_k\right)
+% d_{il}=\|x_i-c_l\|,~d_{ik}=\|x_i-c_k\| 
+% \end{gather*} 
+% where, $\mu_{ik}$ indicates the degree of belonging of $i^{th}$ value to $k^{th}$ ($k \in \lbrace0,1\rbrace$) fuzzy cluster is determined by Eq.~\eqref{exm}. The lower approximation of the cluster is represented by $\munderbar{\mathbf{R}}(c_i)$. $w$ and $w^{\prime}$ are the weight parameters such that $0 <w^{\prime}<w<1$, and $w^{\prime}+w=1$. These parameters control the importance of the approximation regions.
+
+% The fuzzy cluster is formulated as:
+% \begin{equation}\label{exm}
+% \mu_{ik}=\frac{1}{\sum\limits_{l=1}^c\left(\frac{d_{ik}}{d_{il}} \right)^{2/m-1}}
+% \end{equation}
+% where  $\mathbf{c}$ represents the number of clusters, $c_i$ indicates cluster $i$, $i = 2\cdots c$ (here, i=2 for proposed IFSMR method).  The fuzzy membership value $\mu_{ik}$ calculate the membership degree of the object $k$ which is the member of $i$ cluster, and $m$ denotes fuzzy coefficient.
+% A new centroid is determined from Eq~\eqref{eqce} and this process will continue till two approximations become empty. 
+
+% Let  $\mu_{ik}$ and  $\mu_{lk}$ be the highest and second highest membership values of object $k$ over two clusters.  If $|\mu_{ik}- \mu_{lk}|>\theta$, object $k$ belongs to the lower approximation of cluster $i$, otherwise, object $k$ belongs to the boundary regions of both cluster $i$ and cluster $l$ for threshold $\theta$~\cite{maji,majir}.
+
+% Furthermore, the fuzzy sets deal uncertainty whereas the rough set-based clustering deals with overlapping cluster problems. 
+% %The primary benefit of fuzzy set based clustering is to make an object belong to all clusters with different degrees of ownership which enhances efficiency for handling with uncertainties occurring from overlapping boundaries. 
+% The object belongs to the lower approximation if it satisfies the threshold condition, otherwise it belongs to the boundary region. The objects of boundary region get second chance for fulfilling the threshold criteria. This process will continue until boundary region become empty~\cite{maji,majir,majif}.
+
+% The steps in the algorithm of intuitionistic fuzzy rough c-means clustering algorithm is discussed as follows:
+% \begin{enumerate}
+% 	\item Initialize number cluster $k=2$, $k$ bias field $b_i=1$, $\delta \in [0, 1]$, the stop condition.
+% 	\item Compute the initial cluster centroids using Eq.~\eqref{eqqfrc}. 
+% 	\item Determine the initial membership degree $\bigcup^l= \left[u_{ij}\right]$ using Eqs.~\eqref{tri} and ~\eqref{gau}.
+% 	\item Calculate the highest membership degree for each expression value for all the centroids.
+% 	\item Compute the fuzzy rough positive regions and boundary regions using Eqs.~\eqref{ex3}-~\eqref{ex4}.
+% 	\item Update the new centroids $\bigcup^{l+1}$ using Eq.~\eqref{eqpr} and Eq.~\eqref{eqce} simultaneously.
+% 	\item Find the convergence distance ($\eta$) between $\bigcup^{l+1}$ and $\bigcup^l$ using $\thickbar{R}(\pi(x_j))-\munderbar{R}(\pi(x_j))$.
+% 	\item If{$(\eta \geq \delta)$} then exit.
+% \end{enumerate}
+
+%\begin{algorithm}[]
+%	\caption{Algorithm for IFSMR}
+%	\label{algx}
+%	\begin{algorithmic}[1]
+%		\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+%		\renewcommand{\algorithmicensure}{\textbf{Output:}}
+%		$\circ$\textbf{Input}: Gene expression Microarray(2D) $A$, Number of cluster $k=2$, $k$ bias fields initialized to $1$, $\delta$ the value between $[0, 1]$ for stop condition\\ 
+%		$\circ$\textbf{Output}: Gene sets with two clusters.\\
+%		\REQUIRE in: 2D MR brain image $X$, number of clusters $k$, 
+				
+%		\ENSURE  out:$k$ clusters  indicating the seggregated regions of mammogram.
+%		$\circ$ Compute the initial cluster centroids using Eq.~\eqref{eqqfrc}.\\		
+%		\\ \textit{Initialisation} :
+%		\State $C j$ = \textsf{FINDPEAKS}($X$, $n$); $n$ is number bins;
+%		$\circ$ \textit{LOOP 1 Process}\\
+%		$\circ$ For {all $j$ in $k$ clusters }\\
+%		$\circ$ \textit{LOOP 2 Process}\\
+%		$\circ$ For {all $x_i \in A$ }\\
+%		$\circ$ Calculate the initial membership degree $\bigcup^l= \left[u_{ij}\right]$ using Eqs.~\eqref{tri} and ~\eqref{gau}\\
+%		$\circ$ End For\\
+%		$\circ$ End For	\\	
+%		$\circ$ \textit{LOOP 3 Process}\\		$\circ$ While{$1$}\\
+%		$\circ$ For {all $j$ in $k$ clusters}\\
+%		$\circ$ For {all $x_i$ in $jth$ cluster}\\
+%		$\circ$ If {($i \ne 0$)}\\
+%		$\circ$  Determine the fuzzy rough regions, the positive and boundary regions using Eqs.~\eqref{ex3}-~\eqref{ex4}\\
+%		$\circ$ End if\\
+%		$\circ$End For\\
+%		$\circ$End For\\ 					
+%		$\circ$\textit{LOOP 4 Process}\\
+%		$\circ$ For {all $j$ in $k$ clusters}\\
+%		$\circ$ for {all $x_i$ in $X$}\\
+%		$\circ$ Update the cluster centroids using the positive and boundary regions using Eq.~\eqref{eqpr} and Eq.~\eqref{eqce}\\
+%		$\circ$ End For\\
+%		$\circ$ End For\\
+%		$\circ$ Find the convergence distance ($\eta$) between $\bigcup^{l+1}$ and $\bigcup^l$ using $\thickbar{R}(\pi(x_j))-\munderbar{R}(\pi(x_j))$\\		
+%		$\circ$ If{$(\eta \geq \delta)$} then exit\\
+%		\STATE break;
+%		\ELSE
+%		\STATE continue;
+%		$\circ$ End if\\
+%		$\circ$ End While\\
+%		\STATE Extract the $k$ cluster using the stable $\left[u_{ij}\right]$;		
+%		\RETURN $\left[u_{ij}\right]$
+%	\end{algorithmic}
+%\end{algorithm}
+ 
+
+% \section{Experimental Results and Discussion}
+% \label{sec:4}
+% \vspace{-2mm}
+% This section elaborates the experimental evaluation and the results acquired for the proposed IFSMR method. The simulation of the proposed algorithm has been done over a  diabetes (Type 2) gene expression datasets using $Matlab-19a$ on \textsf{Processor Inter Core $i5-6200U$ CPU 3.5 GHz with 16 GB of RAM} and \textit{Ubuntu $18.04$-$64$} bits Linux environment. 
+% %In a progression of various examinations, the proposed methodologies have been connected to two gene expression datasets  of various sizes, and contrasted with other pursuit techniques.
+
+
+
+% %The analysis of myotube cell lines has established from type 2 diabetes and insulin resistance. It reduces mitochondrial biogenesis cohabit quickly in pathogenesis independent of hyperglycemia and obeseness. Results has given insight into the effect of type 2 diabetes on developing skeletal muscle cells. 
+
+% % \begin{figure}[!th]
+% % 	\setlength{\fboxsep}{0pt}
+% % 	\setlength{\fboxrule}{0pt}	
+% % 	\centering
+% % 	\includegraphics[width=0.70\textwidth]{cl.eps}
+% % 	\caption{Clustering result of the Proposed method} 
+% % 	\label{cl}
+% % 	\vspace{-4mm}
+% % \end{figure}
+
+% \vspace{-3mm}
+% \subsection{Performance Evaluation Metrics and baseline methods}
+% \vspace{-2mm}
+% To validate the result of the proposed IFSMR method we have used five performance measures such as accuracy, sensitivity, specificity, and F-Measure~\cite{Melin2014,ghosh} in this section. The calculation of these measures involves a number of true positive (TP), false positive (FP), true negative (TN), and false negative (FN)~\cite{Melin2014,ghosh}. 
+% %TN and TP are the numbers of correctly classified negative and positive samples. FN and FP are the numbers of incorrectly classified positive and negative samples. 
+% We have considered three other clustering methods including Fuzzy c-means (FCM)~\cite{dunn,bezdek}, Possibilistic c-means (PCM)~\cite{krishna}, and Rough-fuzzy c-means (RFCM)~\cite{majir} as state-of-art methods in comparison with proposed IFSMR. All three state-of-art methods have been implemented on same gene expression databases.
+
+% \begin{table*}[!h]
+% 	\centering
+% 	\caption{Accuracy measure (average) of two diabetes databases.}
+% 	\label{t1}
+% 	\begin{tabular}{cccccccccccccccc}
+% 		\hline
+% 		Methods &\multicolumn{3}{c}{\textsf{Sensitivity }}&\multicolumn{2}{c}{\textsf{Specificity }}&\multicolumn{2}{c}{\textsf{Precision }}&\multicolumn{2}{c}{\textsf{ Accuracy}}&\multicolumn{2}{c}{\textsf{F-score}}\\\cline{2-11}
+% 		\textsf{FCM}~\cite{dunn,bezdek}&&0.825&&0.913 &&0.769 &&0.877 &&0.796\\
+% 		\textsf{PCM}~\cite{krishna}&&0.815 &&0.908 && 0.742 &&0.807 &&0.777\\
+% 		\textsf{RFCM}~\cite{majir}&&0.830&&0.882 &&0.783 &&0.877 &&0.805\\
+% 		\textsf{IFSMR}&&\textbf{0.861}&&\textbf{0.894}&&\textbf{0.815}&&\textbf{0.909}&& \textbf{0.837}\\
+% 		\hline
+% 	\end{tabular}
+% \vspace{-3mm}
+% \end{table*}
+
+% %\begin{figure}[!th]
+% %	\setlength{\fboxsep}{0pt}
+% %	\setlength{\fboxrule}{0pt}	
+% %	\centering
+% %	\includegraphics[width=1.0\textwidth]{co.eps}
+% %	\caption{Accuracy measure of two diabetes databases} 
+% %	\label{co}
+% %	\vspace{-2mm}
+% %\end{figure}
+
+% %Accuracy is a measure of overall effectiveness of the classification scheme and it is determined as follows~\cite{Liu2002,Melin2014,ghosh}:
+% %\begin{equation}
+% %\textbf{Accuracy}=\frac{TP+TN}{TP+TN+FP+FN}\times 100
+% %\end{equation} 
+% %Sensitivity is the ability of a classifier to recognize patterns of positive class defined as:
+% %\begin{equation} 
+% %\textbf{Sensitivity}=\frac{TP}{TP+FN}
+% %\end{equation} 
+% %Specificity is the ability of a classifier to recognize patterns of negative class, calculated as:
+% %\begin{equation}
+% %\textbf{Specificity}=\frac{TN}{TN+FP}
+% %\end{equation} 
+% %F-Measure makes use of precision and recall to estimate accuracy of classification where precision is formulated as:
+% %\begin{equation} 
+% %\textbf{Precision}=\frac{TP}{TP+FP}~,\textbf{Recall}=\frac{TP}{TP+FN}
+% %\end{equation} 
+% %Lastly, F-measure is determined as follows~\cite{Liu2002,Melin2014,ghosh}:
+% %\begin{equation}
+% %\textbf{F-Measure}=2\times\frac{Precision\times Recall}{Precision+Recall}
+% %\end{equation}
+
+% % \begin{figure}[!th]
+% % 	\setlength{\fboxsep}{0pt}
+% % 	\setlength{\fboxrule}{0pt}	
+% % 	\centering
+% % 	\includegraphics[width=0.9\textwidth]{go1.eps}
+% % 	\caption{Comparative analysis on number of functional enriched attributes of first 10 to first 40 gene sets: (a)$p-value \le 5\times10^{-5}$ for database GDS3681, (b)$p-value \le 5\times10^{-7}$ for database GDS3681, (c)$p-value \le 5\times10^{-9}$ for database GDS3681, (d) $p-value \le 5\times10^{-5}$ for database GDS3782, (e)$p-value \le 5\times10^{-7}$ for database GDS3782, (f)$p-value \le 5\times10^{-9}$ for database GDS38782} 
+% % 	\label{go1}
+% % 	\vspace{-3mm}
+% % \end{figure}
+% % \begin{figure}[!th]
+% % 	\setlength{\fboxsep}{0pt}
+% % 	\setlength{\fboxrule}{0pt}	
+% % 	\centering
+% % 	\includegraphics[width=0.9\textwidth]{go2.eps}
+% % 	\caption{Comparative analysis on number of functional enriched attributes of last 10 to last 40 gene sets: (a)$p-value \le 5\times10^{-5}$ for database GDS3681, (b)$p-value \le 5\times10^{-7}$ for database GDS3681, (c)$p-value \le 5\times10^{-9}$ for database GDS3681, (d) $p-value \le 5\times10^{-5}$ for database GDS3782, (e)$p-value \le 5\times10^{-7}$ for database GDS3782, (f)$p-value \le 5\times10^{-9}$ for database GDS38782}  
+% % 	\label{go2}
+% % 	\vspace{-3mm}
+% % \end{figure}
+% % \vspace{-3mm}
+% \subsection{Gene Clustering Analysis}
+% \vspace{-2mm}
+% The estimated accuracy across different gene expression results of the proposed IFSMR method along with three state-of-art methods viz. FCM, PCM and RFCM have been shown in table~\ref{t1} for two diabetes datasets taken average of each metric. The cluster analysis of the proposed method has bdeen demonstrated in Fig.~\ref{cl} for a subset of the database. Table~\ref{t1} shows the classification accuracy with baseline methods for two diabetes databases (mean). From the simulation of the proposed method, approximately 105 and 122 genes have been selected from two databases respectively which are somewhat biologically significant with respect to their pattern. It is clear from table~\ref{t1} that F-score of the proposed method produces better result in comparison with three baseline methods. The F-score of the proposed IFSMR methods for two databases are $0.85$ and $0.83$ respectively. However, the RFCM method also produces good accuracy for two databases $0.90$ and $0.86$ which are close to the accuracy of the proposed methods as calculated $0.93$ and $0.89$. 
+
+% \vspace{-3mm}
+% \subsection{Validation}
+% \vspace{-2mm}
+% For the effectiveness of the proposed method, we have validated of the first $50$ gene sets with functional enrichment, called `GO-attributes' with respect to their occurrences in the altered associations. The `GO-attributes' for each gene has been determined corresponding to its p-value. A lower $p-value$ illustrates that the genes belong to the enriched functional classes are biological significant and hence we have considered functional classes with p-values less than or equal to $5\times 10^{-5}$, $5\times 10^{-7}$, and $5\times 10^{-9}$. Fig.~\ref{go1} and Fig.~\ref{go2} show the number of functional enriched attributes selected using proposed IFSMR method along with three baseline methods. 
+
+% In order to demonstrate diabetes mediating gene correctly, we have computed the GO-attribute based on first 10, 20, 30 and 40 genes for two databases separately which is demonstrated in Fig.~\ref{go1} and it illustrates that the proposed IFSMR method is more significant than other baseline methods. Similarly, we have computed the GO-attribute on last 10, 20, 30 and 40 genes in Fig.~\ref{go2}, which also describes that the proposed IFSMR method is more significant though RFCM sometimes is close to proposed method.
+  
+% % \section{Conclusion}
+% % \vspace{-2mm}
+% % In microarray data analysis,  proper gene selection is an important phase in determining the accurate categorization of gene expression pattern. Here we propose an IFS based gene expression microarray clustering in mutigranulation rough set framework for human diabetes patient. It is utilized to predict different classes of genes or samples. The IFS provides more prominent flexibility to reduce the dimension of the data. The multigranulation rough set in fuzzy domain understands the uncertainty nature of the data for further clustering. The major drawback of rough set theory is to obstruct dealing in large data and computational overhead. The proposed method overcomes the issues in rough set to reduce the dimension of the data using IFS. The proposed scheme produces the best result as compared to the clustering based state-of-art methods. The primary advantage of the suggested method is to reduce the computational cost via dimensional reduction using IFS.
+
+% % In future, we will be working on more diabetes and cancer databases for the validation of the algorithm. We will also focus on gene to gene interaction on NCBI database and biochemical pathway analysis for the biological significance of the selected gene sets. We are also planning on finding any existence of relationship between diabetes genome and cancer genome.  
+
+% % %\section*{Appendix}
+% % %\section
+
+% % %The Sensitivity Specificity, Recall and Precision and F-measure, is calculated by using true positive (TP), true negative (TN), false positive (FP) and false negative (FN) from confusion matrix. The Sensitivity or TP rate is the probability of positive examples predicted correctly by the model, i.e. $Sensitivity = \frac{TP}{TP+FN}$. The Specificity or FP rate is the probability of negative examples predicted correctly by the model, i.e. $Specificity =\frac{FP}{TN+FP}$. The Recall is the probability of positive examples predicted correctly by the model relevant document is retrieved in a search, i.e. $Recall = \frac{TP}{TP+FN}$. The Precision is the probability of positive examples predicted correctly by the model i.e. retrieved documents is relevant, i.e. $Precision = \frac{TP}{TP+FP}$. The F-measure is used to examine the tradeoff between recall and precision and it is defined as $F_\beta=(1+\beta^2)\frac{precision\times recall}{precision+recall}$, for non negetive value of $\beta$. Here the precision and recall have the same weight and hence take $\beta=1$ and finally we have defined F-measure as  $F-score = 2\frac{precision\times recall}{precision+recall}  = 2\frac{TP}{2TP+FP+FN}$, basically it nothing but the harmonic mean of precision and recall. The Accuracy of a classifier on a given test set is the probability of test set that are correctly classified by the classifier and defined as $accuracy = \frac{TP+TN}{TP+TN+FP+FN}$~\cite{ghosh,Liu2002,Melin2014}.
+% % \vspace{-3mm}
+% % \begin{thebibliography}{6}
+% % %
+% % \bibitem{thms} Rebecca T.L.: Prevalence of Diabetic Retinopathy Within a National Diabetic Retinopathy Screening Service. The British Journal of Ophthalmology. 2015;99(1):64-68.
+
+% % %\bibitem{exprtComm} Expert Committee on the Diagnosis and Classification of Diabetes Mellitus Report of the Expert Committee on the Diagnosis and Classification of Diabetes Mellitus. Diabetes Care 1997; 20: 1183– 1197
+
+% % %\bibitem{florez} Florez, J. C., Manning, A. K.,  Dupuis, J.: A 100K genome-wide association scan for diabetes and related traits in the Framingham Heart Study: replication and integration with other genome-wide datasets. Diabetes, vol. 56, no. 12, pp. 3063-3074, (2007).
+
+% % %\bibitem{rampersaud} Rmapersaud, E., Damcott, C.M.,  Fu, M.: Identification of novel candidate genes for type 2 diabetes from a genome-wide association scan in the old order amish: evidence for replication from diabetes related quantitative traits and from independent populations. Diabetes, vol. 56, no. 12, pp. 3053-3062, (2007).
+
+% % \bibitem{hanson} Hanson, R. L., Bogardus, C., Duggan, D.: A search for variants associated with young-onset type 2 diabetes in Americal Indians in 100K genotyping array. Diabetes, vol. 56, no. 12, pp. 3045-3052, (2007).
+
+% % %\bibitem{imperatore} Imperatore, G., Hanson, R. L., Pettitt, D. J., Kobes, S., Bennett P.H., Knowler, W.C.: Sib-pair linkage analysis for susceptibility genes for microvascular complications among Pima Indians with 2 diabetes. Diabetes, vol. 47, no. 5, pp. 821-830, (1998).
+
+% % \bibitem{stekel} Stekel, D.: Microarray Bioinformatics. Cambridge University Press, Cambridge, UK, (2006).
+
+% % \bibitem{das} Das, R., Kalita, J., Bhattacharyya, D. K.: A pattern matching approach for clustering gene expression data. International Journal Data Mining, Modeling, and Management, vol. 3, no. 2, (2011).
+
+% % %\bibitem{franek} Franek, F., Jennings, C.G., Smyth, W.F.: A simple fast hybrid pattern-matching algorithm. vol. 5, pp. 682-695, (2007).
+
+% % %\bibitem{banerjee} Banerjee, M., Mitra, S., Pal, S.K.: Rough Fuzzy MLP: Knowledge Encoding and Classification. IEEE Transactions on neural networks, vol. 9, no. 6, (1998).
+
+% % \bibitem{banerjee1} Banerjee, M., Mitra, S., Banka, H.: Evolutionary Rough feature selection in gene expression data. IEEE Transactions on System, Man and Cybernetics, Part C: Application and Reviews, vol.37, (2007).
+
+% % \bibitem{jiang} Jiang, D., Peri, J. Zhang, A.: DHC: a density based hierarchical clustering methods for time series gene expression data. IEEE international Symposium on Bioinformatics and Bioengineering, (2003).
+
+% % \bibitem{kalaiselvi} Kalaiselvi, N., Inbarani H.: A fuzzy soft set based classification for gene expression data. IJSER vol.3, pp. 1315-1321, (2014).
+
+% % %\bibitem{nayak} Nayak, R. K., Mishra, D., Shaw, K. Mishra, S.: Rough set based Attribute Clustering for Sample Classification of Gene Expression Data. International Conference on Modeling Optimization and Computing, vol. 38, (2012).
+
+% % \bibitem{maji1} Maji, P., Pal S.K.: Protein sequence analysis using relational soft clustering algorithms, International Journal of Computer Mathematics, vol. 84, no. 5, pp. 599–617, (2007). 
+
+% % \bibitem{danaee}Danaee, P., Hendrix D.A.: A deep learning approach for cancer detection and relevant gene identification. Pacific Symposium on Biocomputing, pp. 219-229, (2017).
+
+% % \bibitem{pawlak}  Pawlak, Z.: Rough Sets: Theoretical Aspects of Reasoning about data. Kluwer Academic Publishers, (1991).
+
+% % \bibitem{little} Little, R.J.A., Rubin, D.B.: Statistical analysis with missing data. 2nd ed., Hoboken, New Jersey: John Wiley \& Sons, Inc. (2002).
+
+% % %\bibitem{jain} Jain, A.K.,  Murty, M.N., Flynn, P.J.: Data Clustering: A Review, ACM Computing Surveys. 31(3), 264–323 (1999).
+
+% % \bibitem{dunn} Dunn, J. C.: A Fuzzy Relative of the ISODATA Process and Its Use in Detecting Compact Well-Separated Clusters. Journal of Cybernetics. 3 (3): 32–57, (1973) doi:10.1080/01969727308546046. ISSN 0022-0280.
+
+% % \bibitem{bezdek}Bezdek, J. C.: Pattern Recognition with Fuzzy Objective Function Algorithms. ISBN 0-306-40671-3, (1981).
+
+% % \bibitem{krishna} Krishnapuram, R., J. M. Keller, J.M.: The Possibilistic C-Means Algorithm:
+% % Insights and Recommendations. IEEE Transactions on Fuzzy Systems. 4(3),385–393 (1996).
+
+% % \bibitem{lingras} Lingras, P., West, C.,: Interval Set Clustering of Web Users with Rough
+% % K-Means, Journal of Intelligent Information Systems. 23(1), 5–16 (2004).
+
+% % \bibitem{maji} Maji, P., Pal, S. K.: Rough-Fuzzy Pattern Recognition: Applications in
+% % Bioinformatics and Medical Imaging. Wiley-IEEE Computer Society Press,
+% % New Jersey (2012).
+
+% % \bibitem{majir}Maji, P., Pal, S. K.: RFCM: A Hybrid Clustering Algorithm Using Rough and Fuzzy Sets, Fundamenta Informaticae. 80(4), 475–496 (2007).
+
+% % \bibitem{majif} Maji, P., Pal, S. K.:  Rough Set Based Generalized Fuzzy C-Means Algorithm
+% % and Quantitative Indices. IEEE Transactions on System, Man, and Cybernetics, Part B: Cybernetics. 37(6), 1529–1540 (2007).
+
+% % \bibitem{Zadeh1965} Zadeh, L.A.: Fuzzy sets, Information and Computation, 8, pp. 338-353, (1965).
+% % %
+% % \bibitem{Klir1995}  Klir, G.J., Yuan, B.: Fuzzy Sets and Fuzzy Logic: Theory and Applications. Prentice-Hall PTR, Upper Saddle River, NJ, (1995). 
+
+% % \bibitem{Atanassov1999} Atanassov, K.: Intuitionistic Fuzzy Sets: Theory and Applications. Physica-Verlag, Heidelberg, New York, (1999).
+
+% % \bibitem{Montes2014} Montes I., Pal, N.R.,  Janis, V., Montes, S.: Divergence measures for intuitionistic fuzzy sets. IEEE Trans. Fuzzy Syst., vol.23, no.2, pp. 444-456, (2014).
+
+% % %\bibitem{Liu2002} Liu, H., Li, J., Wong, L.: A comparative study on feature selection and classification methods using gene expression profiles and proteomic patterns. Gene Informat., vol. 13, pp. 51-60, (2002).
+
+% % \bibitem{Melin2014} Melin, P., Castillo, O.:  A review on type-2 fuzzy logic applications in clustering, classification and pattern recognition. Applied Soft Com.,  vol. 21, pp. 568-577, (2014).
+
+% % \bibitem{ghosh} Ghosh, S. K., Ghosh, A., Chakrabarti, A.: VEA: Vessel Extraction Algorithm by Active Contour Model and a Novel Wavelet Analyzer for Diabetic Retinopathy Detection. International Journal of Image and Graphics, vol. 18, no. 2, (2018).
+
+% % \bibitem {ncbi} Available:~ \url{http://www.ncbi.nlm.nih.gov/geo}
+
+
+% % \end{thebibliography}
+
+
+
+
+
+
+\section{A Gold-Standard Mahabharata NER Corpus}
+\label{sec:dataset}
+
+\paragraph{Source Text and Preprocessing}
+The corpus is derived from the complete unabridged English prose translation of the \emph{Mahabharata}, covering all nineteen \emph{parvas} (books). The raw text was segmented into sentences and cleaned to remove running headers, page artefacts, and --- critically for a scanned classical text --- footnote reference digits glued onto words (e.g.\ \texttt{Panchala35}), which otherwise fragment entity surfaces and inflate false positives. Each sentence retains its \emph{parva} of origin and a stable global identifier used for deduplication and splitting.
+
+\paragraph{Annotation Protocol}
+Rather than annotate from scratch, we adopted a \emph{correct-a-strong-baseline} protocol: every sentence was pre-tagged by spaCy's \texttt{en\_core\_web\_lg} model, whose OntoNotes labels were mapped to a nine-type schema tailored to the epic, and human annotators then reviewed every mention --- correcting types, deleting spurious mentions, and adding canonical identifiers. The human decision, not the model's guess, is the ground truth.
+
+The released corpus contains \textbf{67{,}482 sentences} and \textbf{123{,}994 reviewed mentions}, of which \textbf{119{,}927} are confirmed gold entities (the remaining $4{,}067$ were marked \textsc{Not\_An\_Entity} and removed). Table~\ref{tab:schema} defines the nine gold types and their corpus frequencies. Names dominate, but the schema deliberately separates categories that a general-domain tagger conflates: bloodline \textsc{Dynasty}, peoples \textsc{Norp}, settlements and realms \textsc{Gpe}/\textsc{Loc}, mythological \textsc{Weapon}s, \textsc{Sacred\_Text}s, and abstract \textsc{Concept}s that the epic routinely personifies.
+
+\begin{table*}[!t]
+\centering
+\caption{The nine-type gold schema and mention counts over the full corpus (119{,}927 confirmed entities across 67{,}482 sentences).}
+\label{tab:schema}
+\small
+\begin{tabularx}{\textwidth}{@{}l l r X@{}}
+\toprule
+\textbf{Type} & \textbf{Sense in the epic} & \textbf{Count} & \textbf{Example surfaces} \\
+\midrule
+\textsc{Person}       & individual characters                 & 83{,}129 & Arjuna, Krishna, Draupadi \\
+\textsc{Norp}         & peoples, communities, tribes          & 13{,}107 & Panchalas, Yadavas \\
+\textsc{Dynasty}      & lineages / royal houses               & 9{,}025  & Kauravas, Kurus, Bharatas \\
+\textsc{Concept}      & abstractions, often personified       & 6{,}915  & Dharma, Truth \\
+\textsc{Gpe}          & kingdoms, cities, realms              & 3{,}085  & Hastinapura, Indraprastha \\
+\textsc{Loc}          & non-political places, geography       & 1{,}984  & Ganga, Himavat \\
+\textsc{Sacred\_Text} & scriptures, hymns                     & 1{,}486  & Vedas, Gita \\
+\textsc{Weapon}       & named / divine weapons                & 1{,}078  & Gandiva, Brahmashira \\
+\textsc{Event}        & named events, battles, rites          & 118      & Rajasuya, Kurukshetra war \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\paragraph{What the Corrections Reveal}
+Because the gold layer records both the transformer's guess and the human label, the corrections diagnose where general-domain NER fails on the epic. Annotators revised \textbf{16{,}310 of 123{,}994 mentions (13.2\%)}, and the revisions are not random noise: the tagger assigned \textsc{Person} to $96{,}175$ mentions where the gold count is only $83{,}129$. The dominant errors in Table~\ref{tab:corrections} show that off-the-shelf NER cannot distinguish a person from the dynasty, people, or place that shares the name's morphology --- precisely the distinctions the feature framework of Section~\ref{sec:features} is built to recover.
+
+\begin{table}[!t]
+\centering
+\caption{Most frequent human corrections of the pretrained tagger's pre-labels (spaCy guess $\rightarrow$ gold).}
+\label{tab:corrections}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}l r X@{}}
+\toprule
+\textbf{spaCy guess $\rightarrow$ gold} & \textbf{Count} & \textbf{Interpretation} \\
+\midrule
+\textsc{Person} $\rightarrow$ \textsc{Not\_An\_Entity} & 4{,}053 & over-tags common capitalised words \\
+\textsc{Person} $\rightarrow$ \textsc{Dynasty}          & 3{,}267 & lineage read as an individual \\
+\textsc{Person} $\rightarrow$ \textsc{Norp}             & 2{,}738 & a people read as an individual \\
+\textsc{Norp}   $\rightarrow$ \textsc{Dynasty}          & 2{,}136 & people vs.\ ruling house \\
+\textsc{Person} $\rightarrow$ \textsc{Loc}              & 1{,}984 & eponymous place read as a person \\
+\textsc{Person} $\rightarrow$ \textsc{Gpe}              & 1{,}015 & kingdom read as a person \\
+\textsc{Person} $\rightarrow$ \textsc{Sacred\_Text}     & 381     & scripture read as a person \\
+\textsc{Concept}$\rightarrow$ \textsc{Person}           & 225     & personified abstraction \\
+\textsc{Person} $\rightarrow$ \textsc{Weapon}           & 135     & named weapon read as a person \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\paragraph{Corpus Splits and Experimental Setup}
+Duplicate sentences are removed by global identifier before any split, and sentences are partitioned $70/15/15$ into train/validation/test folds. All label-dependent statistics --- frequency bins and the entity priors of Section~\ref{sec:features} --- are estimated on the training fold only, so no test information leaks into any feature. Because fitting the full sparse feature matrix is memory-bound, the experiments use a fixed $35{,}000$-sentence sample (Table~\ref{tab:splitstats}); the streaming, checkpointed pipeline scales to the full corpus. The $\sim$91\% \texttt{O}-tag rate is exactly why accuracy is reported only as a diagnostic.
+
+\begin{table}[!t]
+\centering
+\caption{Sampled corpus used for all experiments ($35{,}000$ sentences, $70/15/15$ split by sentence). Per-type gold test-fold counts appear as the support column of Table~\ref{tab:perclass}.}
+\label{tab:splitstats}
+\small
+\begin{tabular}{@{}l r r r@{}}
+\toprule
+ & \textbf{Train} & \textbf{Val} & \textbf{Test} \\
+\midrule
+Sentences         & 24{,}439  & 5{,}236   & 5{,}238 \\
+Tokens            & 500{,}131 & 109{,}234 & 107{,}761 \\
+\texttt{O}-tag \% & 90.91     & 90.72     & 90.96 \\
+Mentions          & 45{,}393  & 10{,}125  & 9{,}726 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Evaluation Protocol}
+\label{sec:protocol}
+We report \textbf{entity-span} precision, recall, and $F_1$ (micro, and macro over gold-attested types) as the primary metric; token-level $F_1$ excluding the \texttt{O} class is secondary, and token accuracy is diagnostic only. Two design choices make the comparison honest. First, we benchmark against \texttt{en\_core\_web\_trf} evaluated \emph{zero-shot} on the gold labels, its OntoNotes output mapped into our schema; several gold types (\textsc{Dynasty}, \textsc{Concept}, \textsc{Weapon}) have no OntoNotes counterpart --- a property of the domain, not a defect in the baseline. Second, we split every span score by whether the entity's surface form was \emph{seen} in the training fold: the seen score is a memorisation ceiling, and the \emph{unseen} score is the true test of recognition and the headline (Section~\ref{sec:results}).
+
+
+
+
+
+
+
+
+
+\section{Feature Engineering}
+\label{sec:features}
+
+Our framework transforms each token into a structured sparse representation capturing lexical, morphological, phonetic, contextual, and statistical signals. Figure~\ref{fig:features} summarises it: nine families feed the headline models, while a tenth --- a name-lookup gazetteer --- is deliberately \emph{excluded} and reported only as an ablation upper bound, because a lookup table recognises only names it has already seen.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{diagram_features.png}
+\caption{The feature framework $\phi(w_i,S)$: nine families are sparsely concatenated via a \texttt{DictVectorizer}; the circular name-gazetteer $\phi^{gaz}$ is held out of every headline model.}
+\label{fig:features}
+\end{figure}
+
+Let a sentence be represented as \(S = (w_1, w_2, \dots, w_n)\), where \(w_i\) denotes the \(i^{th}\) token in the sequence and \(n\) is the sentence length. Each token is associated with a Part-of-Speech tag \(p_i\) and a target entity label \(y_i\). For every token \(w_i\), we construct a feature mapping \(\phi(w_i,S) \in \mathbb{R}^d\), where \(d\) represents the dimensionality of the feature space. The feature vector is defined as a concatenation of multiple feature families:
+
+\begin{multline*}
+\phi(w_i,S) =
+[\phi_i^{core},\phi_i^{morph},\phi_i^{phon},
+\phi_i^{freq},\phi_i^{pos},\\
+\phi_i^{postag},
+\phi_i^{ctx},\phi_i^{dom},\phi_i^{prior}]
+\end{multline*}
+
+The families are emitted as string-keyed sparse dictionaries and assembled by a \texttt{DictVectorizer} (with minimum-document-frequency pruning), so the effective dimensionality $d$ is determined by the training vocabulary. The gazetteer family $\phi_i^{gaz}$ is defined below but kept out of this concatenation for all headline models.
+
+\paragraph{Core Lexical Representation}
+
+The core lexical features capture the basic orthographic identity of tokens. For each token \(w_i\), we compute
+\[
+\phi_i^{core} =
+\left[
+1,
+\text{lower}(w_i),
+\mathbf{1}_{upper}(w_i),
+\mathbf{1}_{title}(w_i),
+\mathbf{1}_{lower}(w_i)
+\right]
+\]
+where \(\mathbf{1}_{upper}(w_i)=1\) if \(w_i\) is fully uppercase (else \(0\)) and \(\mathbf{1}_{title}(w_i)=1\) if \(w_i\) begins with uppercase (else \(0\)).
+
+\paragraph{Morphological Feature Encoding}
+
+Morphological features capture subword structure that often correlates with entity classes. Let \(l_i = |w_i|\) denote token length, and define prefix and suffix operators \(\text{pref}_k(w_i) = w_i[1:k]\) and \(\text{suf}_k(w_i) = w_i[l_i-k+1:l_i]\) for \(k \in \{2,3,4\}\). Thus the morphological feature vector becomes
+
+\begin{multline*}
+\phi_i^{morph} =
+[
+\text{pref}_2,\text{pref}_3,\text{pref}_4,
+\text{suf}_2,\text{suf}_3,\text{suf}_4,\\
+shape(w_i),
+len\_bin(l_i),
+d(w_i),
+h(w_i),
+u(w_i)
+]
+\end{multline*}
+
+where \(d(w_i) = \mathbf{1}(\exists c \in w_i : c \in \{0,...,9\})\), \(h(w_i) = \mathbf{1}(- \in w_i)\), and \(u(w_i) = \mathbf{1}(\exists c \in w_i[2:l_i] : c \text{ uppercase})\). The orthographic shape function \(shape(w_i) : \Sigma^* \rightarrow \Sigma_s^*\) maps characters as \(A{-}Z \rightarrow A\), \(a{-}z \rightarrow a\), \(0{-}9 \rightarrow 0\), normalizing surface patterns while preserving structure.
+
+\paragraph{Phonetic Feature Representation}
+
+Classical texts contain transliterated names with multiple spelling variations. Let \(\sigma(w_i)\) denote the Soundex encoding of token \(w_i\); we further compute the vowel ratio \(r_v(w_i) = | \{ c \in w_i : c \in V \} | / |w_i|\), \(V = \{a,e,i,o,u\}\), and a rule-based syllable count \(s(w_i)\). Thus \(\phi_i^{phon} = [\sigma(w_i), r_v(w_i), s(w_i)]\), letting phonologically similar tokens occupy nearby regions of the feature space.
+
+\paragraph{Corpus Frequency Statistics}
+
+Let \(f(w) = |\{w_j : w_j = w\}|\) represent the corpus frequency of token \(w\). To avoid extreme sparsity, tokens are discretized into \emph{rare}/\emph{medium}/\emph{common} bins by thresholds \(\tau_1, \tau_2\) on \(f(w)\); the feature captures lexical prominence while remaining label-independent.
+
+\paragraph{Positional Features}
+
+Define \(pos\_ratio(w_i) = i/n\); the positional feature vector \(\phi_i^{pos} = [\mathbf{1}(i{=}1), \mathbf{1}(i{=}n), pos\_ratio(w_i)]\) distinguishes sentence-initial, medial, and final positions.
+
+\paragraph{Part-of-Speech Tag Features}
+
+The syntactic category of a token is a strong, vocabulary-independent cue: entities are overwhelmingly proper nouns, and this signal generalises to names never seen in training. We therefore include the token's Part-of-Speech tag $p_i$ (supplied by spaCy on the same tokenisation used for the gold spans) as a one-hot family \(\phi_i^{postag} = [\, \mathbf{1}(p_i = t) : t \in \mathcal{P} \,]\), where $\mathcal{P}$ is the tag set. This family is distinct from the positional family $\phi_i^{pos}$ above; the ablation in Section~\ref{sec:results} shows it is one of the stronger non-lexical signals.
+
+\paragraph{Context Window Representation}
+
+Named entities are strongly influenced by surrounding context. We therefore construct a symmetric context window of size \(k\) (with \(k=2\) in our experiments). Let \(C_i = \{w_{i-k},...,w_{i-1},w_{i+1},...,w_{i+k}\}\). Each context token contributes lexical and syntactic signals \(\psi(w_j,p_j) = [lower(w_j), \mathbf{1}_{title}(w_j), p_j]\), and the contextual feature vector becomes \(\phi_i^{ctx} = \bigoplus_{j \in C_i} \psi(w_j,p_j)\), where \(\oplus\) denotes feature concatenation. Boundary conditions are handled via sentinel tokens \(BOS\) and \(EOS\) representing sentence boundaries.
+
+\paragraph{Domain-Heuristic Features}
+
+Rather than injecting a lookup table of known names, the domain family encodes \emph{non-lexical} cues that a reader of the epic uses to recognise an entity's type without having seen the specific name before. For token $w_i$ with neighbours $w_{i-1}, w_{i+1}$, we compute
+
+\begin{multline*}
+\phi_i^{dom} =
+[
+\mathbf{1}(w_{i-1}\!\in\!T),
+\mathbf{1}(w_{i+1}\!\in\!T),\\
+\mathbf{1}(w_{i-1}\!\in\!\{\text{of},\text{son},\text{king}\}),
+\mathbf{1}(w_i \text{ ends in } \Sigma_{sk}),\\
+\mathbf{1}(\text{istitle}(w_i)\wedge w_i \text{ ends in } a)
+]
+\end{multline*}
+
+where $T$ is a small set of honorific/title cues (\emph{king}, \emph{queen}, \emph{prince}, \emph{sage}, \emph{rishi}, \emph{muni}, \emph{raja}, \dots) and $\Sigma_{sk}$ is a set of characteristic transliterated Sanskrit suffixes (\emph{-deva}, \emph{-sena}, \emph{-dhara}, \emph{-varman}, \emph{-ketu}, \emph{-ratha}, \dots). Because these features fire on \emph{patterns} rather than surface forms, they transfer to unseen names.
+
+\paragraph{Name-Gazetteer (Excluded from Headline Models)}
+\label{sec:gaz}
+
+Let $G_c$ be the set of known entities of category $c$; then $gaz_c(w_i)=\mathbf{1}(w_i \in G_c)$. Such a feature is a strong predictor of \emph{seen} names but is a memorised lookup that can never fire on a name absent from the list. We therefore \textbf{exclude $\phi^{gaz}$ from every headline model} and use it only in the ablation of Section~\ref{sec:results} to bound the memorisation ceiling --- the single most important design choice for the honesty of the evaluation.
+
+\paragraph{Entity Prior Probabilities}
+
+To capture empirical token-label associations from the training corpus, we estimate \(P(y|w) = N(w,y) / \sum_{y'} N(w,y')\), where \(N(w,y)\) denotes the number of occurrences of token \(w\) labeled with entity type \(y\). The prior feature vector is \(\phi_i^{prior} = [P(y_1|w_i),...,P(y_k|w_i)]\), where \(k\) is the number of entity classes, and the dominant prior label is \(y^* = \arg\max_y P(y|w_i)\). These features encode lexical memory while remaining strictly training-set dependent.
+
+\paragraph{Feature Importance via SHAP}
+
+We analyze feature contributions with SHAP: a prediction decomposes as \(f(x) = \phi_0 + \sum_{j=1}^{d}\phi_j\), with global importance \(I_j = \frac{1}{N}\sum_{i=1}^{N} |\phi_{ij}|\). We caution that raw $\sum|\phi_j|$ is biased by family cardinality --- the context family alone contributes tens of thousands of sparse columns --- so we treat the \emph{causal} family ablation of Section~\ref{sec:results} as the primary evidence and use SHAP only as corroboration.
+
+\section{Models}
+\label{sec:models}
+
+We deliberately avoid a bespoke architecture: the question is whether the shared framework $\phi$ is itself strong, so we feed the \emph{same} representation to a range of standard learners. Every model predicts a BIO label sequence $Y=(y_1,\dots,y_n)$, $y_i\in\mathcal{L}$, decoded into entity spans for scoring; the learners comprise a structured sequence tagger and a suite of token classifiers, benchmarked against an off-the-shelf pretrained transformer.
+
+\paragraph{Conditional Random Field Sequence Tagger}
+
+The primary sequence model is a linear-chain Conditional Random Field (CRF), which, unlike an independent classifier, learns transition constraints between adjacent labels (e.g.\ \texttt{I-PERSON} may not follow \texttt{B-DYNASTY}):
+
+\begin{multline*}
+P(Y|S) =
+\frac{1}{Z(S)}
+\exp\!\Biggl(
+\sum_{i=1}^{n}\sum_k \lambda_k f_k(y_i, S, i)\\
++
+\sum_{i=1}^{n-1}\sum_m \mu_m g_m(y_i, y_{i+1}, S, i)
+\Biggr)
+\end{multline*}
+
+where $f_k$ are per-token feature functions (the $\phi$ families), $g_m$ are transition features, $\lambda_k,\mu_m$ are learned weights, and $Z(S)$ is the partition function. The CRF consumes the $\phi$ dictionaries as a sequence and is trained with L-BFGS.
+
+\paragraph{Classical Token Classifiers over $\phi$}
+
+The token classifiers treat each token independently over a shared \texttt{DictVectorizer} design matrix, so any performance difference is attributable to the learner, not the representation. We evaluate Logistic Regression, a linear SVM (\texttt{LinearSVC}), Multinomial Naive Bayes, a Decision Tree, a Random Forest, and XGBoost. Because entities occupy only $\sim$9\% of tokens, learners are trained with balanced class weights; linear models train on the full fold, tree ensembles on a bounded subsample for tractability. No model sees test data during fitting, and all label-dependent features are estimated on the training fold (Section~\ref{sec:dataset}).
+
+\paragraph{Pretrained Transformer Baseline}
+
+To answer ``is the feature engineering actually good?'' we use \texttt{en\_core\_web\_trf}, spaCy's RoBERTa-based transformer NER, run \emph{zero-shot}: not fine-tuned on our corpus, its OntoNotes predictions mapped into our nine-type schema (e.g.\ \textsc{Org}$\rightarrow$\textsc{Dynasty}). This honest ``off-the-shelf'' setting asks whether a practitioner could simply apply the best available pretrained NER instead of engineering features; it is \emph{not} an upper bound on transformers --- a gold-fine-tuned transformer would be a stronger baseline, left to future work (Section~\ref{sec:discussion}). Because several gold types have no OntoNotes analogue, the transformer is structurally unable to produce them; we report this as a finding about domain transfer rather than concealing it.
+
+\paragraph{Interpretability}
+
+To keep predictions auditable, we attach global SHAP attributions (aggregated to family level) and local LIME explanations to the Logistic Regression model; both are read as subordinate to the causal family ablation (Section~\ref{sec:features}).
+
+\section{Results and Analysis}
+\label{sec:results}
+
+\subsection{Overall Span-Level Leaderboard}
+\label{sec:overall}
+
+Table~\ref{tab:leaderboard} reports entity-span scores on the gold test fold. Every $\phi$-based model clears span-$F_1$ $0.94$ except the shallow Decision Tree, and the ranking is what statistical NLP predicts: the structured CRF is best ($0.9833$), followed by a tight linear cluster --- Linear SVM ($0.9824$) and Logistic Regression ($0.9812$) --- with the tree ensembles just behind. The zero-shot transformer trails far behind at $0.679$.
+
+\begin{table*}[!t]
+\centering
+\caption{Span-level performance on the gold test fold, sorted by span-$F_1$. Macro-$F_1$ is over gold-attested types; token-level columns exclude \texttt{O}; the transformer is zero-shot. \emph{The overall span-$F_1$ column is a memorisation-inflated ceiling (Section~\ref{sec:seenunseen}).}}
+\label{tab:leaderboard}
+\small
+\begin{tabular}{@{}l ccc c cc@{}}
+\toprule
+& \multicolumn{3}{c}{\textbf{Span (micro)}} & \textbf{Span} & \multicolumn{2}{c}{\textbf{Token (no-\texttt{O})}} \\
+\cmidrule(lr){2-4}\cmidrule(lr){6-7}
+\textbf{Model} & \textbf{P} & \textbf{R} & \textbf{$F_1$} & \textbf{macro-$F_1$} & \textbf{micro} & \textbf{macro} \\
+\midrule
+CRF ($\phi$, sequence)          & 0.982 & 0.985 & \textbf{0.983} & 0.986 & 0.983 & 0.988 \\
+Linear SVM ($\phi$)             & 0.979 & 0.986 & 0.982 & 0.984 & 0.982 & 0.986 \\
+Logistic Regression ($\phi$)    & 0.974 & 0.989 & 0.981 & 0.977 & 0.981 & 0.976 \\
+Random Forest ($\phi$)          & 0.972 & 0.987 & 0.979 & 0.968 & 0.979 & 0.975 \\
+XGBoost ($\phi$)                & 0.962 & 0.986 & 0.974 & 0.982 & 0.974 & 0.984 \\
+Naive Bayes ($\phi$)            & 0.930 & 0.968 & 0.949 & 0.787 & 0.948 & 0.708 \\
+Decision Tree ($\phi$)          & 0.843 & 0.939 & 0.889 & 0.855 & 0.889 & 0.868 \\
+\midrule
+spaCy \texttt{en\_core\_web\_trf} (zero-shot) & 0.714 & 0.647 & 0.679 & 0.249 & 0.690 & 0.234 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+We stress that the overall span-$F_1$ figures near $0.98$ are \textbf{not} the paper's claim. In a natural sentence-level split of a narrative corpus, entity surfaces recur heavily: $94.0\%$ of test-fold mentions ($9{,}139$ of $9{,}726$) have a surface string that also appears as a gold entity in training. The $\phi^{prior}$ and $\phi^{core}$ families let any learner recover the training-majority label for such surfaces almost perfectly, so most of the $0.98$ measures \emph{recall of memorised names}. This is legitimate --- priors are fitted strictly on the training fold and duplicates are removed before splitting, so there is no leakage --- but it is a memorisation ceiling, and the next section removes that inflation.
+
+\subsection{The Headline: Seen versus Unseen Entities}
+\label{sec:seenunseen}
+
+We partition every test span by whether its surface form was ever a gold entity in training (Table~\ref{tab:seenunseen}). On \emph{seen} surfaces the $\phi$ models are near-perfect (CRF $0.996$) --- the memorisation ceiling. On the $587$ \emph{unseen} surfaces, where priors and token identity are useless and only the generalising features can fire, the CRF still reaches $0.787$ and Logistic Regression $0.792$; the zero-shot transformer sits at $0.698$ seen and $0.466$ unseen, its near-equal scores confirming it derives no benefit from training-set vocabulary. The handcrafted features beat the off-the-shelf transformer by \textbf{$+0.32$ absolute span-$F_1$} on genuinely novel names.
+
+\begin{table*}[!t]
+\centering
+\caption{Seen vs.\ unseen span-$F_1$ on the gold test fold. ``Seen'' surfaces occur as a gold entity in training ($n=9{,}139$); ``unseen'' do not ($n=587$). The seen column is a memorisation ceiling; \textbf{the unseen column is the headline}.}
+\label{tab:seenunseen}
+\small
+\begin{tabular}{@{}l c c c c c@{}}
+\toprule
+\textbf{Model} & \textbf{Overall} & \textbf{Seen} $F_1$ & \textbf{Unseen} $F_1$ & \textbf{Unseen P} & \textbf{Unseen R} \\
+\midrule
+CRF ($\phi$)                 & 0.983 & 0.996 & \textbf{0.787} & 0.773 & 0.801 \\
+Logistic Regression ($\phi$) & 0.981 & 0.994 & \textbf{0.792} & 0.742 & 0.848 \\
+spaCy \texttt{trf} (zero-shot)& 0.679 & 0.698 & 0.466 & 0.374 & 0.617 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Two qualifications bound this claim. First, the comparison is between $\phi$ models \emph{trained} on the gold fold and a transformer used \emph{zero-shot}: the finding is that in-domain feature engineering beats the best off-the-shelf transformer on this epic, not that classical models beat transformers in general. Second, unseen-$F_1$ is a micro average dominated by the \textsc{Person} majority; the harder unseen non-\textsc{Person} types are lower, and the $0.79$ should be read as ``recognises unseen names as entities of a plausible type'' rather than perfect typing.
+
+\subsection{What Generalises: Feature-Family Ablation}
+\label{sec:ablation}
+
+To identify \emph{which} features carry the generalisation, we retrain the model with each family in isolation and with each family removed from the full set (Table~\ref{tab:ablation}). Used alone, \textbf{morphology is the strongest family} ($0.694$) --- ahead of part-of-speech ($0.445$) and phonetics ($0.468$), far ahead of token identity (\textsc{core}, $0.215$); prior ($0.553$) is high alone but is a memorisation feature. In the leave-one-out direction, removing \textbf{context} collapses span-$F_1$ from $0.980$ to $0.838$, whereas removing token identity or domain heuristics costs $\le 0.01$. Morphology and context are thus the load-bearing, transferable families; lexical identity is not.
+
+\begin{table}[!t]
+\centering
+\caption{Feature-family ablation (probe: balanced Logistic Regression, span-$F_1$ on validation). \emph{Alone} uses only that family; \emph{leave-one-out} removes it from the full set (FULL $=0.980$).}
+\label{tab:ablation}
+\small
+\begin{tabular}{@{}l c c@{}}
+\toprule
+\textbf{Family} & \textbf{Alone} $F_1$ & \textbf{Leave-one-out} $F_1$ \\
+\midrule
+morph (morphology)      & \textbf{0.694} & 0.980 \\
+prior (train $P(y|w)$)  & 0.553 & 0.971 \\
+phon (phonetic)         & 0.468 & 0.978 \\
+postag (POS tag)        & 0.445 & 0.979 \\
+core (token identity)   & 0.215 & 0.968 \\
+ctx (context $\pm2$)    & 0.129 & \textbf{0.838} \\
+domain (heuristics)     & 0.104 & 0.979 \\
+freq (frequency bin)    & 0.096 & 0.979 \\
+pos (position)          & 0.009 & 0.980 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Per-Type Performance and Error Analysis}
+\label{sec:pertype}
+
+Table~\ref{tab:perclass} contrasts the CRF and the transformer per type. The transformer scores \emph{zero} $F_1$ on \textsc{Concept}, \textsc{Weapon}, and \textsc{Event}, and only $0.10$ on \textsc{Dynasty} and $0.16$ on \textsc{Norp} --- precisely the epic-specific categories with no OntoNotes counterpart that the corrections (Table~\ref{tab:corrections}) showed generic NER cannot separate from \textsc{Person}. It is competitive only on \textsc{Person} ($0.84$). The CRF is above $0.95$ on every type.
+
+\begin{table}[!t]
+\centering
+\caption{Per-type span $F_1$ on the gold test fold: CRF ($\phi$) versus the zero-shot transformer.}
+\label{tab:perclass}
+\small
+\begin{tabular}{@{}l r c c@{}}
+\toprule
+\textbf{Type} & \textbf{Support} & \textbf{CRF ($\phi$)} & \textbf{spaCy trf} \\
+\midrule
+\textsc{Person}       & 6{,}881 & 0.982 & 0.843 \\
+\textsc{Norp}         & 941     & 0.989 & 0.161 \\
+\textsc{Dynasty}      & 811     & 0.992 & 0.098 \\
+\textsc{Concept}      & 447     & 0.996 & 0.000 \\
+\textsc{Gpe}          & 296     & 0.955 & 0.486 \\
+\textsc{Loc}          & 168     & 0.988 & 0.298 \\
+\textsc{Weapon}       & 87      & 0.976 & 0.000 \\
+\textsc{Sacred\_Text} & 73      & 1.000 & 0.355 \\
+\textsc{Event}        & 22      & 1.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A manual pass over the CRF's errors ($180$ false positives, $145$ false negatives) shows its residual mistakes are the genuinely hard cases: (i) \textsc{Dynasty}$\leftrightarrow$\textsc{Person} confusions on lineage names also used for individuals (\emph{Kaurava}, \emph{Kuru}); (ii) personified abstractions (\emph{Truthfulness}, \emph{Dharma}, \emph{Night}, \emph{Death}) straddling the \textsc{Concept}/\textsc{Person} boundary; and (iii) residual footnote-digit noise (\emph{Kurus2}, \emph{Panchala35}) that survives cleaning. These inherent ambiguities mark the ceiling of what token-level features alone can resolve.
+
+\section{Related Work}
+\label{sec:related}
+
+Named-entity recognition for classical epics poses distinct challenges: archaic and transliterated names, long narrative texts, heavy coreference, and domain-specific vocabulary.
+
+Suryanarayana et al.\ (2014) mechanised ontology construction for the Wayang epic using gazetteer tagging, clustering, and pattern extraction --- a precedent for extracting structured entities from narrative epics, which we extend with a gold-standard, leakage-controlled evaluation. Aralikatte et al.\ (2021) presented \emph{Itihasa}, a large Sanskrit--English parallel corpus, and showed that even strong transformers struggle with Sanskrit --- an insufficiency echoed by our zero-shot baseline. Semantic and sentiment analysis of the full epic (ICON 2022) highlights the difficulty of long narrative spans, while S et al.\ (2022) and Gadesha et al.\ (2023) built domain-specific lexicons with Word2Vec and language models --- vocabulary-level material that does not extend to span-level recognition. The GOMME methodology of Varadarajan et al.\ (2022--2023) formalises manual ontology modeling for epics and informs our schema, though our work targets automation. Gultepe and Mathangi (2023) analysed \emph{Mahabharata} character networks with TF-IDF, LSA and word vectors, but without span-level detection. On the resource side, the Mytho-Annotator of Paul et al.\ (2023) supports expert annotation of Hindu mythological texts; the rahulnyk (2023) dataset offers pre-processed text with initial NER tags but no systematic evaluation; and Terdalkar et al.\ (IITK) developed manual annotation guidelines for the \emph{Ramayana} that influence ours. Downstream, Agarwal (2024, 2025) built a Neo4j knowledge graph and GraphRAG chatbot over the epic --- applications whose accuracy rests on the entity recognition this paper improves --- and Kalita et al.\ (2025) used mBERT for cross-lingual \emph{Ramayana} analysis, guiding our transliteration strategy.
+
+Despite this progress, three gaps remain: reliance on silver labels produced by the very gazetteers or taggers being evaluated; no leakage-controlled, entity-level evaluation (every test surface already seen in training); and little analysis of \emph{which} features enable generalisation to transliteration variants and rare cultural entities. Our gold corpus, gazetteer-free framework, and seen-versus-unseen protocol close exactly these gaps.
+
+\section{Discussion and Conclusion}
+\label{sec:discussion}
+
+This work set out to answer a single question honestly: on a specialised epic, does interpretable feature engineering recognise named entities, or merely memorise them? Two contributions made an honest answer possible: a human gold-annotated \emph{Mahabharata} corpus of $67{,}482$ sentences and $119{,}927$ mentions across nine types, whose construction --- correcting $13.2\%$ of a strong tagger's pre-labels --- documents where general-domain NER fails; and an evaluation protocol that keeps a circular name-gazetteer out of the models and decomposes every score into seen and unseen surfaces. On a natural split, classical models over the shared framework $\phi$ reach span-$F_1$ around $0.98$, but $94\%$ of that is recall of surfaces already seen in training --- a memorisation ceiling, not a result. The honest number is on unseen names, where the CRF ($0.79$) and Logistic Regression ($0.79$) beat the best off-the-shelf transformer ($0.47$) by more than thirty points, and where a causal ablation shows that morphology and context --- not token identity --- carry the generalisation. Per-type, the transformer collapses to zero $F_1$ on the epic-specific categories absent from its label space, while the CRF handles them above $0.95$. Used in-domain, feature engineering is the more accurate and far more interpretable choice, and it generalises to names it has never seen.
+
+We are careful about scope. The transformer baseline is zero-shot; a gold-fine-tuned transformer might close the unseen gap, and establishing that is the most important item of future work. The unseen score is a micro average in which the frequent \textsc{Person} class is comparatively easy, and the experiments use a $35{,}000$-sentence sample, though the pipeline scales to the full corpus; none of these caveats involves leakage. Beyond the \emph{Mahabharata}, the recipe generalises: release gold labels, exclude circular lookup features, and report seen and unseen separately --- a template for honest NER on any closed-vocabulary literary corpus.
+\end{document}
+

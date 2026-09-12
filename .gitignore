@@ -1,0 +1,37 @@
+# Corpus. Read-only input, 300M+, lives outside version control.
+Mahabharata LLM annotated-*/
+Mahabharat_Human_Annotated_Data-*/
+mahabharata_ner_*master*.csv
+parva_pdfs/
+*.pdf
+*_parva.csv
+*_tagged*.csv
+*Parva*.csv
+Aranyaka_tagged.csv
+
+# Trained models and run outputs from the prior NER work. GBs.
+train_delta/
+train_spacy_lg/
+outputs*/
+*.spacy
+*.bin
+*.checkpoint.json
+
+# Build intermediates. Regenerable by definition.
+build/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.synctex.gz
+*.bak
+*.bak2

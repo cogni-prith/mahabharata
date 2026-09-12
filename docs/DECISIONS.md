@@ -298,3 +298,82 @@ rather than theoretical.
 Bhishma, Karna, Shalya, Souptika, Ashramavasika, Mausala, Mahaprasthanika,
 Svargarohana. Of those, Mahaprasthanika and Mausala are effectively unrevised
 (D6), leaving six with a genuine pass.
+
+## D12. Phase 2 asserts no entity merges, and that is the finding (2026-09-12)
+
+Entity resolution was built as construction, per the change of plan. It produced
+547 person entities from single-token PERSON surfaces with at least ten mentions,
+121 appellation nodes, and 246 candidate designation links, each with a confidence
+and an evidence count. It asserts **zero** merges. No appellation was folded into
+an entity.
+
+That is not a pipeline failure. It follows from the hard rule against guessing an
+entity link, applied to evidence that does not support the merges.
+
+**The evidence available.** Where the translation writes an epithet next to a
+name, "Vaikartana Karna" or "Partha Yudhishthira", that apposition is textual
+evidence of co-designation and carries a citation like anything else. 269 such
+pairs occur among 547 names. The corpus `canonical_id` prior is a second,
+independent source: a context-free dictionary performing 43 distinct rewrites over
+11,624 mentions, with 88.0% of its assignments verbatim echoes and only 16 of
+3,958 values carrying more than one surface form.
+
+**Why apposition alone cannot merge.** Apposition proves a phrase designates one
+person. It does not prove the bare epithet designates the bare head elsewhere.
+Merging on apposition alone resolved `Dvaipayana` onto Krishna at 0.98 confidence,
+conflating Vyasa with Vasudeva Krishna, and `Droupadi` onto Krishna at 1.00,
+conflating Draupadi with him as well. Both are the conflation the hard rules
+forbid, and both were produced by the first version of this phase.
+
+The reason is structural and worth recording. Partner count does not detect it:
+Krishna has sixteen apposition partners because Vasudeva Krishna genuinely carries
+fifteen epithets. The homonyms hide inside a legitimate epithet cluster. **A rich
+epithet cluster and a homonym are indistinguishable in apposition evidence.**
+The one available signal is disagreement with the prior, which flags 40 heads as
+homonymy risks; `Krishna` is flagged by `Dvaipayana`, `Panchali` and `Yajnaseni`,
+which is direct textual attestation that the string names Vyasa and Draupadi too.
+
+**Why the prior alone cannot merge.** It is context-free. Audited against
+apposition evidence in `build/canonical_id_audit.md`:
+
+| verdict | rewrites | mentions |
+|---|---|---|
+| shared_appellation | 9 | large, see below |
+| confirmed | 13 | 650 |
+| unsupported | 20 | 411 |
+| ancestor_collision | 1 | 208 |
+
+`Partha` is assigned to Arjuna across 1,833 mentions, but where the text apposes
+an anchor name it gives Arjuna 9, Yudhishthira 7 and Bhima 1, so 53% support.
+`Kounteya` is assigned to Arjuna across 613 mentions with 30% support: the text
+gives Yudhishthira 13, Bhima 2, Arjuna 7, and Karna once, which is correct, since
+Karna is Kunti's son. `Bharadvaja` is assigned to Drona across 208 mentions while
+ten sentences name Bharadvaja as the parent of Drona in the same breath, so one
+string carries both father and son. `unsupported` means no apposition evidence
+either way, not that the rewrite is wrong.
+
+**Why the folding approaches were rejected.** Folding partners through the prior
+uses each claim as evidence for itself: "Partha Bhimasena" became "Arjuna is a
+bearer of Bhimasena" only because the prior asserts Partha is Arjuna. Folding only
+through already-confirmed rewrites does not converge, because the clusters are
+mutually entangled, confirming `Partha` requires `Dhananjaya` resolved and vice
+versa. Bearers are therefore counted only over anchor names, meaning surfaces the
+prior rewrites to but never from, which is 15 names derived from the prior's own
+structure rather than chosen by hand.
+
+**Consequence.** There is no fixed point without a hand-authored seed of canonical
+entities. This is the concrete, measured reason the change of plan is right that
+Phase 2 is where annotation budget should go. A seed of roughly 100 canonical
+persons with their epithets would anchor the fold and convert most of the 246
+candidate links into assertions. That seed is a human task and cannot be
+bootstrapped from the corpus, because the corpus prior is the thing under audit.
+
+**Class terms are excluded using the corpus label.** "Pandava Bhimasena" is a
+correct apposition, but `Pandava` is DYNASTY-labelled and cannot be an individual.
+Counting it as a bearer swamped every share in an earlier version.
+
+**The 200-sample audit is generated but not performed.** `build/entity_audit_sample.csv`
+holds 200 candidate links sampled with seed 20260912, with blank verdict columns.
+Precision against it requires a human annotator. No precision figure is claimed
+here, and a figure computed by the same process that produced the links would not
+be an evaluation.

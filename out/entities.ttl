@@ -1,0 +1,1587 @@
+@prefix mbh: <http://example.org/mbh/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/mbh/e/Abhimanyu> a mbh:Person ; rdfs:label "Abhimanyu" .
+
+<http://example.org/mbh/e/Achala> a mbh:Person ; rdfs:label "Achala" .
+
+<http://example.org/mbh/e/Achyuta> a mbh:Person ; rdfs:label "Achyuta" .
+
+<http://example.org/mbh/e/Adhiratha> a mbh:Person ; rdfs:label "Adhiratha" .
+
+<http://example.org/mbh/e/Aditi> a mbh:Person ; rdfs:label "Aditi" .
+
+<http://example.org/mbh/e/Aditya> a mbh:Person ; rdfs:label "Aditya" .
+
+<http://example.org/mbh/e/Adityas> a mbh:Person ; rdfs:label "Adityas" .
+
+<http://example.org/mbh/e/Agastya> a mbh:Person ; rdfs:label "Agastya" .
+
+<http://example.org/mbh/e/Agni> a mbh:Person ; rdfs:label "Agni" .
+
+<http://example.org/mbh/e/Aila> a mbh:Person ; rdfs:label "Aila" .
+
+<http://example.org/mbh/e/Airavata> a mbh:Person ; rdfs:label "Airavata" .
+
+<http://example.org/mbh/e/Ajamidha> a mbh:Person ; rdfs:label "Ajamidha" .
+
+<http://example.org/mbh/e/Ajatashatru> a mbh:Person ; rdfs:label "Ajatashatru" .
+
+<http://example.org/mbh/e/Akritavrana> a mbh:Person ; rdfs:label "Akritavrana" .
+
+<http://example.org/mbh/e/Akrura> a mbh:Person ; rdfs:label "Akrura" .
+
+<http://example.org/mbh/e/Alambusa> a mbh:Person ; rdfs:label "Alambusa" .
+
+<http://example.org/mbh/e/Alambusha> a mbh:Person ; rdfs:label "Alambusha" .
+
+<http://example.org/mbh/e/Alarka> a mbh:Person ; rdfs:label "Alarka" .
+
+<http://example.org/mbh/e/Alayudha> a mbh:Person ; rdfs:label "Alayudha" .
+
+<http://example.org/mbh/e/Amba> a mbh:Person ; rdfs:label "Amba" .
+
+<http://example.org/mbh/e/Ambarisha> a mbh:Person ; rdfs:label "Ambarisha" .
+
+<http://example.org/mbh/e/Ambika> a mbh:Person ; rdfs:label "Ambika" .
+
+<http://example.org/mbh/e/Ananta> a mbh:Person ; rdfs:label "Ananta" .
+
+<http://example.org/mbh/e/Angada> a mbh:Person ; rdfs:label "Angada" .
+
+<http://example.org/mbh/e/Angiras> a mbh:Person ; rdfs:label "Angiras" .
+
+<http://example.org/mbh/e/Angirasa> a mbh:Person ; rdfs:label "Angirasa" .
+
+<http://example.org/mbh/e/Aniruddha> a mbh:Person ; rdfs:label "Aniruddha" .
+
+<http://example.org/mbh/e/Anshuman> a mbh:Person ; rdfs:label "Anshuman" .
+
+<http://example.org/mbh/e/Anuvinda> a mbh:Person ; rdfs:label "Anuvinda" .
+
+<http://example.org/mbh/e/Arjuna> a mbh:Person ; rdfs:label "Arjuna" .
+
+<http://example.org/mbh/e/Arshtishena> a mbh:Person ; rdfs:label "Arshtishena" .
+
+<http://example.org/mbh/e/Aruna> a mbh:Person ; rdfs:label "Aruna" .
+
+<http://example.org/mbh/e/Arundhati> a mbh:Person ; rdfs:label "Arundhati" .
+
+<http://example.org/mbh/e/Aruni> a mbh:Person ; rdfs:label "Aruni" .
+
+<http://example.org/mbh/e/Aryama> a mbh:Person ; rdfs:label "Aryama" .
+
+<http://example.org/mbh/e/Ashtaka> a mbh:Person ; rdfs:label "Ashtaka" .
+
+<http://example.org/mbh/e/Ashtavakra> a mbh:Person ; rdfs:label "Ashtavakra" .
+
+<http://example.org/mbh/e/Ashvapati> a mbh:Person ; rdfs:label "Ashvapati" .
+
+<http://example.org/mbh/e/Ashvatthama> a mbh:Person ; rdfs:label "Ashvatthama" .
+
+<http://example.org/mbh/e/Ashvins> a mbh:Person ; rdfs:label "Ashvins" .
+
+<http://example.org/mbh/e/Asita> a mbh:Person ; rdfs:label "Asita" .
+
+<http://example.org/mbh/e/Astika> a mbh:Person ; rdfs:label "Astika" .
+
+<http://example.org/mbh/e/Atri> a mbh:Person ; rdfs:label "Atri" .
+
+<http://example.org/mbh/e/Babhru> a mbh:Person ; rdfs:label "Babhru" .
+
+<http://example.org/mbh/e/Babhruvahana> a mbh:Person ; rdfs:label "Babhruvahana" .
+
+<http://example.org/mbh/e/Bahlika> a mbh:Person ; rdfs:label "Bahlika" .
+
+<http://example.org/mbh/e/Bahuka> a mbh:Person ; rdfs:label "Bahuka" .
+
+<http://example.org/mbh/e/Baka> a mbh:Person ; rdfs:label "Baka" .
+
+<http://example.org/mbh/e/Bala> a mbh:Person ; rdfs:label "Bala" .
+
+<http://example.org/mbh/e/Baladeva> a mbh:Person ; rdfs:label "Baladeva" .
+
+<http://example.org/mbh/e/Bali> a mbh:Person ; rdfs:label "Bali" .
+
+<http://example.org/mbh/e/Bandi> a mbh:Person ; rdfs:label "Bandi" .
+
+<http://example.org/mbh/e/Bhadra> a mbh:Person ; rdfs:label "Bhadra" .
+
+<http://example.org/mbh/e/Bhaga> a mbh:Person ; rdfs:label "Bhaga" .
+
+<http://example.org/mbh/e/Bhagadatta> a mbh:Person ; rdfs:label "Bhagadatta" .
+
+<http://example.org/mbh/e/Bhagiratha> a mbh:Person ; rdfs:label "Bhagiratha" .
+
+<http://example.org/mbh/e/Bhanu> a mbh:Person ; rdfs:label "Bhanu" .
+
+<http://example.org/mbh/e/Bharadvaja> a mbh:Person ; rdfs:label "Bharadvaja" .
+
+<http://example.org/mbh/e/Bharata> a mbh:Person ; rdfs:label "Bharata" .
+
+<http://example.org/mbh/e/Bhargava> a mbh:Person ; rdfs:label "Bhargava" .
+
+<http://example.org/mbh/e/Bhava> a mbh:Person ; rdfs:label "Bhava" .
+
+<http://example.org/mbh/e/Bhima> a mbh:Person ; rdfs:label "Bhima" .
+
+<http://example.org/mbh/e/Bhimasena> a mbh:Person ; rdfs:label "Bhimasena" .
+
+<http://example.org/mbh/e/Bhimsena> a mbh:Person ; rdfs:label "Bhimsena" .
+
+<http://example.org/mbh/e/Bhishma> a mbh:Person ; rdfs:label "Bhishma" .
+
+<http://example.org/mbh/e/Bhoja> a mbh:Person ; rdfs:label "Bhoja" .
+
+<http://example.org/mbh/e/Bhrigu> a mbh:Person ; rdfs:label "Bhrigu" .
+
+<http://example.org/mbh/e/Bhurishrava> a mbh:Person ; rdfs:label "Bhurishrava" .
+
+<http://example.org/mbh/e/Bibhatsu> a mbh:Person ; rdfs:label "Bibhatsu" .
+
+<http://example.org/mbh/e/Brahma> a mbh:Person ; rdfs:label "Brahma" .
+
+<http://example.org/mbh/e/Brahmadatta> a mbh:Person ; rdfs:label "Brahmadatta" .
+
+<http://example.org/mbh/e/Brihadashva> a mbh:Person ; rdfs:label "Brihadashva" .
+
+<http://example.org/mbh/e/Brihadbala> a mbh:Person ; rdfs:label "Brihadbala" .
+
+<http://example.org/mbh/e/Brihadratha> a mbh:Person ; rdfs:label "Brihadratha" .
+
+<http://example.org/mbh/e/Brihannada> a mbh:Person ; rdfs:label "Brihannada" .
+
+<http://example.org/mbh/e/Brihanta> a mbh:Person ; rdfs:label "Brihanta" .
+
+<http://example.org/mbh/e/Brihaspati> a mbh:Person ; rdfs:label "Brihaspati" .
+
+<http://example.org/mbh/e/Brihatkshatra> a mbh:Person ; rdfs:label "Brihatkshatra" .
+
+<http://example.org/mbh/e/Budha> a mbh:Person ; rdfs:label "Budha" .
+
+<http://example.org/mbh/e/Chandra> a mbh:Person ; rdfs:label "Chandra" .
+
+<http://example.org/mbh/e/Charudeshna> a mbh:Person ; rdfs:label "Charudeshna" .
+
+<http://example.org/mbh/e/Chekitana> a mbh:Person ; rdfs:label "Chekitana" .
+
+<http://example.org/mbh/e/Chitra> a mbh:Person ; rdfs:label "Chitra" .
+
+<http://example.org/mbh/e/Chitrangada> a mbh:Person ; rdfs:label "Chitrangada" .
+
+<http://example.org/mbh/e/Chitrasena> a mbh:Person ; rdfs:label "Chitrasena" .
+
+<http://example.org/mbh/e/Chitrayudha> a mbh:Person ; rdfs:label "Chitrayudha" .
+
+<http://example.org/mbh/e/Chyavana> a mbh:Person ; rdfs:label "Chyavana" .
+
+<http://example.org/mbh/e/Dadhicha> a mbh:Person ; rdfs:label "Dadhicha" .
+
+<http://example.org/mbh/e/Daksha> a mbh:Person ; rdfs:label "Daksha" .
+
+<http://example.org/mbh/e/Damayanti> a mbh:Person ; rdfs:label "Damayanti" .
+
+<http://example.org/mbh/e/Dambhodbhava> a mbh:Person ; rdfs:label "Dambhodbhava" .
+
+<http://example.org/mbh/e/Dandadhara> a mbh:Person ; rdfs:label "Dandadhara" .
+
+<http://example.org/mbh/e/Daruka> a mbh:Person ; rdfs:label "Daruka" .
+
+<http://example.org/mbh/e/Dashagriva> a mbh:Person ; rdfs:label "Dashagriva" .
+
+<http://example.org/mbh/e/Dasharatha> a mbh:Person ; rdfs:label "Dasharatha" .
+
+<http://example.org/mbh/e/Dasharha> a mbh:Person ; rdfs:label "Dasharha" .
+
+<http://example.org/mbh/e/Death> a mbh:Person ; rdfs:label "Death" .
+
+<http://example.org/mbh/e/Devaki> a mbh:Person ; rdfs:label "Devaki" .
+
+<http://example.org/mbh/e/Devala> a mbh:Person ; rdfs:label "Devala" .
+
+<http://example.org/mbh/e/Devapi> a mbh:Person ; rdfs:label "Devapi" .
+
+<http://example.org/mbh/e/Devasharma> a mbh:Person ; rdfs:label "Devasharma" .
+
+<http://example.org/mbh/e/Devavrata> a mbh:Person ; rdfs:label "Devavrata" .
+
+<http://example.org/mbh/e/Devayani> a mbh:Person ; rdfs:label "Devayani" .
+
+<http://example.org/mbh/e/Dhananjaya> a mbh:Person ; rdfs:label "Dhananjaya" .
+
+<http://example.org/mbh/e/Dharma> a mbh:Person ; rdfs:label "Dharma" .
+
+<http://example.org/mbh/e/Dharmaraja> a mbh:Person ; rdfs:label "Dharmaraja" .
+
+<http://example.org/mbh/e/Dhata> a mbh:Person ; rdfs:label "Dhata" .
+
+<http://example.org/mbh/e/Dhoumya> a mbh:Person ; rdfs:label "Dhoumya" .
+
+<http://example.org/mbh/e/Dhrishtadyumna> a mbh:Person ; rdfs:label "Dhrishtadyumna" .
+
+<http://example.org/mbh/e/Dhrishtaketu> a mbh:Person ; rdfs:label "Dhrishtaketu" .
+
+<http://example.org/mbh/e/Dhritarashtra> a mbh:Person ; rdfs:label "Dhritarashtra" .
+
+<http://example.org/mbh/e/Dhritarasthra> a mbh:Person ; rdfs:label "Dhritarasthra" .
+
+<http://example.org/mbh/e/Dhruva> a mbh:Person ; rdfs:label "Dhruva" .
+
+<http://example.org/mbh/e/Dhundhu> a mbh:Person ; rdfs:label "Dhundhu" .
+
+<http://example.org/mbh/e/Dhundhumara> a mbh:Person ; rdfs:label "Dhundhumara" .
+
+<http://example.org/mbh/e/Dilipa> a mbh:Person ; rdfs:label "Dilipa" .
+
+<http://example.org/mbh/e/Diti> a mbh:Person ; rdfs:label "Diti" .
+
+<http://example.org/mbh/e/Divodasa> a mbh:Person ; rdfs:label "Divodasa" .
+
+<http://example.org/mbh/e/Drona> a mbh:Person ; rdfs:label "Drona" .
+
+<http://example.org/mbh/e/Droupadi> a mbh:Person ; rdfs:label "Droupadi" .
+
+<http://example.org/mbh/e/Drupada> a mbh:Person ; rdfs:label "Drupada" .
+
+<http://example.org/mbh/e/Duhsaha> a mbh:Person ; rdfs:label "Duhsaha" .
+
+<http://example.org/mbh/e/Duhshala> a mbh:Person ; rdfs:label "Duhshala" .
+
+<http://example.org/mbh/e/Duhshanta> a mbh:Person ; rdfs:label "Duhshanta" .
+
+<http://example.org/mbh/e/Duhshasana> a mbh:Person ; rdfs:label "Duhshasana" .
+
+<http://example.org/mbh/e/Durjaya> a mbh:Person ; rdfs:label "Durjaya" .
+
+<http://example.org/mbh/e/Durmarshana> a mbh:Person ; rdfs:label "Durmarshana" .
+
+<http://example.org/mbh/e/Durmukha> a mbh:Person ; rdfs:label "Durmukha" .
+
+<http://example.org/mbh/e/Durvasa> a mbh:Person ; rdfs:label "Durvasa" .
+
+<http://example.org/mbh/e/Duryodhana> a mbh:Person ; rdfs:label "Duryodhana" .
+
+<http://example.org/mbh/e/Dushkarna> a mbh:Person ; rdfs:label "Dushkarna" .
+
+<http://example.org/mbh/e/Dvaipayana> a mbh:Person ; rdfs:label "Dvaipayana" .
+
+<http://example.org/mbh/e/Dyumatsena> a mbh:Person ; rdfs:label "Dyumatsena" .
+
+<http://example.org/mbh/e/Ekalavya> a mbh:Person ; rdfs:label "Ekalavya" .
+
+<http://example.org/mbh/e/Ekata> a mbh:Person ; rdfs:label "Ekata" .
+
+<http://example.org/mbh/e/Gada> a mbh:Person ; rdfs:label "Gada" .
+
+<http://example.org/mbh/e/Gadhi> a mbh:Person ; rdfs:label "Gadhi" .
+
+<http://example.org/mbh/e/Galava> a mbh:Person ; rdfs:label "Galava" .
+
+<http://example.org/mbh/e/Gandhari> a mbh:Person ; rdfs:label "Gandhari" .
+
+<http://example.org/mbh/e/Ganga> a mbh:Person ; rdfs:label "Ganga" .
+
+<http://example.org/mbh/e/Gangeya> a mbh:Person ; rdfs:label "Gangeya" .
+
+<http://example.org/mbh/e/Garuda> a mbh:Person ; rdfs:label "Garuda" .
+
+<http://example.org/mbh/e/Gavalgana> a mbh:Person ; rdfs:label "Gavalgana" .
+
+<http://example.org/mbh/e/Gaya> a mbh:Person ; rdfs:label "Gaya" .
+
+<http://example.org/mbh/e/Ghatotkacha> a mbh:Person ; rdfs:label "Ghatotkacha" .
+
+<http://example.org/mbh/e/Ghritachi> a mbh:Person ; rdfs:label "Ghritachi" .
+
+<http://example.org/mbh/e/Goutama> a mbh:Person ; rdfs:label "Goutama" .
+
+<http://example.org/mbh/e/Goutami> a mbh:Person ; rdfs:label "Goutami" .
+
+<http://example.org/mbh/e/Govinda> a mbh:Person ; rdfs:label "Govinda" .
+
+<http://example.org/mbh/e/Gudakesha> a mbh:Person ; rdfs:label "Gudakesha" .
+
+<http://example.org/mbh/e/Guha> a mbh:Person ; rdfs:label "Guha" .
+
+<http://example.org/mbh/e/Hamsa> a mbh:Person ; rdfs:label "Hamsa" .
+
+<http://example.org/mbh/e/Hanuman> a mbh:Person ; rdfs:label "Hanuman" .
+
+<http://example.org/mbh/e/Hara> a mbh:Person ; rdfs:label "Hara" .
+
+<http://example.org/mbh/e/Hardikya> a mbh:Person ; rdfs:label "Hardikya" .
+
+<http://example.org/mbh/e/Hari> a mbh:Person ; rdfs:label "Hari" .
+
+<http://example.org/mbh/e/Harishchandra> a mbh:Person ; rdfs:label "Harishchandra" .
+
+<http://example.org/mbh/e/Hayashira> a mbh:Person ; rdfs:label "Hayashira" .
+
+<http://example.org/mbh/e/Hidimba> a mbh:Person ; rdfs:label "Hidimba" .
+
+<http://example.org/mbh/e/Hiranyakashipu> a mbh:Person ; rdfs:label "Hiranyakashipu" .
+
+<http://example.org/mbh/e/Hridika> a mbh:Person ; rdfs:label "Hridika" .
+
+<http://example.org/mbh/e/Hrishikesha> a mbh:Person ; rdfs:label "Hrishikesha" .
+
+<http://example.org/mbh/e/Ikshvaku> a mbh:Person ; rdfs:label "Ikshvaku" .
+
+<http://example.org/mbh/e/Ilvala> a mbh:Person ; rdfs:label "Ilvala" .
+
+<http://example.org/mbh/e/Indra> a mbh:Person ; rdfs:label "Indra" .
+
+<http://example.org/mbh/e/Indrajit> a mbh:Person ; rdfs:label "Indrajit" .
+
+<http://example.org/mbh/e/Indrani> a mbh:Person ; rdfs:label "Indrani" .
+
+<http://example.org/mbh/e/Indras> a mbh:Person ; rdfs:label "Indras" .
+
+<http://example.org/mbh/e/Indrasena> a mbh:Person ; rdfs:label "Indrasena" .
+
+<http://example.org/mbh/e/Iravat> a mbh:Person ; rdfs:label "Iravat" .
+
+<http://example.org/mbh/e/Ishana> a mbh:Person ; rdfs:label "Ishana" .
+
+<http://example.org/mbh/e/Ishvara> a mbh:Person ; rdfs:label "Ishvara" .
+
+<http://example.org/mbh/e/Jaigishavya> a mbh:Person ; rdfs:label "Jaigishavya" .
+
+<http://example.org/mbh/e/Jajali> a mbh:Person ; rdfs:label "Jajali" .
+
+<http://example.org/mbh/e/Jalasandha> a mbh:Person ; rdfs:label "Jalasandha" .
+
+<http://example.org/mbh/e/Jamadagni> a mbh:Person ; rdfs:label "Jamadagni" .
+
+<http://example.org/mbh/e/Jambha> a mbh:Person ; rdfs:label "Jambha" .
+
+<http://example.org/mbh/e/Janaka> a mbh:Person ; rdfs:label "Janaka" .
+
+<http://example.org/mbh/e/Janamejaya> a mbh:Person ; rdfs:label "Janamejaya" .
+
+<http://example.org/mbh/e/Janardana> a mbh:Person ; rdfs:label "Janardana" .
+
+<http://example.org/mbh/e/Jantu> a mbh:Person ; rdfs:label "Jantu" .
+
+<http://example.org/mbh/e/Jarasandha> a mbh:Person ; rdfs:label "Jarasandha" .
+
+<http://example.org/mbh/e/Jaratkaru> a mbh:Person ; rdfs:label "Jaratkaru" .
+
+<http://example.org/mbh/e/Jarita> a mbh:Person ; rdfs:label "Jarita" .
+
+<http://example.org/mbh/e/Jaya> a mbh:Person ; rdfs:label "Jaya" .
+
+<http://example.org/mbh/e/Jayadratha> a mbh:Person ; rdfs:label "Jayadratha" .
+
+<http://example.org/mbh/e/Jayatsena> a mbh:Person ; rdfs:label "Jayatsena" .
+
+<http://example.org/mbh/e/Jishnu> a mbh:Person ; rdfs:label "Jishnu" .
+
+<http://example.org/mbh/e/Kacha> a mbh:Person ; rdfs:label "Kacha" .
+
+<http://example.org/mbh/e/Kadru> a mbh:Person ; rdfs:label "Kadru" .
+
+<http://example.org/mbh/e/Kaitabha> a mbh:Person ; rdfs:label "Kaitabha" .
+
+<http://example.org/mbh/e/Kakutstha> a mbh:Person ; rdfs:label "Kakutstha" .
+
+<http://example.org/mbh/e/Kala> a mbh:Person ; rdfs:label "Kala" .
+
+<http://example.org/mbh/e/Kali> a mbh:Person ; rdfs:label "Kali" .
+
+<http://example.org/mbh/e/Kamsa> a mbh:Person ; rdfs:label "Kamsa" .
+
+<http://example.org/mbh/e/Kanka> a mbh:Person ; rdfs:label "Kanka" .
+
+<http://example.org/mbh/e/Kanva> a mbh:Person ; rdfs:label "Kanva" .
+
+<http://example.org/mbh/e/Kapila> a mbh:Person ; rdfs:label "Kapila" .
+
+<http://example.org/mbh/e/Karna> a mbh:Person ; rdfs:label "Karna" .
+
+<http://example.org/mbh/e/Kartavirya> a mbh:Person ; rdfs:label "Kartavirya" .
+
+<http://example.org/mbh/e/Kartikeya> a mbh:Person ; rdfs:label "Kartikeya" .
+
+<http://example.org/mbh/e/Kashyapa> a mbh:Person ; rdfs:label "Kashyapa" .
+
+<http://example.org/mbh/e/Kavya> a mbh:Person ; rdfs:label "Kavya" .
+
+<http://example.org/mbh/e/Kekaya> a mbh:Person ; rdfs:label "Kekaya" .
+
+<http://example.org/mbh/e/Keshava> a mbh:Person ; rdfs:label "Keshava" .
+
+<http://example.org/mbh/e/Keshi> a mbh:Person ; rdfs:label "Keshi" .
+
+<http://example.org/mbh/e/Keshini> a mbh:Person ; rdfs:label "Keshini" .
+
+<http://example.org/mbh/e/Kichaka> a mbh:Person ; rdfs:label "Kichaka" .
+
+<http://example.org/mbh/e/Kiriti> a mbh:Person ; rdfs:label "Kiriti" .
+
+<http://example.org/mbh/e/Kirmira> a mbh:Person ; rdfs:label "Kirmira" .
+
+<http://example.org/mbh/e/Kounteya> a mbh:Person ; rdfs:label "Kounteya" .
+
+<http://example.org/mbh/e/Kouravya> a mbh:Person ; rdfs:label "Kouravya" .
+
+<http://example.org/mbh/e/Kousalya> a mbh:Person ; rdfs:label "Kousalya" .
+
+<http://example.org/mbh/e/Koushika> a mbh:Person ; rdfs:label "Koushika" .
+
+<http://example.org/mbh/e/Kratha> a mbh:Person ; rdfs:label "Kratha" .
+
+<http://example.org/mbh/e/Kratu> a mbh:Person ; rdfs:label "Kratu" .
+
+<http://example.org/mbh/e/Kripa> a mbh:Person ; rdfs:label "Kripa" .
+
+<http://example.org/mbh/e/Krishna> a mbh:Person ; rdfs:label "Krishna" .
+
+<http://example.org/mbh/e/Krishnas> a mbh:Person ; rdfs:label "Krishnas" .
+
+<http://example.org/mbh/e/Kritavarma> a mbh:Person ; rdfs:label "Kritavarma" .
+
+<http://example.org/mbh/e/Kshatradeva> a mbh:Person ; rdfs:label "Kshatradeva" .
+
+<http://example.org/mbh/e/Kshatta> a mbh:Person ; rdfs:label "Kshatta" .
+
+<http://example.org/mbh/e/Kshemadhurti> a mbh:Person ; rdfs:label "Kshemadhurti" .
+
+<http://example.org/mbh/e/Kubera> a mbh:Person ; rdfs:label "Kubera" .
+
+<http://example.org/mbh/e/Kumara> a mbh:Person ; rdfs:label "Kumara" .
+
+<http://example.org/mbh/e/Kumbhakarna> a mbh:Person ; rdfs:label "Kumbhakarna" .
+
+<http://example.org/mbh/e/Kundadhara> a mbh:Person ; rdfs:label "Kundadhara" .
+
+<http://example.org/mbh/e/Kunti> a mbh:Person ; rdfs:label "Kunti" .
+
+<http://example.org/mbh/e/Kuntibhoja> a mbh:Person ; rdfs:label "Kuntibhoja" .
+
+<http://example.org/mbh/e/Kushika> a mbh:Person ; rdfs:label "Kushika" .
+
+<http://example.org/mbh/e/Kuvalashva> a mbh:Person ; rdfs:label "Kuvalashva" .
+
+<http://example.org/mbh/e/Lakshmana> a mbh:Person ; rdfs:label "Lakshmana" .
+
+<http://example.org/mbh/e/Lakshmi> a mbh:Person ; rdfs:label "Lakshmi" .
+
+<http://example.org/mbh/e/Likhita> a mbh:Person ; rdfs:label "Likhita" .
+
+<http://example.org/mbh/e/Lomasha> a mbh:Person ; rdfs:label "Lomasha" .
+
+<http://example.org/mbh/e/Lopamudra> a mbh:Person ; rdfs:label "Lopamudra" .
+
+<http://example.org/mbh/e/Lubdhaka> a mbh:Person ; rdfs:label "Lubdhaka" .
+
+<http://example.org/mbh/e/Madhava> a mbh:Person ; rdfs:label "Madhava" .
+
+<http://example.org/mbh/e/Madhu> a mbh:Person ; rdfs:label "Madhu" .
+
+<http://example.org/mbh/e/Madhusudana> a mbh:Person ; rdfs:label "Madhusudana" .
+
+<http://example.org/mbh/e/Madravati> a mbh:Person ; rdfs:label "Madravati" .
+
+<http://example.org/mbh/e/Madri> a mbh:Person ; rdfs:label "Madri" .
+
+<http://example.org/mbh/e/Maghavan> a mbh:Person ; rdfs:label "Maghavan" .
+
+<http://example.org/mbh/e/Mahadeva> a mbh:Person ; rdfs:label "Mahadeva" .
+
+<http://example.org/mbh/e/Mahasena> a mbh:Person ; rdfs:label "Mahasena" .
+
+<http://example.org/mbh/e/Maheshvara> a mbh:Person ; rdfs:label "Maheshvara" .
+
+<http://example.org/mbh/e/Mahisha> a mbh:Person ; rdfs:label "Mahisha" .
+
+<http://example.org/mbh/e/Mahodara> a mbh:Person ; rdfs:label "Mahodara" .
+
+<http://example.org/mbh/e/Maitreya> a mbh:Person ; rdfs:label "Maitreya" .
+
+<http://example.org/mbh/e/Mandapala> a mbh:Person ; rdfs:label "Mandapala" .
+
+<http://example.org/mbh/e/Mandavya> a mbh:Person ; rdfs:label "Mandavya" .
+
+<http://example.org/mbh/e/Mandhata> a mbh:Person ; rdfs:label "Mandhata" .
+
+<http://example.org/mbh/e/Manibhadra> a mbh:Person ; rdfs:label "Manibhadra" .
+
+<http://example.org/mbh/e/Mankanaka> a mbh:Person ; rdfs:label "Mankanaka" .
+
+<http://example.org/mbh/e/Manu> a mbh:Person ; rdfs:label "Manu" .
+
+<http://example.org/mbh/e/Marichi> a mbh:Person ; rdfs:label "Marichi" .
+
+<http://example.org/mbh/e/Markandeya> a mbh:Person ; rdfs:label "Markandeya" .
+
+<http://example.org/mbh/e/Maruts> a mbh:Person ; rdfs:label "Maruts" .
+
+<http://example.org/mbh/e/Marutta> a mbh:Person ; rdfs:label "Marutta" .
+
+<http://example.org/mbh/e/Matali> a mbh:Person ; rdfs:label "Matali" .
+
+<http://example.org/mbh/e/Matanga> a mbh:Person ; rdfs:label "Matanga" .
+
+<http://example.org/mbh/e/Maya> a mbh:Person ; rdfs:label "Maya" .
+
+<http://example.org/mbh/e/Menaka> a mbh:Person ; rdfs:label "Menaka" .
+
+<http://example.org/mbh/e/Mitra> a mbh:Person ; rdfs:label "Mitra" .
+
+<http://example.org/mbh/e/Mrityu> a mbh:Person ; rdfs:label "Mrityu" .
+
+<http://example.org/mbh/e/Mudgala> a mbh:Person ; rdfs:label "Mudgala" .
+
+<http://example.org/mbh/e/Nabhaga> a mbh:Person ; rdfs:label "Nabhaga" .
+
+<http://example.org/mbh/e/Nahusha> a mbh:Person ; rdfs:label "Nahusha" .
+
+<http://example.org/mbh/e/Nakula> a mbh:Person ; rdfs:label "Nakula" .
+
+<http://example.org/mbh/e/Nala> a mbh:Person ; rdfs:label "Nala" .
+
+<http://example.org/mbh/e/Namuchi> a mbh:Person ; rdfs:label "Namuchi" .
+
+<http://example.org/mbh/e/Nara> a mbh:Person ; rdfs:label "Nara" .
+
+<http://example.org/mbh/e/Narada> a mbh:Person ; rdfs:label "Narada" .
+
+<http://example.org/mbh/e/Naraka> a mbh:Person ; rdfs:label "Naraka" .
+
+<http://example.org/mbh/e/Narayana> a mbh:Person ; rdfs:label "Narayana" .
+
+<http://example.org/mbh/e/Nila> a mbh:Person ; rdfs:label "Nila" .
+
+<http://example.org/mbh/e/Nishadha> a mbh:Person ; rdfs:label "Nishadha" .
+
+<http://example.org/mbh/e/Nriga> a mbh:Person ; rdfs:label "Nriga" .
+
+<http://example.org/mbh/e/Oghavati> a mbh:Person ; rdfs:label "Oghavati" .
+
+<http://example.org/mbh/e/Ourva> a mbh:Person ; rdfs:label "Ourva" .
+
+<http://example.org/mbh/e/Paka> a mbh:Person ; rdfs:label "Paka" .
+
+<http://example.org/mbh/e/Palita> a mbh:Person ; rdfs:label "Palita" .
+
+<http://example.org/mbh/e/Panchala> a mbh:Person ; rdfs:label "Panchala" .
+
+<http://example.org/mbh/e/Panchali> a mbh:Person ; rdfs:label "Panchali" .
+
+<http://example.org/mbh/e/Pandava> a mbh:Person ; rdfs:label "Pandava" .
+
+<http://example.org/mbh/e/Pandu> a mbh:Person ; rdfs:label "Pandu" .
+
+<http://example.org/mbh/e/Pandya> a mbh:Person ; rdfs:label "Pandya" .
+
+<http://example.org/mbh/e/Parameshthi> a mbh:Person ; rdfs:label "Parameshthi" .
+
+<http://example.org/mbh/e/Parashara> a mbh:Person ; rdfs:label "Parashara" .
+
+<http://example.org/mbh/e/Paravasu> a mbh:Person ; rdfs:label "Paravasu" .
+
+<http://example.org/mbh/e/Parikshit> a mbh:Person ; rdfs:label "Parikshit" .
+
+<http://example.org/mbh/e/Parjanya> a mbh:Person ; rdfs:label "Parjanya" .
+
+<http://example.org/mbh/e/Parshata> a mbh:Person ; rdfs:label "Parshata" .
+
+<http://example.org/mbh/e/Partha> a mbh:Person ; rdfs:label "Partha" .
+
+<http://example.org/mbh/e/Parthas> a mbh:Person ; rdfs:label "Parthas" .
+
+<http://example.org/mbh/e/Parvata> a mbh:Person ; rdfs:label "Parvata" .
+
+<http://example.org/mbh/e/Pashupati> a mbh:Person ; rdfs:label "Pashupati" .
+
+<http://example.org/mbh/e/Pavaka> a mbh:Person ; rdfs:label "Pavaka" .
+
+<http://example.org/mbh/e/Phalguna> a mbh:Person ; rdfs:label "Phalguna" .
+
+<http://example.org/mbh/e/Pourava> a mbh:Person ; rdfs:label "Pourava" .
+
+<http://example.org/mbh/e/Poushya> a mbh:Person ; rdfs:label "Poushya" .
+
+<http://example.org/mbh/e/Pradyumna> a mbh:Person ; rdfs:label "Pradyumna" .
+
+<http://example.org/mbh/e/Prahlada> a mbh:Person ; rdfs:label "Prahlada" .
+
+<http://example.org/mbh/e/Prahrada> a mbh:Person ; rdfs:label "Prahrada" .
+
+<http://example.org/mbh/e/Prajapati> a mbh:Person ; rdfs:label "Prajapati" .
+
+<http://example.org/mbh/e/Prajapatis> a mbh:Person ; rdfs:label "Prajapatis" .
+
+<http://example.org/mbh/e/Pramadvara> a mbh:Person ; rdfs:label "Pramadvara" .
+
+<http://example.org/mbh/e/Pramati> a mbh:Person ; rdfs:label "Pramati" .
+
+<http://example.org/mbh/e/Prana> a mbh:Person ; rdfs:label "Prana" .
+
+<http://example.org/mbh/e/Pratardana> a mbh:Person ; rdfs:label "Pratardana" .
+
+<http://example.org/mbh/e/Pratipa> a mbh:Person ; rdfs:label "Pratipa" .
+
+<http://example.org/mbh/e/Prativindhya> a mbh:Person ; rdfs:label "Prativindhya" .
+
+<http://example.org/mbh/e/Prishata> a mbh:Person ; rdfs:label "Prishata" .
+
+<http://example.org/mbh/e/Pritha> a mbh:Person ; rdfs:label "Pritha" .
+
+<http://example.org/mbh/e/Prithu> a mbh:Person ; rdfs:label "Prithu" .
+
+<http://example.org/mbh/e/Pujani> a mbh:Person ; rdfs:label "Pujani" .
+
+<http://example.org/mbh/e/Pulaha> a mbh:Person ; rdfs:label "Pulaha" .
+
+<http://example.org/mbh/e/Pulastya> a mbh:Person ; rdfs:label "Pulastya" .
+
+<http://example.org/mbh/e/Puloma> a mbh:Person ; rdfs:label "Puloma" .
+
+<http://example.org/mbh/e/Pundarikaksha> a mbh:Person ; rdfs:label "Pundarikaksha" .
+
+<http://example.org/mbh/e/Punyashloka> a mbh:Person ; rdfs:label "Punyashloka" .
+
+<http://example.org/mbh/e/Purandara> a mbh:Person ; rdfs:label "Purandara" .
+
+<http://example.org/mbh/e/Purochana> a mbh:Person ; rdfs:label "Purochana" .
+
+<http://example.org/mbh/e/Puru> a mbh:Person ; rdfs:label "Puru" .
+
+<http://example.org/mbh/e/Purumitra> a mbh:Person ; rdfs:label "Purumitra" .
+
+<http://example.org/mbh/e/Pururava> a mbh:Person ; rdfs:label "Pururava" .
+
+<http://example.org/mbh/e/Purusha> a mbh:Person ; rdfs:label "Purusha" .
+
+<http://example.org/mbh/e/Purushottama> a mbh:Person ; rdfs:label "Purushottama" .
+
+<http://example.org/mbh/e/Pusha> a mbh:Person ; rdfs:label "Pusha" .
+
+<http://example.org/mbh/e/Pushkara> a mbh:Person ; rdfs:label "Pushkara" .
+
+<http://example.org/mbh/e/Radheya> a mbh:Person ; rdfs:label "Radheya" .
+
+<http://example.org/mbh/e/Raghava> a mbh:Person ; rdfs:label "Raghava" .
+
+<http://example.org/mbh/e/Rahu> a mbh:Person ; rdfs:label "Rahu" .
+
+<http://example.org/mbh/e/Raibhya> a mbh:Person ; rdfs:label "Raibhya" .
+
+<http://example.org/mbh/e/Rama> a mbh:Person ; rdfs:label "Rama" .
+
+<http://example.org/mbh/e/Rantideva> a mbh:Person ; rdfs:label "Rantideva" .
+
+<http://example.org/mbh/e/Ravana> a mbh:Person ; rdfs:label "Ravana" .
+
+<http://example.org/mbh/e/Ravi> a mbh:Person ; rdfs:label "Ravi" .
+
+<http://example.org/mbh/e/Richika> a mbh:Person ; rdfs:label "Richika" .
+
+<http://example.org/mbh/e/Rishyashringa> a mbh:Person ; rdfs:label "Rishyashringa" .
+
+<http://example.org/mbh/e/Rituparna> a mbh:Person ; rdfs:label "Rituparna" .
+
+<http://example.org/mbh/e/Rohini> a mbh:Person ; rdfs:label "Rohini" .
+
+<http://example.org/mbh/e/Ruchi> a mbh:Person ; rdfs:label "Ruchi" .
+
+<http://example.org/mbh/e/Rudra> a mbh:Person ; rdfs:label "Rudra" .
+
+<http://example.org/mbh/e/Rudras> a mbh:Person ; rdfs:label "Rudras" .
+
+<http://example.org/mbh/e/Rukmini> a mbh:Person ; rdfs:label "Rukmini" .
+
+<http://example.org/mbh/e/Ruru> a mbh:Person ; rdfs:label "Ruru" .
+
+<http://example.org/mbh/e/Sadhyas> a mbh:Person ; rdfs:label "Sadhyas" .
+
+<http://example.org/mbh/e/Sagara> a mbh:Person ; rdfs:label "Sagara" .
+
+<http://example.org/mbh/e/Sahadeva> a mbh:Person ; rdfs:label "Sahadeva" .
+
+<http://example.org/mbh/e/Saindhava> a mbh:Person ; rdfs:label "Saindhava" .
+
+<http://example.org/mbh/e/Sainya> a mbh:Person ; rdfs:label "Sainya" .
+
+<http://example.org/mbh/e/Sairandhri> a mbh:Person ; rdfs:label "Sairandhri" .
+
+<http://example.org/mbh/e/Samba> a mbh:Person ; rdfs:label "Samba" .
+
+<http://example.org/mbh/e/Samkarshana> a mbh:Person ; rdfs:label "Samkarshana" .
+
+<http://example.org/mbh/e/Samvarana> a mbh:Person ; rdfs:label "Samvarana" .
+
+<http://example.org/mbh/e/Samvarta> a mbh:Person ; rdfs:label "Samvarta" .
+
+<http://example.org/mbh/e/Sanatkumara> a mbh:Person ; rdfs:label "Sanatkumara" .
+
+<http://example.org/mbh/e/Sanatsujata> a mbh:Person ; rdfs:label "Sanatsujata" .
+
+<http://example.org/mbh/e/Sanjaya> a mbh:Person ; rdfs:label "Sanjaya" .
+
+<http://example.org/mbh/e/Sarasvata> a mbh:Person ; rdfs:label "Sarasvata" .
+
+<http://example.org/mbh/e/Sarasvati> a mbh:Person ; rdfs:label "Sarasvati" .
+
+<http://example.org/mbh/e/Sarva> a mbh:Person ; rdfs:label "Sarva" .
+
+<http://example.org/mbh/e/Satvata> a mbh:Person ; rdfs:label "Satvata" .
+
+<http://example.org/mbh/e/Satya> a mbh:Person ; rdfs:label "Satya" .
+
+<http://example.org/mbh/e/Satyabhama> a mbh:Person ; rdfs:label "Satyabhama" .
+
+<http://example.org/mbh/e/Satyadhriti> a mbh:Person ; rdfs:label "Satyadhriti" .
+
+<http://example.org/mbh/e/Satyajit> a mbh:Person ; rdfs:label "Satyajit" .
+
+<http://example.org/mbh/e/Satyaki> a mbh:Person ; rdfs:label "Satyaki" .
+
+<http://example.org/mbh/e/Satyasena> a mbh:Person ; rdfs:label "Satyasena" .
+
+<http://example.org/mbh/e/Satyavan> a mbh:Person ; rdfs:label "Satyavan" .
+
+<http://example.org/mbh/e/Satyavati> a mbh:Person ; rdfs:label "Satyavati" .
+
+<http://example.org/mbh/e/Satyavrata> a mbh:Person ; rdfs:label "Satyavrata" .
+
+<http://example.org/mbh/e/Savitri> a mbh:Person ; rdfs:label "Savitri" .
+
+<http://example.org/mbh/e/Savyasachi> a mbh:Person ; rdfs:label "Savyasachi" .
+
+<http://example.org/mbh/e/Shachi> a mbh:Person ; rdfs:label "Shachi" .
+
+<http://example.org/mbh/e/Shaibya> a mbh:Person ; rdfs:label "Shaibya" .
+
+<http://example.org/mbh/e/Shakra> a mbh:Person ; rdfs:label "Shakra" .
+
+<http://example.org/mbh/e/Shakti> a mbh:Person ; rdfs:label "Shakti" .
+
+<http://example.org/mbh/e/Shakuni> a mbh:Person ; rdfs:label "Shakuni" .
+
+<http://example.org/mbh/e/Shakuntala> a mbh:Person ; rdfs:label "Shakuntala" .
+
+<http://example.org/mbh/e/Shala> a mbh:Person ; rdfs:label "Shala" .
+
+<http://example.org/mbh/e/Shalva> a mbh:Person ; rdfs:label "Shalva" .
+
+<http://example.org/mbh/e/Shalya> a mbh:Person ; rdfs:label "Shalya" .
+
+<http://example.org/mbh/e/Shambara> a mbh:Person ; rdfs:label "Shambara" .
+
+<http://example.org/mbh/e/Shambhu> a mbh:Person ; rdfs:label "Shambhu" .
+
+<http://example.org/mbh/e/Shankara> a mbh:Person ; rdfs:label "Shankara" .
+
+<http://example.org/mbh/e/Shankha> a mbh:Person ; rdfs:label "Shankha" .
+
+<http://example.org/mbh/e/Shantanu> a mbh:Person ; rdfs:label "Shantanu" .
+
+<http://example.org/mbh/e/Sharadvat> a mbh:Person ; rdfs:label "Sharadvat" .
+
+<http://example.org/mbh/e/Sharadvata> a mbh:Person ; rdfs:label "Sharadvata" .
+
+<http://example.org/mbh/e/Sharmishtha> a mbh:Person ; rdfs:label "Sharmishtha" .
+
+<http://example.org/mbh/e/Sharva> a mbh:Person ; rdfs:label "Sharva" .
+
+<http://example.org/mbh/e/Sharyati> a mbh:Person ; rdfs:label "Sharyati" .
+
+<http://example.org/mbh/e/Shatakratu> a mbh:Person ; rdfs:label "Shatakratu" .
+
+<http://example.org/mbh/e/Shatanika> a mbh:Person ; rdfs:label "Shatanika" .
+
+<http://example.org/mbh/e/Shatayupa> a mbh:Person ; rdfs:label "Shatayupa" .
+
+<http://example.org/mbh/e/Shesha> a mbh:Person ; rdfs:label "Shesha" .
+
+<http://example.org/mbh/e/Shibi> a mbh:Person ; rdfs:label "Shibi" .
+
+<http://example.org/mbh/e/Shikhandi> a mbh:Person ; rdfs:label "Shikhandi" .
+
+<http://example.org/mbh/e/Shini> a mbh:Person ; rdfs:label "Shini" .
+
+<http://example.org/mbh/e/Shishupala> a mbh:Person ; rdfs:label "Shishupala" .
+
+<http://example.org/mbh/e/Shiva> a mbh:Person ; rdfs:label "Shiva" .
+
+<http://example.org/mbh/e/Shounaka> a mbh:Person ; rdfs:label "Shounaka" .
+
+<http://example.org/mbh/e/Shouri> a mbh:Person ; rdfs:label "Shouri" .
+
+<http://example.org/mbh/e/Shringi> a mbh:Person ; rdfs:label "Shringi" .
+
+<http://example.org/mbh/e/Shrutakarma> a mbh:Person ; rdfs:label "Shrutakarma" .
+
+<http://example.org/mbh/e/Shrutakirti> a mbh:Person ; rdfs:label "Shrutakirti" .
+
+<http://example.org/mbh/e/Shrutayu> a mbh:Person ; rdfs:label "Shrutayu" .
+
+<http://example.org/mbh/e/Shrutayudha> a mbh:Person ; rdfs:label "Shrutayudha" .
+
+<http://example.org/mbh/e/Shuka> a mbh:Person ; rdfs:label "Shuka" .
+
+<http://example.org/mbh/e/Shukra> a mbh:Person ; rdfs:label "Shukra" .
+
+<http://example.org/mbh/e/Shunaka> a mbh:Person ; rdfs:label "Shunaka" .
+
+<http://example.org/mbh/e/Shunasakha> a mbh:Person ; rdfs:label "Shunasakha" .
+
+<http://example.org/mbh/e/Shura> a mbh:Person ; rdfs:label "Shura" .
+
+<http://example.org/mbh/e/Shvetaketu> a mbh:Person ; rdfs:label "Shvetaketu" .
+
+<http://example.org/mbh/e/Sita> a mbh:Person ; rdfs:label "Sita" .
+
+<http://example.org/mbh/e/Skanda> a mbh:Person ; rdfs:label "Skanda" .
+
+<http://example.org/mbh/e/Soma> a mbh:Person ; rdfs:label "Soma" .
+
+<http://example.org/mbh/e/Somadatta> a mbh:Person ; rdfs:label "Somadatta" .
+
+<http://example.org/mbh/e/Somaka> a mbh:Person ; rdfs:label "Somaka" .
+
+<http://example.org/mbh/e/Soubala> a mbh:Person ; rdfs:label "Soubala" .
+
+<http://example.org/mbh/e/Soudasa> a mbh:Person ; rdfs:label "Soudasa" .
+
+<http://example.org/mbh/e/Soumitri> a mbh:Person ; rdfs:label "Soumitri" .
+
+<http://example.org/mbh/e/Souti> a mbh:Person ; rdfs:label "Souti" .
+
+<http://example.org/mbh/e/Srinjaya> a mbh:Person ; rdfs:label "Srinjaya" .
+
+<http://example.org/mbh/e/Sthanu> a mbh:Person ; rdfs:label "Sthanu" .
+
+<http://example.org/mbh/e/Sthuna> a mbh:Person ; rdfs:label "Sthuna" .
+
+<http://example.org/mbh/e/Subahu> a mbh:Person ; rdfs:label "Subahu" .
+
+<http://example.org/mbh/e/Subala> a mbh:Person ; rdfs:label "Subala" .
+
+<http://example.org/mbh/e/Subhadra> a mbh:Person ; rdfs:label "Subhadra" .
+
+<http://example.org/mbh/e/Sudakshina> a mbh:Person ; rdfs:label "Sudakshina" .
+
+<http://example.org/mbh/e/Sudarshana> a mbh:Person ; rdfs:label "Sudarshana" .
+
+<http://example.org/mbh/e/Sudeshna> a mbh:Person ; rdfs:label "Sudeshna" .
+
+<http://example.org/mbh/e/Sudeva> a mbh:Person ; rdfs:label "Sudeva" .
+
+<http://example.org/mbh/e/Sudhanva> a mbh:Person ; rdfs:label "Sudhanva" .
+
+<http://example.org/mbh/e/Sudharma> a mbh:Person ; rdfs:label "Sudharma" .
+
+<http://example.org/mbh/e/Sugriva> a mbh:Person ; rdfs:label "Sugriva" .
+
+<http://example.org/mbh/e/Suhotra> a mbh:Person ; rdfs:label "Suhotra" .
+
+<http://example.org/mbh/e/Sukanya> a mbh:Person ; rdfs:label "Sukanya" .
+
+<http://example.org/mbh/e/Sumitra> a mbh:Person ; rdfs:label "Sumitra" .
+
+<http://example.org/mbh/e/Sumukha> a mbh:Person ; rdfs:label "Sumukha" .
+
+<http://example.org/mbh/e/Sunda> a mbh:Person ; rdfs:label "Sunda" .
+
+<http://example.org/mbh/e/Suparna> a mbh:Person ; rdfs:label "Suparna" .
+
+<http://example.org/mbh/e/Surabhi> a mbh:Person ; rdfs:label "Surabhi" .
+
+<http://example.org/mbh/e/Suratha> a mbh:Person ; rdfs:label "Suratha" .
+
+<http://example.org/mbh/e/Surya> a mbh:Person ; rdfs:label "Surya" .
+
+<http://example.org/mbh/e/Susharma> a mbh:Person ; rdfs:label "Susharma" .
+
+<http://example.org/mbh/e/Sushena> a mbh:Person ; rdfs:label "Sushena" .
+
+<http://example.org/mbh/e/Sutasoma> a mbh:Person ; rdfs:label "Sutasoma" .
+
+<http://example.org/mbh/e/Suyodhana> a mbh:Person ; rdfs:label "Suyodhana" .
+
+<http://example.org/mbh/e/Svaha> a mbh:Person ; rdfs:label "Svaha" .
+
+<http://example.org/mbh/e/Svarbhanu> a mbh:Person ; rdfs:label "Svarbhanu" .
+
+<http://example.org/mbh/e/Svayambhu> a mbh:Person ; rdfs:label "Svayambhu" .
+
+<http://example.org/mbh/e/Takshaka> a mbh:Person ; rdfs:label "Takshaka" .
+
+<http://example.org/mbh/e/Tapati> a mbh:Person ; rdfs:label "Tapati" .
+
+<http://example.org/mbh/e/Taraka> a mbh:Person ; rdfs:label "Taraka" .
+
+<http://example.org/mbh/e/Tarkshya> a mbh:Person ; rdfs:label "Tarkshya" .
+
+<http://example.org/mbh/e/Tilottama> a mbh:Person ; rdfs:label "Tilottama" .
+
+<http://example.org/mbh/e/Trishira> a mbh:Person ; rdfs:label "Trishira" .
+
+<http://example.org/mbh/e/Trita> a mbh:Person ; rdfs:label "Trita" .
+
+<http://example.org/mbh/e/Tryambaka> a mbh:Person ; rdfs:label "Tryambaka" .
+
+<http://example.org/mbh/e/Tuladhara> a mbh:Person ; rdfs:label "Tuladhara" .
+
+<http://example.org/mbh/e/Tvashtra> a mbh:Person ; rdfs:label "Tvashtra" .
+
+<http://example.org/mbh/e/Ugrasena> a mbh:Person ; rdfs:label "Ugrasena" .
+
+<http://example.org/mbh/e/Uluka> a mbh:Person ; rdfs:label "Uluka" .
+
+<http://example.org/mbh/e/Ulupi> a mbh:Person ; rdfs:label "Ulupi" .
+
+<http://example.org/mbh/e/Uma> a mbh:Person ; rdfs:label "Uma" .
+
+<http://example.org/mbh/e/Upamanyu> a mbh:Person ; rdfs:label "Upamanyu" .
+
+<http://example.org/mbh/e/Ushanas> a mbh:Person ; rdfs:label "Ushanas" .
+
+<http://example.org/mbh/e/Ushinara> a mbh:Person ; rdfs:label "Ushinara" .
+
+<http://example.org/mbh/e/Utanka> a mbh:Person ; rdfs:label "Utanka" .
+
+<http://example.org/mbh/e/Utathya> a mbh:Person ; rdfs:label "Utathya" .
+
+<http://example.org/mbh/e/Uttamouja> a mbh:Person ; rdfs:label "Uttamouja" .
+
+<http://example.org/mbh/e/Uttara> a mbh:Person ; rdfs:label "Uttara" .
+
+<http://example.org/mbh/e/Vaidehi> a mbh:Person ; rdfs:label "Vaidehi" .
+
+<http://example.org/mbh/e/Vaikartana> a mbh:Person ; rdfs:label "Vaikartana" .
+
+<http://example.org/mbh/e/Vainya> a mbh:Person ; rdfs:label "Vainya" .
+
+<http://example.org/mbh/e/Vaishampayana> a mbh:Person ; rdfs:label "Vaishampayana" .
+
+<http://example.org/mbh/e/Vaishravana> a mbh:Person ; rdfs:label "Vaishravana" .
+
+<http://example.org/mbh/e/Vaivasvata> a mbh:Person ; rdfs:label "Vaivasvata" .
+
+<http://example.org/mbh/e/Vajra> a mbh:Person ; rdfs:label "Vajra" .
+
+<http://example.org/mbh/e/Vali> a mbh:Person ; rdfs:label "Vali" .
+
+<http://example.org/mbh/e/Vamadeva> a mbh:Person ; rdfs:label "Vamadeva" .
+
+<http://example.org/mbh/e/Vamana> a mbh:Person ; rdfs:label "Vamana" .
+
+<http://example.org/mbh/e/Varshneya> a mbh:Person ; rdfs:label "Varshneya" .
+
+<http://example.org/mbh/e/Varuna> a mbh:Person ; rdfs:label "Varuna" .
+
+<http://example.org/mbh/e/Vasava> a mbh:Person ; rdfs:label "Vasava" .
+
+<http://example.org/mbh/e/Vashishtha> a mbh:Person ; rdfs:label "Vashishtha" .
+
+<http://example.org/mbh/e/Vasishtha> a mbh:Person ; rdfs:label "Vasishtha" .
+
+<http://example.org/mbh/e/Vasu> a mbh:Person ; rdfs:label "Vasu" .
+
+<http://example.org/mbh/e/Vasudana> a mbh:Person ; rdfs:label "Vasudana" .
+
+<http://example.org/mbh/e/Vasudeva> a mbh:Person ; rdfs:label "Vasudeva" .
+
+<http://example.org/mbh/e/Vasuki> a mbh:Person ; rdfs:label "Vasuki" .
+
+<http://example.org/mbh/e/Vasumana> a mbh:Person ; rdfs:label "Vasumana" .
+
+<http://example.org/mbh/e/Vasus> a mbh:Person ; rdfs:label "Vasus" .
+
+<http://example.org/mbh/e/Vatapi> a mbh:Person ; rdfs:label "Vatapi" .
+
+<http://example.org/mbh/e/Vayu> a mbh:Person ; rdfs:label "Vayu" .
+
+<http://example.org/mbh/e/Vibhavasu> a mbh:Person ; rdfs:label "Vibhavasu" .
+
+<http://example.org/mbh/e/Vibhishana> a mbh:Person ; rdfs:label "Vibhishana" .
+
+<http://example.org/mbh/e/Vichitravirya> a mbh:Person ; rdfs:label "Vichitravirya" .
+
+<http://example.org/mbh/e/Vidhata> a mbh:Person ; rdfs:label "Vidhata" .
+
+<http://example.org/mbh/e/Vidura> a mbh:Person ; rdfs:label "Vidura" .
+
+<http://example.org/mbh/e/Vijaya> a mbh:Person ; rdfs:label "Vijaya" .
+
+<http://example.org/mbh/e/Vikarna> a mbh:Person ; rdfs:label "Vikarna" .
+
+<http://example.org/mbh/e/Vinata> a mbh:Person ; rdfs:label "Vinata" .
+
+<http://example.org/mbh/e/Vinda> a mbh:Person ; rdfs:label "Vinda" .
+
+<http://example.org/mbh/e/Viprachitti> a mbh:Person ; rdfs:label "Viprachitti" .
+
+<http://example.org/mbh/e/Vipula> a mbh:Person ; rdfs:label "Vipula" .
+
+<http://example.org/mbh/e/Virata> a mbh:Person ; rdfs:label "Virata" .
+
+<http://example.org/mbh/e/Virochana> a mbh:Person ; rdfs:label "Virochana" .
+
+<http://example.org/mbh/e/Virupaksha> a mbh:Person ; rdfs:label "Virupaksha" .
+
+<http://example.org/mbh/e/Vishakha> a mbh:Person ; rdfs:label "Vishakha" .
+
+<http://example.org/mbh/e/Vishnu> a mbh:Person ; rdfs:label "Vishnu" .
+
+<http://example.org/mbh/e/Vishoka> a mbh:Person ; rdfs:label "Vishoka" .
+
+<http://example.org/mbh/e/Vishvadevas> a mbh:Person ; rdfs:label "Vishvadevas" .
+
+<http://example.org/mbh/e/Vishvakarma> a mbh:Person ; rdfs:label "Vishvakarma" .
+
+<http://example.org/mbh/e/Vishvamitra> a mbh:Person ; rdfs:label "Vishvamitra" .
+
+<http://example.org/mbh/e/Vishvarupa> a mbh:Person ; rdfs:label "Vishvarupa" .
+
+<http://example.org/mbh/e/Vishvavasu> a mbh:Person ; rdfs:label "Vishvavasu" .
+
+<http://example.org/mbh/e/Vivasvat> a mbh:Person ; rdfs:label "Vivasvat" .
+
+<http://example.org/mbh/e/Vivimshati> a mbh:Person ; rdfs:label "Vivimshati" .
+
+<http://example.org/mbh/e/Vriddhakshatra> a mbh:Person ; rdfs:label "Vriddhakshatra" .
+
+<http://example.org/mbh/e/Vrika> a mbh:Person ; rdfs:label "Vrika" .
+
+<http://example.org/mbh/e/Vrikodara> a mbh:Person ; rdfs:label "Vrikodara" .
+
+<http://example.org/mbh/e/Vrisha> a mbh:Person ; rdfs:label "Vrisha" .
+
+<http://example.org/mbh/e/Vrishadhvaja> a mbh:Person ; rdfs:label "Vrishadhvaja" .
+
+<http://example.org/mbh/e/Vrishaka> a mbh:Person ; rdfs:label "Vrishaka" .
+
+<http://example.org/mbh/e/Vrishaparva> a mbh:Person ; rdfs:label "Vrishaparva" .
+
+<http://example.org/mbh/e/Vrishasena> a mbh:Person ; rdfs:label "Vrishasena" .
+
+<http://example.org/mbh/e/Vritra> a mbh:Person ; rdfs:label "Vritra" .
+
+<http://example.org/mbh/e/Vyasa> a mbh:Person ; rdfs:label "Vyasa" .
+
+<http://example.org/mbh/e/Yadu> a mbh:Person ; rdfs:label "Yadu" .
+
+<http://example.org/mbh/e/Yaja> a mbh:Person ; rdfs:label "Yaja" .
+
+<http://example.org/mbh/e/Yajnasena> a mbh:Person ; rdfs:label "Yajnasena" .
+
+<http://example.org/mbh/e/Yajnaseni> a mbh:Person ; rdfs:label "Yajnaseni" .
+
+<http://example.org/mbh/e/Yajnavalkya> a mbh:Person ; rdfs:label "Yajnavalkya" .
+
+<http://example.org/mbh/e/Yama> a mbh:Person ; rdfs:label "Yama" .
+
+<http://example.org/mbh/e/Yatudhani> a mbh:Person ; rdfs:label "Yatudhani" .
+
+<http://example.org/mbh/e/Yavakrita> a mbh:Person ; rdfs:label "Yavakrita" .
+
+<http://example.org/mbh/e/Yayati> a mbh:Person ; rdfs:label "Yayati" .
+
+<http://example.org/mbh/e/Yudhamanyu> a mbh:Person ; rdfs:label "Yudhamanyu" .
+
+<http://example.org/mbh/e/Yudhishthira> a mbh:Person ; rdfs:label "Yudhishthira" .
+
+<http://example.org/mbh/e/Yudhisthira> a mbh:Person ; rdfs:label "Yudhisthira" .
+
+<http://example.org/mbh/e/Yuvanashva> a mbh:Person ; rdfs:label "Yuvanashva" .
+
+<http://example.org/mbh/e/Yuyudhana> a mbh:Person ; rdfs:label "Yuyudhana" .
+
+<http://example.org/mbh/e/Yuyutsu> a mbh:Person ; rdfs:label "Yuyutsu" .
+
+<http://example.org/mbh/e/Achyuta> a mbh:Appellation ; rdfs:label "Achyuta" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Achyuta> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Govinda> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Achyuta> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Madhusudana> ; mbh:confidence "0.1667"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Achyuta> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Purushottama> ; mbh:confidence "0.0833"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Achyuta> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vasudeva> ; mbh:confidence "0.0833"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Achyuta> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Janardana> ; mbh:confidence "0.0833"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Achyuta> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.0833"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Achyuta> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dasharha> ; mbh:confidence "0.0833"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Achyuta> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pundarikaksha> ; mbh:confidence "0.0833"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Achyuta> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Narayana> ; mbh:confidence "0.0833"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Aila> a mbh:Appellation ; rdfs:label "Aila" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Aila> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pururava> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Ajamidha> a mbh:Appellation ; rdfs:label "Ajamidha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Ajamidha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yudhishthira> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Ajamidha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Nakula> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Ajatashatru> a mbh:Appellation ; rdfs:label "Ajatashatru" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Ajatashatru> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kounteya> ; mbh:confidence "0.4286"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Ajatashatru> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.2857"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Ajatashatru> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Partha> ; mbh:confidence "0.1429"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Ajatashatru> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yudhishthira> ; mbh:confidence "0.1429"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Angiras> a mbh:Appellation ; rdfs:label "Angiras" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Angiras> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Agni> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Angirasa> a mbh:Appellation ; rdfs:label "Angirasa" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Angirasa> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Brihaspati> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Baladeva> a mbh:Appellation ; rdfs:label "Baladeva" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Baladeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Madhava> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Bhanu> a mbh:Appellation ; rdfs:label "Bhanu" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Bhanu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Surya> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Bhanu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vibhavasu> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Bharadvaja> a mbh:Appellation ; rdfs:label "Bharadvaja" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/Bharadvaja> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Drona> ; mbh:evidenceCount 0 ] .
+
+<http://example.org/mbh/e/Bharata> a mbh:Appellation ; rdfs:label "Bharata" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Bharata> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Bhargava> a mbh:Appellation ; rdfs:label "Bhargava" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Bhargava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Rama> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 7 ] .
+
+<http://example.org/mbh/e/Bhima> a mbh:Appellation ; rdfs:label "Bhima" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Bhima> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dhritarashtra> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Bhimasena> a mbh:Appellation ; rdfs:label "Bhimasena" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Bhimasena> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.9677"^^xsd:decimal ; mbh:evidenceCount 30 ] .
+<http://example.org/mbh/e/Bhimasena> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Partha> ; mbh:confidence "0.0323"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Bhoja> a mbh:Appellation ; rdfs:label "Bhoja" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Bhoja> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kritavarma> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+
+<http://example.org/mbh/e/Bibhatsu> a mbh:Appellation ; rdfs:label "Bibhatsu" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Bibhatsu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.3636"^^xsd:decimal ; mbh:evidenceCount 4 ] .
+<http://example.org/mbh/e/Bibhatsu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Partha> ; mbh:confidence "0.2727"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Bibhatsu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Phalguna> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Bibhatsu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kounteya> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Bibhatsu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Savyasachi> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Bibhatsu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kiriti> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Brihatkshatra> a mbh:Appellation ; rdfs:label "Brihatkshatra" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Brihatkshatra> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pourava> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Chekitana> a mbh:Appellation ; rdfs:label "Chekitana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Chekitana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Varshneya> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Chyavana> a mbh:Appellation ; rdfs:label "Chyavana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Chyavana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhargava> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 8 ] .
+
+<http://example.org/mbh/e/Daksha> a mbh:Appellation ; rdfs:label "Daksha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Daksha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 7 ] .
+
+<http://example.org/mbh/e/Dasharha> a mbh:Appellation ; rdfs:label "Dasharha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Dasharha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.6667"^^xsd:decimal ; mbh:evidenceCount 4 ] .
+<http://example.org/mbh/e/Dasharha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Madhusudana> ; mbh:confidence "0.1667"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Dasharha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Satyaki> ; mbh:confidence "0.1667"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Devavrata> a mbh:Appellation ; rdfs:label "Devavrata" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Devavrata> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhishma> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+
+<http://example.org/mbh/e/Dhananjaya> a mbh:Appellation ; rdfs:label "Dhananjaya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Dhananjaya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Partha> ; mbh:confidence "0.5893"^^xsd:decimal ; mbh:evidenceCount 33 ] .
+<http://example.org/mbh/e/Dhananjaya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.3929"^^xsd:decimal ; mbh:evidenceCount 22 ] .
+<http://example.org/mbh/e/Dhananjaya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kouravya> ; mbh:confidence "0.0179"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Dharmaraja> a mbh:Appellation ; rdfs:label "Dharmaraja" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Dharmaraja> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yudhishthira> ; mbh:confidence "0.8361"^^xsd:decimal ; mbh:evidenceCount 102 ] .
+<http://example.org/mbh/e/Dharmaraja> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.1066"^^xsd:decimal ; mbh:evidenceCount 13 ] .
+<http://example.org/mbh/e/Dharmaraja> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yama> ; mbh:confidence "0.0164"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Dharmaraja> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kounteya> ; mbh:confidence "0.0164"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Dharmaraja> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yudhisthira> ; mbh:confidence "0.0164"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Dharmaraja> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kouravya> ; mbh:confidence "0.0082"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Droupadi> a mbh:Appellation ; rdfs:label "Droupadi" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Droupadi> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 15 ] .
+
+<http://example.org/mbh/e/Dvaipayana> a mbh:Appellation ; rdfs:label "Dvaipayana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Dvaipayana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.9825"^^xsd:decimal ; mbh:evidenceCount 56 ] .
+<http://example.org/mbh/e/Dvaipayana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vyasa> ; mbh:confidence "0.0175"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Gangeya> a mbh:Appellation ; rdfs:label "Gangeya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Gangeya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhishma> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+
+<http://example.org/mbh/e/Goutama> a mbh:Appellation ; rdfs:label "Goutama" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Goutama> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kripa> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+
+<http://example.org/mbh/e/Govinda> a mbh:Appellation ; rdfs:label "Govinda" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Govinda> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Varshneya> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Govinda> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shouri> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Govinda> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Purushottama> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Gudakesha> a mbh:Appellation ; rdfs:label "Gudakesha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Gudakesha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dhananjaya> ; mbh:confidence "0.75"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Gudakesha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Partha> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Halayudha> a mbh:Appellation ; rdfs:label "Halayudha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/Halayudha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Balarama> ; mbh:evidenceCount 0 ] .
+
+<http://example.org/mbh/e/Hardikya> a mbh:Appellation ; rdfs:label "Hardikya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Hardikya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kritavarma> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 9 ] .
+
+<http://example.org/mbh/e/Hrishikesha> a mbh:Appellation ; rdfs:label "Hrishikesha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Hrishikesha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vishnu> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Hrishikesha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Janardana> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Indrani> a mbh:Appellation ; rdfs:label "Indrani" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Indrani> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shachi> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Ishana> a mbh:Appellation ; rdfs:label "Ishana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Ishana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shiva> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Jalasandha> a mbh:Appellation ; rdfs:label "Jalasandha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Jalasandha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kouravya> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Jamadagni> a mbh:Appellation ; rdfs:label "Jamadagni" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Jamadagni> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Rama> ; mbh:confidence "0.6667"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Jamadagni> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhargava> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Janardana> a mbh:Appellation ; rdfs:label "Janardana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Janardana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.2727"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Janardana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dasharha> ; mbh:confidence "0.1818"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Janardana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Hari> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Janardana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Madhusudana> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Janardana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Purushottama> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Janardana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Keshava> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Janardana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vishnu> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Janardana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shouri> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Jayatsena> a mbh:Appellation ; rdfs:label "Jayatsena" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Jayatsena> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kouravya> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Jishnu> a mbh:Appellation ; rdfs:label "Jishnu" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Jishnu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kounteya> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Jishnu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Nara> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Kapila> a mbh:Appellation ; rdfs:label "Kapila" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Kapila> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Kartavirya> a mbh:Appellation ; rdfs:label "Kartavirya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Kartavirya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Arjuna> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Kartikeya> a mbh:Appellation ; rdfs:label "Kartikeya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Kartikeya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bala> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Kashyapa> a mbh:Appellation ; rdfs:label "Kashyapa" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Kashyapa> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 5 ] .
+
+<http://example.org/mbh/e/Kavya> a mbh:Appellation ; rdfs:label "Kavya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Kavya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Ushanas> ; mbh:confidence "0.75"^^xsd:decimal ; mbh:evidenceCount 6 ] .
+<http://example.org/mbh/e/Kavya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shukra> ; mbh:confidence "0.125"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Kavya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhargava> ; mbh:confidence "0.125"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Keshava> a mbh:Appellation ; rdfs:label "Keshava" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Keshava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.2"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Keshava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vishnu> ; mbh:confidence "0.2"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Keshava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dasharha> ; mbh:confidence "0.2"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Keshava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Varshneya> ; mbh:confidence "0.2"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Keshava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Purushottama> ; mbh:confidence "0.2"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Khandavaprastha> a mbh:Appellation ; rdfs:label "Khandavaprastha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/Khandavaprastha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Indraprastha> ; mbh:evidenceCount 0 ] .
+
+<http://example.org/mbh/e/Kiriti> a mbh:Appellation ; rdfs:label "Kiriti" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Kiriti> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.375"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Kiriti> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Partha> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Kiriti> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Arjuna> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Kiriti> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dhananjaya> ; mbh:confidence "0.125"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Kounteya> a mbh:Appellation ; rdfs:label "Kounteya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Kounteya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yudhishthira> ; mbh:confidence "0.2889"^^xsd:decimal ; mbh:evidenceCount 13 ] .
+<http://example.org/mbh/e/Kounteya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhimasena> ; mbh:confidence "0.2222"^^xsd:decimal ; mbh:evidenceCount 10 ] .
+<http://example.org/mbh/e/Kounteya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Arjuna> ; mbh:confidence "0.1556"^^xsd:decimal ; mbh:evidenceCount 7 ] .
+<http://example.org/mbh/e/Kounteya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.1111"^^xsd:decimal ; mbh:evidenceCount 5 ] .
+<http://example.org/mbh/e/Kounteya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dhananjaya> ; mbh:confidence "0.1111"^^xsd:decimal ; mbh:evidenceCount 5 ] .
+<http://example.org/mbh/e/Kounteya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhima> ; mbh:confidence "0.0444"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Kounteya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yudhisthira> ; mbh:confidence "0.0222"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Kounteya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kouravya> ; mbh:confidence "0.0222"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Kounteya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Karna> ; mbh:confidence "0.0222"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Kouravya> a mbh:Appellation ; rdfs:label "Kouravya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Kouravya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yudhishthira> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Kouravya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dhritarashtra> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Kouravya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Duryodhana> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Kouravya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhishma> ; mbh:confidence "0.125"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Kouravya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Arjuna> ; mbh:confidence "0.125"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Koushika> a mbh:Appellation ; rdfs:label "Koushika" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Koushika> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vishvamitra> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Kritavarma> a mbh:Appellation ; rdfs:label "Kritavarma" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Kritavarma> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Satyaki> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Kshatta> a mbh:Appellation ; rdfs:label "Kshatta" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Kshatta> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vidura> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+
+<http://example.org/mbh/e/Kumara> a mbh:Appellation ; rdfs:label "Kumara" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Kumara> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Skanda> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Kuntibhoja> a mbh:Appellation ; rdfs:label "Kuntibhoja" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/Kuntibhoja> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kunti> ; mbh:evidenceCount 0 ] .
+
+<http://example.org/mbh/e/Madhava> a mbh:Appellation ; rdfs:label "Madhava" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Madhava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Madhava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Satyaki> ; mbh:confidence "0.2222"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Madhava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Rama> ; mbh:confidence "0.2222"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Madhava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Janardana> ; mbh:confidence "0.1111"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Madhava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vasudeva> ; mbh:confidence "0.1111"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Madhusudana> a mbh:Appellation ; rdfs:label "Madhusudana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Madhusudana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Mahadeva> a mbh:Appellation ; rdfs:label "Mahadeva" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Mahadeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Rudra> ; mbh:confidence "0.2857"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Mahadeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pashupati> ; mbh:confidence "0.2857"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Mahadeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Maheshvara> ; mbh:confidence "0.1429"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Mahadeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shiva> ; mbh:confidence "0.1429"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Mahadeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "0.1429"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Manu> a mbh:Appellation ; rdfs:label "Manu" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Manu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 8 ] .
+
+<http://example.org/mbh/e/Nara> a mbh:Appellation ; rdfs:label "Nara" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Nara> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Narayana> a mbh:Appellation ; rdfs:label "Narayana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Narayana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Hari> ; mbh:confidence "0.8333"^^xsd:decimal ; mbh:evidenceCount 15 ] .
+<http://example.org/mbh/e/Narayana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vishnu> ; mbh:confidence "0.0556"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Narayana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.0556"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Narayana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dhata> ; mbh:confidence "0.0556"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Nishadha> a mbh:Appellation ; rdfs:label "Nishadha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Nishadha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Nala> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+
+<http://example.org/mbh/e/Panchala> a mbh:Appellation ; rdfs:label "Panchala" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Panchala> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dhrishtadyumna> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 10 ] .
+<http://example.org/mbh/e/Panchala> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shikhandi> ; mbh:confidence "0.35"^^xsd:decimal ; mbh:evidenceCount 7 ] .
+<http://example.org/mbh/e/Panchala> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yajnasena> ; mbh:confidence "0.05"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Panchala> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Parshata> ; mbh:confidence "0.05"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Panchala> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Uttamouja> ; mbh:confidence "0.05"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Panchali> a mbh:Appellation ; rdfs:label "Panchali" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Panchali> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Droupadi> ; mbh:confidence "0.75"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Panchali> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Pandava> a mbh:Appellation ; rdfs:label "Pandava" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Pandava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yudhishthira> ; mbh:confidence "0.3438"^^xsd:decimal ; mbh:evidenceCount 11 ] .
+<http://example.org/mbh/e/Pandava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Sahadeva> ; mbh:confidence "0.2188"^^xsd:decimal ; mbh:evidenceCount 7 ] .
+<http://example.org/mbh/e/Pandava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Arjuna> ; mbh:confidence "0.1875"^^xsd:decimal ; mbh:evidenceCount 6 ] .
+<http://example.org/mbh/e/Pandava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhima> ; mbh:confidence "0.1562"^^xsd:decimal ; mbh:evidenceCount 5 ] .
+<http://example.org/mbh/e/Pandava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Nakula> ; mbh:confidence "0.0625"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Pandava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Janamejaya> ; mbh:confidence "0.0312"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Parameshthi> a mbh:Appellation ; rdfs:label "Parameshthi" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Parameshthi> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Brahma> ; mbh:confidence "0.75"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Parameshthi> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Parshata> a mbh:Appellation ; rdfs:label "Parshata" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Parshata> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dhrishtadyumna> ; mbh:confidence "0.9778"^^xsd:decimal ; mbh:evidenceCount 44 ] .
+<http://example.org/mbh/e/Parshata> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Drupada> ; mbh:confidence "0.0222"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Partha> a mbh:Appellation ; rdfs:label "Partha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Partha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Arjuna> ; mbh:confidence "0.45"^^xsd:decimal ; mbh:evidenceCount 9 ] .
+<http://example.org/mbh/e/Partha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yudhishthira> ; mbh:confidence "0.35"^^xsd:decimal ; mbh:evidenceCount 7 ] .
+<http://example.org/mbh/e/Partha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.1"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Partha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhima> ; mbh:confidence "0.05"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Partha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kouravya> ; mbh:confidence "0.05"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Phalguna> a mbh:Appellation ; rdfs:label "Phalguna" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Phalguna> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Phalguna> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Partha> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Pourava> a mbh:Appellation ; rdfs:label "Pourava" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Pourava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Jalasandha> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Prajapati> a mbh:Appellation ; rdfs:label "Prajapati" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Prajapati> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Brahma> ; mbh:confidence "0.8571"^^xsd:decimal ; mbh:evidenceCount 6 ] .
+<http://example.org/mbh/e/Prajapati> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vishnu> ; mbh:confidence "0.1429"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Pritha> a mbh:Appellation ; rdfs:label "Pritha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Pritha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kunti> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Pundarikaksha> a mbh:Appellation ; rdfs:label "Pundarikaksha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Pundarikaksha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.6667"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Pundarikaksha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Hari> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Punyashloka> a mbh:Appellation ; rdfs:label "Punyashloka" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Punyashloka> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Nishadha> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Punyashloka> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Nala> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Purandara> a mbh:Appellation ; rdfs:label "Purandara" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/Purandara> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Indra> ; mbh:evidenceCount 0 ] .
+
+<http://example.org/mbh/e/Purushottama> a mbh:Appellation ; rdfs:label "Purushottama" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Purushottama> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.75"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Purushottama> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pundarikaksha> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Radheya> a mbh:Appellation ; rdfs:label "Radheya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Radheya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Karna> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 4 ] .
+
+<http://example.org/mbh/e/Richika> a mbh:Appellation ; rdfs:label "Richika" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Richika> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhargava> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+
+<http://example.org/mbh/e/Rudra> a mbh:Appellation ; rdfs:label "Rudra" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Rudra> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Hara> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Rukmini> a mbh:Appellation ; rdfs:label "Rukmini" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Rukmini> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Gandhari> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Saindhava> a mbh:Appellation ; rdfs:label "Saindhava" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Saindhava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Jayadratha> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 9 ] .
+
+<http://example.org/mbh/e/Samkarshana> a mbh:Appellation ; rdfs:label "Samkarshana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Samkarshana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Satvata> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Satvata> a mbh:Appellation ; rdfs:label "Satvata" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Satvata> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kritavarma> ; mbh:confidence "0.8696"^^xsd:decimal ; mbh:evidenceCount 20 ] .
+<http://example.org/mbh/e/Satvata> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Satyaki> ; mbh:confidence "0.087"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Satvata> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Hardikya> ; mbh:confidence "0.0435"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Savyasachi> a mbh:Appellation ; rdfs:label "Savyasachi" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Savyasachi> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 6 ] .
+<http://example.org/mbh/e/Savyasachi> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dhananjaya> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Savyasachi> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Arjuna> ; mbh:confidence "0.1667"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Savyasachi> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Partha> ; mbh:confidence "0.0833"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Shakra> a mbh:Appellation ; rdfs:label "Shakra" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Shakra> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Maghavan> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Shakra> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shatakratu> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Shambhu> a mbh:Appellation ; rdfs:label "Shambhu" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Shambhu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Svayambhu> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Shambhu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Sharadvat> a mbh:Appellation ; rdfs:label "Sharadvat" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Sharadvat> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kripa> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Sharadvata> a mbh:Appellation ; rdfs:label "Sharadvata" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Sharadvata> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kripa> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 34 ] .
+
+<http://example.org/mbh/e/Sharva> a mbh:Appellation ; rdfs:label "Sharva" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Sharva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shiva> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Shatakratu> a mbh:Appellation ; rdfs:label "Shatakratu" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Shatakratu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Indra> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+
+<http://example.org/mbh/e/Shiva> a mbh:Appellation ; rdfs:label "Shiva" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Shiva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shankara> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Shouri> a mbh:Appellation ; rdfs:label "Shouri" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Shouri> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Shouri> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shini> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Shvetavahana> a mbh:Appellation ; rdfs:label "Shvetavahana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/Shvetavahana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Arjuna> ; mbh:evidenceCount 0 ] .
+
+<http://example.org/mbh/e/Somaka> a mbh:Appellation ; rdfs:label "Somaka" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Somaka> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Sahadeva> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Soubala> a mbh:Appellation ; rdfs:label "Soubala" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Soubala> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shakuni> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 51 ] .
+
+<http://example.org/mbh/e/Soumitri> a mbh:Appellation ; rdfs:label "Soumitri" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Soumitri> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Lakshmana> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Sthanu> a mbh:Appellation ; rdfs:label "Sthanu" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Sthanu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Ishana> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Sthanu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shiva> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Sthanu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Maheshvara> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Suyodhana> a mbh:Appellation ; rdfs:label "Suyodhana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/Suyodhana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Duryodhana> ; mbh:evidenceCount 0 ] .
+
+<http://example.org/mbh/e/Svayambhu> a mbh:Appellation ; rdfs:label "Svayambhu" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Svayambhu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Brahma> ; mbh:confidence "0.4286"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Svayambhu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Manu> ; mbh:confidence "0.4286"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Svayambhu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vishnu> ; mbh:confidence "0.1429"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Tryambaka> a mbh:Appellation ; rdfs:label "Tryambaka" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Tryambaka> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Hara> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Tvashtra> a mbh:Appellation ; rdfs:label "Tvashtra" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Tvashtra> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "0.6667"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Tvashtra> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vishvakarma> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Ushinara> a mbh:Appellation ; rdfs:label "Ushinara" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Ushinara> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shibi> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Vaidehi> a mbh:Appellation ; rdfs:label "Vaidehi" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Vaidehi> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Sita> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+
+<http://example.org/mbh/e/Vaikartana> a mbh:Appellation ; rdfs:label "Vaikartana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Vaikartana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Karna> ; mbh:confidence "0.98"^^xsd:decimal ; mbh:evidenceCount 49 ] .
+<http://example.org/mbh/e/Vaikartana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kripa> ; mbh:confidence "0.02"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Vaishravana> a mbh:Appellation ; rdfs:label "Vaishravana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Vaishravana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kubera> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Vaivasvata> a mbh:Appellation ; rdfs:label "Vaivasvata" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Vaivasvata> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yama> ; mbh:confidence "0.5833"^^xsd:decimal ; mbh:evidenceCount 7 ] .
+<http://example.org/mbh/e/Vaivasvata> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Manu> ; mbh:confidence "0.4167"^^xsd:decimal ; mbh:evidenceCount 5 ] .
+
+<http://example.org/mbh/e/Varshneya> a mbh:Appellation ; rdfs:label "Varshneya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Varshneya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Varshneya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Satyaki> ; mbh:confidence "0.3333"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Varshneya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yuyudhana> ; mbh:confidence "0.1667"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Vasudeva> a mbh:Appellation ; rdfs:label "Vasudeva" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Vasudeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Varshneya> ; mbh:confidence "0.2727"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Vasudeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Shouri> ; mbh:confidence "0.1818"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Vasudeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "0.1818"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Vasudeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Satvata> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Vasudeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Prajapati> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Vasudeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Purusha> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Vasudeva> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Dasharha> ; mbh:confidence "0.0909"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Vedavyasa> a mbh:Appellation ; rdfs:label "Vedavyasa" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/Vedavyasa> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vyasa> ; mbh:evidenceCount 0 ] .
+
+<http://example.org/mbh/e/Vibhavasu> a mbh:Appellation ; rdfs:label "Vibhavasu" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Vibhavasu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Surya> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Vibhavasu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Agni> ; mbh:confidence "0.5"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Vijaya> a mbh:Appellation ; rdfs:label "Vijaya" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Vijaya> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Arjuna> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Virupaksha> a mbh:Appellation ; rdfs:label "Virupaksha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Virupaksha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Sthanu> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Vriddhakshatra> a mbh:Appellation ; rdfs:label "Vriddhakshatra" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Vriddhakshatra> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pourava> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+
+<http://example.org/mbh/e/Vrikodara> a mbh:Appellation ; rdfs:label "Vrikodara" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Vrikodara> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Partha> ; mbh:confidence "0.5556"^^xsd:decimal ; mbh:evidenceCount 10 ] .
+<http://example.org/mbh/e/Vrikodara> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Pandava> ; mbh:confidence "0.2778"^^xsd:decimal ; mbh:evidenceCount 5 ] .
+<http://example.org/mbh/e/Vrikodara> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhima> ; mbh:confidence "0.1111"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+<http://example.org/mbh/e/Vrikodara> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Bhimasena> ; mbh:confidence "0.0556"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Vrisha> a mbh:Appellation ; rdfs:label "Vrisha" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Vrisha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Vaikartana> ; mbh:confidence "0.6"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Vrisha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Karna> ; mbh:confidence "0.2"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+<http://example.org/mbh/e/Vrisha> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Radheya> ; mbh:confidence "0.2"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/Yajnasena> a mbh:Appellation ; rdfs:label "Yajnasena" ; mbh:referentUnresolved true ; mbh:resolutionStatus "apposition_only" .
+<http://example.org/mbh/e/Yajnasena> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Drupada> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+
+<http://example.org/mbh/e/Yajnaseni> a mbh:Appellation ; rdfs:label "Yajnaseni" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Yajnaseni> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 2 ] .
+
+<http://example.org/mbh/e/Yuyudhana> a mbh:Appellation ; rdfs:label "Yuyudhana" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Yuyudhana> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Satyaki> ; mbh:confidence "1.0"^^xsd:decimal ; mbh:evidenceCount 5 ] .
+
+<http://example.org/mbh/e/Yuyutsu> a mbh:Appellation ; rdfs:label "Yuyutsu" ; mbh:referentUnresolved true ; mbh:resolutionStatus "ambiguous" .
+<http://example.org/mbh/e/Yuyutsu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Kouravya> ; mbh:confidence "0.75"^^xsd:decimal ; mbh:evidenceCount 3 ] .
+<http://example.org/mbh/e/Yuyutsu> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Satyaki> ; mbh:confidence "0.25"^^xsd:decimal ; mbh:evidenceCount 1 ] .
+
+<http://example.org/mbh/e/brahma> a mbh:Appellation ; rdfs:label "brahma" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/brahma> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Brahma> ; mbh:evidenceCount 0 ] .
+
+<http://example.org/mbh/e/madhava> a mbh:Appellation ; rdfs:label "madhava" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/madhava> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Krishna> ; mbh:evidenceCount 0 ] .
+
+<http://example.org/mbh/e/yama> a mbh:Appellation ; rdfs:label "yama" ; mbh:referentUnresolved true ; mbh:resolutionStatus "prior_only" .
+<http://example.org/mbh/e/yama> mbh:designatesCandidate [ mbh:entity <http://example.org/mbh/e/Yama> ; mbh:evidenceCount 0 ] .
+

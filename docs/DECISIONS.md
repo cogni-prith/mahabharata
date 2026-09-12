@@ -134,17 +134,34 @@ limitation, not a pipeline gap, and more extraction work does not close it.
 Acquiring a shloka-aligned Sanskrit text was considered and declined. Most
 scholarship cites at chapter level in prose anyway.
 
-Chapter granularity is uneven:
+**Amended 2026-09-12, same day.** This decision originally recorded that chapter
+granularity was uneven, with 1,054 of 1,057 heads in parvas 6 through 18, 28 of
+197 in Udyoga, and 0 of 654 in Adi, Sabha, Aranyaka and Virata. That is now
+false. `src/build_spine.py` recovers **1,995 of 1,995 (100%)**, matching the known
+BORI per-parva counts in all 18 parvas.
 
-| Parvas | Body chapter heads recovered |
-|---|---|
-| 6 through 18 | 1,054 of 1,057 |
-| Udyoga | 28 of 197 |
-| Adi, Sabha, Aranyaka, Virata | 0 of 654 |
-| Harivamsha | 118 of 118, but out of scope per D1 |
+The earlier figure measured one head format. The source uses three. Parvas 2, 3, 4
+and most of 5 print a bare `226(1)` and never use the word CHAPTER; pattern B
+recovers 72/72, 299/299, 67/67 and 197/197. Adi prints a bare global number with
+no parenthesis, detected from layout rather than from a flat string, because
+footnote markers are the same glyphs; 225 number-only lines sit at 10.8pt against
+a 14.4pt body. A flat regex produced a non-monotonic sequence, which is what an
+earlier session mistook for evidence that Adi's numerals were footnote markers.
 
-Where no chapter head exists the passage anchors at `(parvan)` with `adhyaya`
-null and `cited: false` at chapter level. **The null stays null.** Not
+Two guards were needed. Pattern B matches the thousand names of Shiva in Shanti
+and Anushasana (`554 (136) Bhojana;555 (137) Bhokta`), so head candidates are
+filtered by a non-decreasing global-number continuity window; Ashramavasika prints
+`Chapter 1977(45)` and `Chapter 1977(46)`, a genuine duplicate global, which is
+why the window is non-decreasing rather than strictly increasing. Patterns C and
+C' are scoped to Adi only; unscoped, C' fired 12 times in Bhishma and dragged the
+search cursor past 13 real heads.
+
+What survives from the original decision is the shloka ceiling above and the
+null-handling and keying rules below. Harivamsha is 118 of 118 and remains out of
+scope per D1.
+
+Where a passage cannot be located in the extracted text, it anchors at `(parvan)`
+with `adhyaya` null and `cited: false` at chapter level. **The null stays null.** Not
 interpolated from position, not estimated from shloka counts, not carried from a
 neighbouring passage. This follows directly from the rule against inventing
 citations: an interpolated chapter number is indistinguishable downstream from a

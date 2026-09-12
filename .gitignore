@@ -35,3 +35,5 @@ __pycache__/
 *.synctex.gz
 *.bak
 *.bak2
+.claude/
+.serena/

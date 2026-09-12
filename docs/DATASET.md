@@ -158,7 +158,7 @@ heads were measured across all 20 PDFs by separating the two forms:
 | 6 Bhishma to 18 Svargarohana | 1,057 | 1,054 | complete |
 | Harivamsha (bare `Chapter N` form) | 118 | 118 | complete |
 | 5 Udyoga | 197 | 28 | partial, 14% |
-| 1 Adi, 2 Sabha, 3 Aranyaka, 4 Virata | 654 | 0 | none |
+| 1 Adi, 2 Sabha, 3 Aranyaka, 4 Virata | 654 | 654 (superseded, see DECISIONS.md D4) | pattern B / layout |
 
 Adi Parva was checked specifically. All 220 of its "Chapter" occurrences are
 front-matter list entries. Debroy's first volume does not print chapter heads in
@@ -365,7 +365,8 @@ These need decisions before Phase 1, not after.
 3. **Sanskrit-dependent work is out.** Phase 4's verb lexicon and Phase 6's
    recension layer have no data to stand on.
 4. **Five parvas cannot be chapter-addressed at all** (Adi, Sabha, Aranyaka,
-   Virata, and 86% of Udyoga). Those are 654 chapters and include the entire
+   Virata, and 86% of Udyoga). SUPERSEDED 2026-09-12: all 1,995 chapters are now
+   recovered, see docs/DECISIONS.md D4. Those were thought to be 654 chapters including the entire
    frame story. They can carry parva-level citation only.
 5. **The two substrates have different label spaces.** LOC and NOT_AN_ENTITY
    exist in one, CELESTIAL in the other. A mapping decision is required before

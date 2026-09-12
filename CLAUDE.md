@@ -108,18 +108,22 @@ provenance.
 The citation unit is `(parvan, adhyaya)`. Shloka-level citation is impossible
 from this corpus and no shloka-aligned Sanskrit text is being acquired.
 
-Chapter granularity is not uniform, and the difference is load-bearing:
+Chapter granularity is uniform. All 1,995 BORI chapters are recovered, matching
+the known per-parva counts exactly in all 18 parvas. Three head formats occur and
+all three are handled: `CHAPTER 1162(45)` (1,162 heads), a bare `226(1)` with the
+word omitted (608), and in Adi a bare global number on its own line detected from
+layout at 10.8pt against a 14.4pt body (224, plus 1 fused).
 
-| Parvas | Chapter heads recoverable |
-|---|---|
-| 6 through 18 | 1,054 of 1,057 |
-| Udyoga | 28 of 197 |
-| Adi, Sabha, Aranyaka, Virata | 0 of 654 |
+Where a passage cannot be located in the extracted text at all, it anchors at
+`(parvan)` with `adhyaya` null and `cited: false` at chapter level. The null stays
+null. It is not interpolated from position, not estimated from shloka counts, and
+not carried over from a neighbouring passage.
 
-Where no chapter head exists, the passage is anchored at `(parvan)` with
-`adhyaya` null and `cited: false` at chapter level. The null stays null. It is
-not interpolated from position, not estimated from shloka counts, and not carried
-over from a neighbouring passage.
+Mentions anchor on the sentence midpoint, not its start. Drop caps place the
+decorative initial before the chapter head in the extracted stream, so a
+first-sentence-of-chapter reads `' 'S Chapter 1152(2) anjaya said` and begins
+before the boundary it belongs after. Start-anchoring put every such sentence one
+chapter early, which was all of Karna and all of Shalya.
 
 Anchors are keyed on `(parva, ordinal)`. Printed global chapter numbers contain
 typos in the source, confirmed in Shalya, which prints `Chapter 1126(7)` where

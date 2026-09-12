@@ -426,3 +426,59 @@ run that revealed the errors. Reporting the pre-fix sample would have measured
 a version that no longer exists; reusing the post-fix judgements on the same
 seed keeps the sample honest because the seed selects rows from a rebuilt
 table and 71% of the sampled rows are different triples.
+
+## D15. The Phase 6 entry gate cannot be reached from this corpus by grounded extraction, 2026-09-12
+
+The gate requires 10,000 triples, 500 entities of degree 5 or more, and no
+relation above 40% of the data. Measured: 635 distinct asserted triples, 61
+entities at degree 5 or more, top relation 40.8%. All three fail. Nothing was
+trained. `out/eval.md` carries the numbers.
+
+The interesting part is why, because the obvious explanations are all wrong.
+
+**It is not the entity inventory.** 87% of the 78,732 PERSON mentions are
+single-token proper names that the extractor can use, spanning 3,144 distinct
+surfaces. Only 488 of them reach the asserted graph.
+
+**It is not the predicate set.** A combat-encounter predicate, the one relation
+Debroy's war books are dense in, was measured before proposing to add it: 286
+subject-verb-object instances over 210 distinct pairs across all 18 parvas. Even
+a generous 25-verb version of it would move the triple count by under 5%. The
+twelve-predicate limit is not what is binding, so no expansion is proposed.
+
+**It is not the epithet problem either,** at least not directly. Epithets are
+single-token proper names and the extractor already picks them up as separate
+nodes. Leaving them unmerged inflates the node count and deflates degree; it
+does not reduce the triple count.
+
+**What binds is that the relation is rarely inside one clause with both ends
+named.** Over seventeen relation verbs: 5,552 clauses are missing an argument
+entirely, usually an agentless passive; 1,798 have an argument that is a
+multiword description such as "the son of Drona" or "that bull among men"; 722
+have one proper name and one pronoun; 220 have two pronouns; and 360 have two
+proper names. Only the last group is extractable without coreference or
+description linking, and that is the 360.
+
+So the ceiling on this corpus is structural. Adding coreference resolution and
+noun-phrase entity linking would bring the recoverable set to roughly 3,000 to
+5,000 triples and would comfortably clear the degree condition, which is the
+condition that actually governs whether an embedding means anything. It would
+not reach 10,000.
+
+Four ways forward, none of which can be chosen here:
+
+1. Add coreference and description linking as a Phase 4b. Real work, a new
+   dependency, and the largest honest gain available.
+2. Lower the triple threshold with a recorded decision. CLAUDE.md's own text
+   puts the floor at "below roughly 5,000 the vectors are not meaningful",
+   which is a different number from the 10,000 in the gate table.
+3. Supply the hand-authored canonical seed of about 100 persons that Phase 2
+   concluded was necessary. This raises degree sharply by folding epithet
+   clusters and is the single change that most improves the embedding, though
+   it lowers the distinct triple count.
+4. Accept that the symbolic graph is the deliverable after all, which
+   contradicts the stated aim and is recorded here only so the option is on
+   the table rather than arrived at by drift.
+
+Training anyway was not an option. The rule is explicit and the failure margin
+is a factor of sixteen, not a rounding error.

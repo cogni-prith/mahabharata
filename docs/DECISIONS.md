@@ -482,3 +482,90 @@ Four ways forward, none of which can be chosen here:
 
 Training anyway was not an option. The rule is explicit and the failure margin
 is a factor of sixteen, not a rounding error.
+
+## D16. Coreference resolution, and what it did not buy
+
+Phase 4b resolves coreference over the English prose and feeds the resolved names
+into the Phase 4 argument slots. It was chosen from the four ways forward listed
+in D15 as the one most likely to reach the Phase 6 entry gate. It did not.
+
+**Model.** `biu-nlp/lingmess-coref` through fastcoref, on GPU. f-coref was tried
+first and failed a smoke test on a single Bhishma passage by merging Bhishma with
+Arjuna into one cluster, which would have asserted that Arjuna pierced himself.
+LingMess separated them correctly on the same passage. Inference is deterministic,
+so no seed applies. transformers is pinned below 5 because fastcoref does not load
+on 5.x, and LingMess is a Longformer, which transformers 4.57 refuses to dispatch
+to sdpa attention and will not fall back, so eager attention is forced.
+
+**Document unit.** The chapter, split at 7,000 characters, which is about 1,800
+wordpieces and inside the 4,096 window. 2,008 chapters became 2,094 windows.
+A mention that straddles two sentences is dropped, 104 of them.
+
+**What is not resolved.** A cluster resolves only where a known person name
+appears inside one of its mentions, and only where one name is strictly most
+frequent. 18,777 clusters of pronouns with no name in them are dropped rather
+than guessed, and so are ties. Choosing a name for a nameless cluster is the
+entity-link guess the hard rules forbid.
+
+**First and second person are not used at all.** "I" and "you" inside a quoted
+speech refer to the speaker and the addressee of that speech. LingMess has no
+notion of a diegetic level, and this corpus nests speech four levels deep, so it
+resolved "me" to the frame narrator Sanjaya or Vaishampayana rather than to the
+character speaking. Measured precision on triples using one was 0.348 against
+0.497 for third person. This is not a calibration problem and a confidence
+discount does not express it.
+
+**Two extractor bugs were found by this phase and fixed at root, not at the
+symptom.** Neither is a coreference bug and both affected the directly read
+triples too.
+
+- Non-assertive clauses were being read as assertions. "I will kill Jayadratha
+  tomorrow", "Had I possessed the ability, I would have killed Vrikodara", "you
+  should instruct me", "Is this what Indra instructed you?". Coreference made the
+  fault visible because it fills the arguments of quoted speech, which is where
+  modals live. The guard rejects a modal auxiliary, a hypothetical subordinator
+  and any sentence containing a question mark. The question mark test rejects the
+  whole sentence, which costs recall on the assertive clauses of a sentence that
+  also asks something. Precision is the trade this project takes everywhere else
+  and it is taken here.
+- `instructedBy` from a genitive role noun was emitted with subject and object
+  the wrong way round. "A's preceptor is B" says B taught A. Without coreference
+  the possessive was almost always a third person name and the earlier sample did
+  not reach the case; with coreference, "You are my preceptor" asserted that Drona
+  had been instructed by Arjuna.
+
+**Two coreference-specific guards.** A mention whose text holds the resolved name
+in a possessive or oblique slot is about the thing possessed, not the name:
+"Nakula's horses had been slain by Vrishasena" gave Nakula as the victim, and "the
+maharatha who was Bharadvaja's son" gave Bharadvaja, who is Drona's father. 8,226
+of 63,181 mentions have that shape. Separately, a coreference argument is used
+only where the argument's own head word can denote one person, so the army, the
+maya, the sacrifice and four horses stop being victims, and plurals are refused
+outright because a cluster resolves to one name and "they were slain by Partha" is
+not a fact about one person.
+
+**Measured outcome.** 63,181 mentions resolved to 1,023 distinct names. After the
+guards, coreference contributed 334 triple instances, taking the graph from 1,297
+to 1,614. Precision of that tier is 0.609, against 0.931 for the directly read
+tier. The stages of that measurement are in `build/phase4b_gate.md`. The residual
+errors are wrong antecedents, which nothing on the extractor side can catch.
+
+**The tier stays in the graph and is labelled.** Every triple from it carries
+`mbh:argumentsByCoreference` with the count of arguments recovered that way and a
+confidence discounted by 0.85 per such argument. It is excluded from every
+precision claim made about the graph.
+
+**Diegetic depth is now on every triple.** `mbh:diegeticDepth` records the minimum
+depth of the sentence that asserts it, from the Phase 3 tellings, carried forward
+from the last telling seen within a parva where a sentence has none of its own.
+That carry-forward is an approximation and is recorded as one. 763 of the 1,614
+instances are narrated by the text at depth 0; the rest are claims made inside
+someone's speech.
+
+**D15 projected 3,000 to 5,000 triples from this phase and it produced 334.** The
+projection was wrong because it counted relation clauses with a pronoun or a
+description in an argument slot without asking whether the other slot survives the
+existing guards, whether the clause asserts anything, and whether the description
+heads a person. The Phase 6 entry gate still fails on all three conditions: 861
+distinct triples against 10,000, 82 entities of degree 5 or more against 500, and
+hasBiologicalParent at 42.6% against a 40% ceiling. Nothing was trained.

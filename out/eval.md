@@ -4,47 +4,45 @@ Checked before training, as required. No model was trained.
 
 | condition | required | measured | result |
 |---|---|---|---|
-| distinct asserted triples | >= 10,000 | 635 | **FAIL** |
-| entities of degree >= 5 | >= 500 | 61 | **FAIL** |
-| largest relation share | <= 40% | 40.8% (speaksTo) | **FAIL** |
+| distinct asserted triples | >= 10,000 | 861 | **FAIL** |
+| entities of degree >= 5 | >= 500 | 82 | **FAIL** |
+| largest relation share | <= 40% | 42.6% (hasBiologicalParent) | **FAIL** |
 
 **The gate does not pass. Nothing was trained.**
 
 Proposed triples, held separately and not eligible: 26.
-Entities appearing in the asserted graph: 488.
+Entities appearing in the asserted graph: 585.
 
 ## Degree distribution
 
 | degree | entities |
 |---|---|
-| 1 | 286 |
-| 2 | 74 |
-| 3 | 46 |
-| 4 | 21 |
-| 5 | 16 |
-| 6 | 8 |
-| 7 | 6 |
-| 8 | 8 |
-| 9 | 1 |
-| 10 | 3 |
-| 11 | 4 |
+| 1 | 311 |
+| 2 | 110 |
+| 3 | 50 |
+| 4 | 32 |
+| 5 | 15 |
+| 6 | 15 |
+| 7 | 9 |
+| 8 | 9 |
+| 9 | 6 |
+| 10 | 4 |
+| 11 | 3 |
 | 12 | 2 |
-| 13 | 1 |
-| 14 | 1 |
+| 14 | 2 |
 | 15 | 1 |
-| 16 | 2 |
-| 17 | 2 |
+| 16 | 3 |
 | 19 | 1 |
-| 20+ | 5 |
+| 20+ | 12 |
 
 ## Relation shares
 
 | relation | triples | share |
 |---|---|---|
-| speaksTo | 259 | 40.8% |
-| hasBiologicalParent | 237 | 37.3% |
-| slainBy | 71 | 11.2% |
-| rules | 37 | 5.8% |
-| hasSpouse | 21 | 3.3% |
-| cursedBy | 7 | 1.1% |
-| instructedBy | 3 | 0.5% |
+| hasBiologicalParent | 367 | 42.6% |
+| speaksTo | 259 | 30.1% |
+| slainBy | 107 | 12.4% |
+| hasSpouse | 52 | 6.0% |
+| rules | 39 | 4.5% |
+| cursedBy | 20 | 2.3% |
+| instructedBy | 17 | 2.0% |

@@ -45,12 +45,30 @@ PARENT_NOUNS = {"son": "hasBiologicalParent", "daughter": "hasBiologicalParent",
 SPOUSE_NOUNS = {"wife": "INV_hasSpouse", "husband": "INV_hasSpouse",
                 "consort": "INV_hasSpouse"}
 FOSTER = {"foster", "adopted", "adoptive"}
-TEACHER_NOUNS = {"preceptor": "instructedBy", "teacher": "instructedBy",
-                 "guru": "instructedBy"}
+# "A's preceptor is B" says B taught A, so the holder of the genitive is the
+# student and the bearer is the teacher. Emitting it uninverted read "You are my
+# preceptor" as Drona having been instructed by Arjuna, in 7 of the 41
+# instructedBy rows in the coreference sample.
+TEACHER_NOUNS = {"preceptor": "INV_instructedBy", "teacher": "INV_instructedBy",
+                 "guru": "INV_instructedBy"}
 
 MIN_CONF = {"passive_agent": 0.80, "active_dobj": 0.75, "poss_kinship": 0.85,
             "of_kinship": 0.80, "appos_kinship": 0.70, "noun_role": 0.70,
             "vocative": 0.90}
+
+# An argument recovered by coreference rather than read directly is discounted,
+# because a coref error and a parse error compound. Third person anaphora is
+# discounted less than "I" and "you", which resolve to the speaker and the
+# addressee of a quoted speech and are a harder problem.
+COREF_PENALTY = {3: 0.85}
+
+# First and second person mentions are not used. "I" and "you" inside a quoted
+# speech resolve to the speaker and the addressee of that speech, and LingMess
+# has no notion of a diegetic level, so it resolved "me" to the frame narrator
+# Sanjaya or Vaishampayana rather than to the character speaking. Measured
+# precision on the triples that used one was 0.348 against 0.497 for third
+# person, and the errors are not of a kind a confidence discount expresses.
+ALLOW_PERSON = {3}
 
 
 # Capitalized forms the corpus labels PERSON that are not names. They arrive
@@ -101,38 +119,124 @@ def simile(doc, a, b):
     return any(doc[i].text.lower() in ("like", "as", "just") for i in range(lo, hi))
 
 
+# A coreference mention may cover a phrase whose head is not a person. "Bhimasena
+# swiftly killed his four horses" resolves "his" correctly and then offers
+# "horses" as an argument, which read as Yudhishthira slain by Bhimasena. The same
+# shape produced the army, the maya and the sacrifice as victims. A coreference
+# argument is therefore taken only where the argument's own head word can denote a
+# person. Plurals are refused outright, because a cluster resolves to one name and
+# "they were slain by Partha" is not a fact about one person.
+PERSON_HEADS = {
+    "son", "daughter", "child", "father", "mother", "brother", "sister", "wife",
+    "husband", "consort", "grandfather", "grandson", "uncle", "nephew", "king",
+    "queen", "prince", "lord", "ruler", "sovereign", "emperor", "monarch",
+    "chief", "leader", "commander", "preceptor", "teacher", "guru", "disciple",
+    "student", "one", "sage", "rishi", "maharshi", "brahmarshi", "devarshi",
+    "ascetic", "brahmana", "kshatriya", "warrior", "maharatha", "ratha",
+    "archer", "hero", "slayer", "destroyer", "charioteer", "suta", "god",
+    "goddess", "man", "woman", "lady", "friend", "enemy", "bull", "tiger",
+    "rakshasa", "asura", "daitya", "danava", "gandharva", "apsara", "serpent",
+    "naga", "yaksha", "vanquisher", "scorcher", "upholder", "granter",
+}
+PLURAL_PRON = {"they", "them", "their", "theirs", "these", "those", "both"}
+
+
+def person_head(tok):
+    """True if this token can head a phrase that denotes one person."""
+    if tok.lower_ in PLURAL_PRON or tok.tag_ in ("NNS", "NNPS"):
+        return False
+    return tok.pos_ in ("PRON", "PROPN") or tok.lemma_.lower() in PERSON_HEADS
+
+
+MODALS = {"will", "would", "shall", "should", "can", "could", "may", "might",
+          "must", "'ll", "'d"}
+HYPO = {"if", "whether", "unless", "lest", "though"}
+
+
+def non_assertive(tok):
+    """True if this verb is not asserting that its event happened.
+
+    "I will kill Jayadratha tomorrow", "Had I possessed the ability, I would
+    have killed Vrikodara", "you should instruct me", "Is this what Indra
+    instructed you?". Future, conditional, counterfactual, optative and
+    interrogative clauses were being read as assertions. Coreference made the
+    fault visible because it fills in the arguments of quoted speech, which is
+    where modals live, but the fault is in the verb patterns and the guard is
+    put there.
+
+    A question mark anywhere in the sentence rejects the whole sentence. That is
+    blunt, because Debroy's sentences often carry several quoted clauses, and it
+    costs recall on the assertive clauses of a sentence that also asks
+    something. Precision is the trade this project takes.
+    """
+    for t in [tok, *tok.ancestors]:
+        for c in t.children:
+            if c.dep_ == "aux" and c.text.lower() in MODALS:
+                return True
+            if c.dep_ == "mark" and c.text.lower() in HYPO:
+                return True
+    return "?" in tok.sent.text
+
+
 def usable(tok):
     return not in_name_list(tok) and not epithet_head(tok)
 
 
-def ent_of(tok, persons, places):
-    """The entity string a token denotes, if any. Proper nouns only."""
+def ent_of(tok, persons, places, coref=None):
+    """The entity string a token denotes, if any.
+
+    A token is read directly when it is a known name. Otherwise, if Phase 4b
+    resolved a coreference mention covering this token, the antecedent name is
+    used and the caller is told, so the confidence can be discounted and the
+    provenance recorded.
+    """
     t = tok.text.strip()
     if t in persons:
-        return t, "person"
+        return t, "person", None
     if t in places:
-        return t, "place"
-    return None, None
+        return t, "place", None
+    if coref and person_head(tok):
+        for start, end, name, person in coref:
+            if person not in ALLOW_PERSON:
+                continue
+            if tok.idx >= start and tok.idx + len(tok) <= end:
+                return name, "person", person
+    return None, None, None
 
 
-def emit(out, subj, pred, obj, conf, pattern, r, evidence):
+def emit(out, subj, pred, obj, pattern, r, evidence, crs=(None, None)):
+    """Record one triple.
+
+    `crs` carries, for the subject and the object, the grammatical person of the
+    coreference mention each was recovered from, or None if the name was read
+    directly. The confidence is discounted once per coref-recovered argument and
+    the provenance is kept, so a consumer can filter to directly-read triples.
+    """
     if pred.startswith("INV_"):
         pred, subj, obj = pred[4:], obj, subj
+        crs = (crs[1], crs[0])
     if subj == obj:
         return
+    conf = MIN_CONF[pattern]
+    for cr in crs:
+        if cr is not None:
+            conf *= COREF_PENALTY[cr]
     out.append({"subject": subj, "predicate": pred, "object": obj,
                 "confidence": round(conf, 3), "pattern": pattern,
+                "coref_subject": crs[0], "coref_object": crs[1],
+                "depth": r["depth"],
                 "parva": r["parva"], "adhyaya_ordinal": r["adhyaya_ordinal"],
                 "sent_id": r["sent_id"], "cited": r["chapter_cited"],
                 "evidence": evidence[:200]})
 
 
-def extract_sentence(doc, r, persons, places, out):
+def extract_sentence(doc, r, persons, places, out, coref=None):
     for tok in doc:
         lemma = tok.lemma_.lower()
 
         negated = any(c.dep_ == "neg" for c in tok.children) or any(
-            c.text.lower() in ("cannot", "never", "not") for c in tok.children)
+            c.text.lower() in ("cannot", "never", "not") for c in tok.children) \
+            or non_assertive(tok)
 
         # Passive with an explicit agent: "Bhishma was slain by Arjuna".
         if lemma in KILL and not negated and tok.pos_ in ("VERB", "AUX", "NOUN"):
@@ -140,49 +244,49 @@ def extract_sentence(doc, r, persons, places, out):
             agents = [g for c in tok.children if c.dep_ == "agent"
                       for g in c.children if g.dep_ == "pobj"]
             for v in victims:
-                vs, vk = ent_of(v, persons, places)
+                vs, vk, vs_cr = ent_of(v, persons, places, coref)
                 for a in agents:
-                    as_, ak = ent_of(a, persons, places)
+                    as_, ak, as__cr = ent_of(a, persons, places, coref)
                     if (vs and as_ and vk == "person" and ak == "person"
                             and not simile(doc, v, a)):
-                        emit(out, vs, "slainBy", as_, MIN_CONF["passive_agent"],
-                             "passive_agent", r, doc.text)
+                        emit(out, vs, "slainBy", as_, "passive_agent", r, doc.text,
+                             (vs_cr, as__cr))
             # Active with a direct object: "Arjuna killed Bhishma".
             subs = [c for c in tok.children if c.dep_ == "nsubj"]
             objs = [c for c in tok.children if c.dep_ in ("dobj", "obj")]
             for s in subs:
-                ss, sk = ent_of(s, persons, places)
+                ss, sk, ss_cr = ent_of(s, persons, places, coref)
                 for o in objs:
-                    os_, ok = ent_of(o, persons, places)
+                    os_, ok, os__cr = ent_of(o, persons, places, coref)
                     if ss and os_ and sk == "person" and ok == "person":
-                        emit(out, os_, "slainBy", ss, MIN_CONF["active_dobj"],
-                             "active_dobj", r, doc.text)
+                        emit(out, os_, "slainBy", ss, "active_dobj", r, doc.text,
+                             (os__cr, ss_cr))
 
         if lemma in CURSE and tok.pos_ == "VERB" and not negated:
             for s in [c for c in tok.children if c.dep_ == "nsubj"]:
-                ss, sk = ent_of(s, persons, places)
+                ss, sk, ss_cr = ent_of(s, persons, places, coref)
                 for o in [c for c in tok.children if c.dep_ in ("dobj", "obj")]:
-                    os_, ok = ent_of(o, persons, places)
+                    os_, ok, os__cr = ent_of(o, persons, places, coref)
                     if ss and os_ and sk == ok == "person":
-                        emit(out, os_, "cursedBy", ss, MIN_CONF["active_dobj"],
-                             "active_dobj", r, doc.text)
+                        emit(out, os_, "cursedBy", ss, "active_dobj", r, doc.text,
+                             (os__cr, ss_cr))
             for v in [c for c in tok.children if c.dep_ in ("nsubjpass", "nsubj:pass")]:
-                vs, vk = ent_of(v, persons, places)
+                vs, vk, vs_cr = ent_of(v, persons, places, coref)
                 for a in [g for c in tok.children if c.dep_ == "agent"
                           for g in c.children if g.dep_ == "pobj"]:
-                    as_, ak = ent_of(a, persons, places)
+                    as_, ak, as__cr = ent_of(a, persons, places, coref)
                     if vs and as_ and vk == ak == "person":
-                        emit(out, vs, "cursedBy", as_, MIN_CONF["passive_agent"],
-                             "passive_agent", r, doc.text)
+                        emit(out, vs, "cursedBy", as_, "passive_agent", r, doc.text,
+                             (vs_cr, as__cr))
 
         if lemma in MARRY and tok.pos_ == "VERB" and not negated:
             for s in [c for c in tok.children if c.dep_ == "nsubj"]:
-                ss, sk = ent_of(s, persons, places)
+                ss, sk, ss_cr = ent_of(s, persons, places, coref)
                 for o in [c for c in tok.children if c.dep_ in ("dobj", "obj")]:
-                    os_, ok = ent_of(o, persons, places)
+                    os_, ok, os__cr = ent_of(o, persons, places, coref)
                     if ss and os_ and sk == ok == "person":
-                        emit(out, ss, "hasSpouse", os_, MIN_CONF["active_dobj"],
-                             "active_dobj", r, doc.text)
+                        emit(out, ss, "hasSpouse", os_, "active_dobj", r, doc.text,
+                             (ss_cr, os__cr))
 
         # "instructed Ghatotkacha to engage in the duel" is an order, not
         # teaching, and the predicate definition is teaching. An infinitive
@@ -190,12 +294,12 @@ def extract_sentence(doc, r, persons, places, out):
         if lemma in TEACH and tok.pos_ == "VERB" and not negated and not any(
                 c.dep_ in ("xcomp", "ccomp") for c in tok.children):
             for s in [c for c in tok.children if c.dep_ == "nsubj"]:
-                ss, sk = ent_of(s, persons, places)
+                ss, sk, ss_cr = ent_of(s, persons, places, coref)
                 for o in [c for c in tok.children if c.dep_ in ("dobj", "obj")]:
-                    os_, ok = ent_of(o, persons, places)
+                    os_, ok, os__cr = ent_of(o, persons, places, coref)
                     if ss and os_ and sk == ok == "person":
-                        emit(out, os_, "instructedBy", ss, MIN_CONF["active_dobj"],
-                             "active_dobj", r, doc.text)
+                        emit(out, os_, "instructedBy", ss, "active_dobj", r, doc.text,
+                             (os__cr, ss_cr))
 
         # Kinship and role nouns.
         roles = {}
@@ -222,14 +326,14 @@ def extract_sentence(doc, r, persons, places, out):
             if tok.dep_ in ("attr", "acomp"):
                 bearers += [c for c in tok.head.children if c.dep_ == "nsubj"] if tok.head else []
             for h in holders:
-                hs, hk = ent_of(h, persons, places)
+                hs, hk, hs_cr = ent_of(h, persons, places, coref)
                 if not hs:
                     continue
                 for b in bearers:
-                    bs, bk = ent_of(b, persons, places)
+                    bs, bk, bs_cr = ent_of(b, persons, places, coref)
                     if bs and bk == hk == "person" and usable(b) and usable(h):
                         pat = "poss_kinship" if any(c.dep_ == "poss" for c in tok.children) else "of_kinship"
-                        emit(out, bs, pred, hs, MIN_CONF[pat], pat, r, doc.text)
+                        emit(out, bs, pred, hs, pat, r, doc.text, (bs_cr, hs_cr))
 
         # "the king of Hastinapura", "ruler of Panchala"
         if lemma in ("king", "ruler", "lord", "sovereign") and tok.pos_ == "NOUN":
@@ -239,28 +343,88 @@ def extract_sentence(doc, r, persons, places, out):
             if tok.dep_ == "appos" and tok.head is not None:
                 bearers.append(tok.head)
             for p in places_:
-                ps, pk = ent_of(p, persons, places)
+                ps, pk, ps_cr = ent_of(p, persons, places, coref)
                 for b in bearers:
-                    bs, bk = ent_of(b, persons, places)
+                    bs, bk, bs_cr = ent_of(b, persons, places, coref)
                     if ps and bs and pk == "place" and bk == "person" and usable(b):
-                        emit(out, bs, "rules", ps, MIN_CONF["noun_role"],
-                             "noun_role", r, doc.text)
+                        emit(out, bs, "rules", ps, "noun_role", r, doc.text,
+                             (bs_cr, ps_cr))
+
+
+def load_coref():
+    """Phase 4b resolutions, keyed by sentence, as (start, end, name, person)."""
+    try:
+        c = pd.read_parquet("build/coref.parquet")
+    except FileNotFoundError:
+        return {}
+    # A mention whose text holds the resolved name in a possessive or oblique
+    # slot is about the thing possessed, not about the name. "Nakula's horses had
+    # been slain by Vrishasena" gave Nakula as the victim, and "the maharatha who
+    # was Bharadvaja's son" gave Bharadvaja, which is Drona's father. 8,226 of
+    # the 63,181 mentions are of this shape and they were the largest single
+    # error class in the sample. Mentions where the name comes from elsewhere in
+    # the cluster, which is how "Kunti's son" reaches Yudhishthira, are kept.
+    name = c.canonical.map(re.escape)
+    poss = [bool(re.search(n + r"\s*[\u2019']s\b", t) or
+                 re.search(r"\bof\s+" + n + r"\b", t))
+            for n, t in zip(name, c.surface.astype(str))]
+    c = c[[not p for p in poss]]
+    out = collections.defaultdict(list)
+    for t in c.itertuples():
+        out[(t.parva, int(t.sent_id))].append(
+            (int(t.start), int(t.end), t.canonical, int(t.person)))
+    return out
+
+
+def load_depth():
+    """Diegetic depth per sentence, from Phase 3.
+
+    A triple drawn from a sentence at depth 0 is something the text narrates. A
+    triple at depth 2 is something a character says inside another character's
+    speech. They are not the same kind of claim and the depth travels with the
+    triple so that later work can separate them instead of flattening the epic
+    into one voice.
+    """
+    try:
+        t = pd.read_parquet("build/tellings.parquet")
+    except FileNotFoundError:
+        return {}
+    d = {}
+    for r in t.itertuples():
+        k = (r.parva, int(r.sent_id))
+        d[k] = min(d.get(k, 99), int(r.depth))
+    return d
 
 
 def main():
     limit = int(sys.argv[1]) if len(sys.argv) > 1 else 0
     persons, places, df = load_entities()
+    coref_all, depth_all = load_coref(), load_depth()
     sents = df.drop_duplicates(subset=["parva", "sent_id"])[
         ["parva", "sent_id", "adhyaya_ordinal", "chapter_cited", "sentence"]]
+    # Sorted because depth is carried forward from the previous sentence.
+    sents = sents.sort_values(["parva", "sent_id"])
     if limit:
         sents = sents.head(limit)
     nlp = spacy.load("en_core_web_sm", disable=["ner"])
 
     rows = sents.to_dict("records")
+    # Depth is carried forward from the last sentence that opened a frame, since
+    # most sentences are not themselves speech openers but sit inside one. This
+    # is an approximation: it assumes a frame stays open until another opener
+    # appears, which is what the typography does in practice but is not
+    # guaranteed at a chapter boundary.
+    last = {}
+    for r in rows:
+        k = (r["parva"], int(r["sent_id"]))
+        if k in depth_all:
+            last[r["parva"]] = depth_all[k]
+        r["depth"] = last.get(r["parva"], 0)
     out = []
     texts = [r["sentence"] for r in rows]
     for r, doc in zip(rows, nlp.pipe(texts, batch_size=256, n_process=1)):
-        extract_sentence(doc, r, persons, places, out)
+        coref = coref_all.get((r["parva"], int(r["sent_id"])))
+        extract_sentence(doc, r, persons, places, out, coref)
 
     # speaksTo from Phase 3 tellings: narrator addresses the vocative narratee
     tel = pd.read_parquet("build/tellings.parquet")
@@ -268,7 +432,9 @@ def main():
         if t.narratee and t.narrator in persons and t.narratee in persons:
             out.append({"subject": t.narrator, "predicate": "speaksTo",
                         "object": t.narratee, "confidence": MIN_CONF["vocative"],
-                        "pattern": "vocative", "parva": t.parva,
+                        "pattern": "vocative", "coref_subject": None,
+                        "coref_object": None, "depth": int(t.depth),
+                        "parva": t.parva,
                         "adhyaya_ordinal": t.adhyaya_ordinal, "sent_id": t.sent_id,
                         "cited": t.cited, "evidence": "vocative narratee in telling"})
 
@@ -316,6 +482,17 @@ def report(rel, n_sents):
         f.write("\n## By pattern\n\n| pattern | instances |\n|---|---|\n")
         for p, g in rel.groupby("pattern"):
             f.write("| %s | %d |\n" % (p, len(g)))
+        f.write("\n## Arguments recovered by coreference\n\n"
+                "| coref arguments | instances |\n|---|---|\n")
+        nc = (rel.coref_subject.notna().astype(int)
+              + rel.coref_object.notna().astype(int))
+        for k, v in sorted(nc.value_counts().items()):
+            f.write("| %d | %d |\n" % (k, v))
+        f.write("\n## Diegetic depth of the asserting sentence\n\n"
+                "Depth 0 is narrated by the text. Deeper is a claim made inside a\n"
+                "character's speech.\n\n| depth | instances |\n|---|---|\n")
+        for k, v in sorted(rel.depth.value_counts().items()):
+            f.write("| %d | %d |\n" % (k, v))
         f.write("\n## Citation coverage\n\n- Chapter-cited: %d\n- Parva level only: %d\n"
                 % (int(rel.cited.sum()), int((~rel.cited).sum())))
 

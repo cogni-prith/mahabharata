@@ -40,8 +40,30 @@ of those slots is a guaranteed miss.
 
 That is a real and usable result about the method, not about the epic: cosine
 similarity in this embedding is a candidate generator for the alias merge that
-Phase 2 could not complete. It should be checked against `build/appellations.csv`
-before it is trusted, and that check has not been run.
+Phase 2 could not complete. It has now been checked against
+`build/appellations.csv` by `src/phase8b_alias.py`, and the check is in
+`build/alias_candidates.md`.
+
+The check, since a dozen rows read by hand is a hypothesis and not a result. 185
+of the 246 appellation rows have both names embedded. There is no gold alias
+mapping, so this is not precision; it is agreement between apposition read off
+the prose in Phase 2 and cosine distance in the embedding, which are independent.
+An apposition-evidenced candidate lands in the cosine top 10 for 18.4% of pairs
+against 1.5% by chance, top 25 for 31.9% against 3.6%, with a median rank of 96
+out of 688 and 74 on the pairs with two or more sightings. Where each signal
+names one best candidate, they agree for 69 of 94 appellations, 73.4%; restricted
+to the 40 appellations where more than one candidate exists and the pick is a
+real choice, 37.5%.
+
+So the signal is real and far above chance, and it is nowhere near strong enough
+to merge on. It is a generator. The shortlist it produces is 20 pairs, and by eye
+most of them are right: Kshatta/Vidura, Saindhava/Jayadratha, Hardikya/Kritavarma,
+Partha/Arjuna, Radheya/Karna, Dharmaraja/Yudhishthira, four names for Indra. Two
+of the twenty carry no apposition span at all, only the weak `canonical_id` prior,
+and they are printed as uncited rather than given an address. Two independent
+appellations land on Bhargava, which is every descendant of Bhrigu and not one
+man, so the list also reproduces the conflation failure mode Phase 2 measured. The
+report says so on its face. Nothing was merged.
 
 **Graph adjacency here mostly means opposition.** `foughtWith`, `slainBy` and
 `defeatedBy` are 35% of the asserted triples, and all three join enemies. So the

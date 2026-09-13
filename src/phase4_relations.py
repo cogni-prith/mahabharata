@@ -16,6 +16,8 @@ import collections, json, re, sys
 import pandas as pd
 import spacy
 
+import nplink
+
 BASE = "http://example.org/mbh/"
 
 PREDICATES = {
@@ -31,11 +33,30 @@ PREDICATES = {
     "rules": "X is the reigning king of the place Y.",
     "bornTo": "X was born to Y, where the text marks birth without specifying kind.",
     "speaksTo": "X addresses Y in direct speech.",
+    "foughtWith": "X and Y exchange blows in a described encounter. Symmetric, and "
+                  "it says nothing about who prevailed or about standing enmity.",
+    "defeatedBy": "X was beaten by Y in a described encounter and survived it. "
+                  "Distinct from slainBy, which is fatal.",
 }
 
 # Verb lemma to predicate. Direction is recorded per entry: "agent" means the
 # grammatical agent fills the object slot of the triple.
 KILL = {"kill", "slay", "slaughter", "behead", "murder", "destroy", "fell"}
+
+# Combat. Measured in build/phase4d_verbs.md as the largest recoverable block in
+# the corpus, about 700 clauses with two resolvable person arguments. The verbs
+# are the ones Debroy uses for an exchange of blows. "cover", "envelop" and
+# "shroud" are in because in this translation they take arrows as the instrument
+# and a warrior as the object: "he enveloped Bhima with arrows".
+COMBAT = {"pierce", "strike", "attack", "envelop", "counter", "repulse", "grasp",
+          "surround", "shroud", "cover", "afflict", "wound", "assail", "resist",
+          "oppose", "encounter", "fight", "battle"}
+DEFEAT = {"defeat", "vanquish", "subjugate", "conquer", "rout", "overwhelm"}
+# Speech verbs that take the addressee as a direct object, and those that take it
+# behind "to". This populates the existing speaksTo, which until now came only
+# from the vocative addressee of a Phase 3 telling.
+SPEAK_DOBJ = {"tell", "ask", "address", "answer", "command", "summon", "question"}
+SPEAK_TO = {"speak", "say", "reply", "talk", "call"}
 CURSE = {"curse"}
 MARRY = {"marry", "wed"}
 TEACH = {"teach", "instruct", "train"}
@@ -54,13 +75,22 @@ TEACHER_NOUNS = {"preceptor": "INV_instructedBy", "teacher": "INV_instructedBy",
 
 MIN_CONF = {"passive_agent": 0.80, "active_dobj": 0.75, "poss_kinship": 0.85,
             "of_kinship": 0.80, "appos_kinship": 0.70, "noun_role": 0.70,
-            "vocative": 0.90}
+            "vocative": 0.90, "combat_dobj": 0.75, "combat_passive": 0.80,
+            "speech_dobj": 0.75, "speech_to": 0.80, "defeat_dobj": 0.75,
+            "defeat_passive": 0.80,
+            "speech_passive": 0.80}
 
 # An argument recovered by coreference rather than read directly is discounted,
 # because a coref error and a parse error compound. Third person anaphora is
 # discounted less than "I" and "you", which resolve to the speaker and the
 # addressee of a quoted speech and are a harder problem.
 COREF_PENALTY = {3: 0.85}
+
+# An argument recovered by linking a description to the graph is discounted like
+# a coreference argument. It is not the same kind of inference: it is refused
+# outright unless the graph settles it, so the uncertainty is in the parent edge
+# it rests on rather than in the choice of antecedent.
+NPLINK_PENALTY = 0.85
 
 # First and second person mentions are not used. "I" and "you" inside a quoted
 # speech resolve to the speaker and the addressee of that speech, and LingMess
@@ -182,7 +212,7 @@ def usable(tok):
     return not in_name_list(tok) and not epithet_head(tok)
 
 
-def ent_of(tok, persons, places, coref=None):
+def ent_of(tok, persons, places, coref=None, table=None):
     """The entity string a token denotes, if any.
 
     A token is read directly when it is a known name. Otherwise, if Phase 4b
@@ -195,6 +225,10 @@ def ent_of(tok, persons, places, coref=None):
         return t, "person", None
     if t in places:
         return t, "place", None
+    if table is not None:
+        name = nplink.resolve(tok, table, persons, places)
+        if name:
+            return name, "person", "np"
     if coref and person_head(tok):
         for start, end, name, person in coref:
             if person not in ALLOW_PERSON:
@@ -219,18 +253,23 @@ def emit(out, subj, pred, obj, pattern, r, evidence, crs=(None, None)):
         return
     conf = MIN_CONF[pattern]
     for cr in crs:
-        if cr is not None:
+        if cr == "np":
+            conf *= NPLINK_PENALTY
+        elif cr is not None:
             conf *= COREF_PENALTY[cr]
     out.append({"subject": subj, "predicate": pred, "object": obj,
                 "confidence": round(conf, 3), "pattern": pattern,
-                "coref_subject": crs[0], "coref_object": crs[1],
+                "coref_subject": crs[0] if crs[0] != "np" else None,
+                "coref_object": crs[1] if crs[1] != "np" else None,
+                "nplink_subject": crs[0] == "np" or None,
+                "nplink_object": crs[1] == "np" or None,
                 "depth": r["depth"],
                 "parva": r["parva"], "adhyaya_ordinal": r["adhyaya_ordinal"],
                 "sent_id": r["sent_id"], "cited": r["chapter_cited"],
                 "evidence": evidence[:200]})
 
 
-def extract_sentence(doc, r, persons, places, out, coref=None):
+def extract_sentence(doc, r, persons, places, out, coref=None, table=None):
     for tok in doc:
         lemma = tok.lemma_.lower()
 
@@ -244,9 +283,9 @@ def extract_sentence(doc, r, persons, places, out, coref=None):
             agents = [g for c in tok.children if c.dep_ == "agent"
                       for g in c.children if g.dep_ == "pobj"]
             for v in victims:
-                vs, vk, vs_cr = ent_of(v, persons, places, coref)
+                vs, vk, vs_cr = ent_of(v, persons, places, coref, table)
                 for a in agents:
-                    as_, ak, as__cr = ent_of(a, persons, places, coref)
+                    as_, ak, as__cr = ent_of(a, persons, places, coref, table)
                     if (vs and as_ and vk == "person" and ak == "person"
                             and not simile(doc, v, a)):
                         emit(out, vs, "slainBy", as_, "passive_agent", r, doc.text,
@@ -255,35 +294,85 @@ def extract_sentence(doc, r, persons, places, out, coref=None):
             subs = [c for c in tok.children if c.dep_ == "nsubj"]
             objs = [c for c in tok.children if c.dep_ in ("dobj", "obj")]
             for s in subs:
-                ss, sk, ss_cr = ent_of(s, persons, places, coref)
+                ss, sk, ss_cr = ent_of(s, persons, places, coref, table)
                 for o in objs:
-                    os_, ok, os__cr = ent_of(o, persons, places, coref)
+                    os_, ok, os__cr = ent_of(o, persons, places, coref, table)
                     if ss and os_ and sk == "person" and ok == "person":
                         emit(out, os_, "slainBy", ss, "active_dobj", r, doc.text,
                              (os__cr, ss_cr))
 
+        # Combat, defeat and address all read the same two shapes, so they share
+        # one block. Combat is symmetric and emitted in the order the clause puts
+        # it; deduplicating the pair is the splitter's job in Phase 6, per the
+        # symmetric leakage rule.
+        for verbs, pred, flip in ((COMBAT, "foughtWith", False),
+                                  (DEFEAT, "defeatedBy", True),
+                                  (SPEAK_DOBJ, "speaksTo", False)):
+            if lemma not in verbs or tok.pos_ != "VERB" or negated:
+                continue
+            tag = {"foughtWith": "combat", "defeatedBy": "defeat",
+                   "speaksTo": "speech"}[pred]
+            for s_ in [c for c in tok.children if c.dep_ == "nsubj"]:
+                ss, sk, ss_cr = ent_of(s_, persons, places, coref, table)
+                for o in [c for c in tok.children if c.dep_ in ("dobj", "obj")]:
+                    os_, ok, os__cr = ent_of(o, persons, places, coref, table)
+                    if (ss and os_ and sk == ok == "person" and usable(s_)
+                            and usable(o) and not simile(doc, s_, o)):
+                        a, b, ca, cb = ((os_, ss, os__cr, ss_cr) if flip
+                                        else (ss, os_, ss_cr, os__cr))
+                        emit(out, a, pred, b, tag + "_dobj", r, doc.text, (ca, cb))
+            for v in [c for c in tok.children if c.dep_ in ("nsubjpass", "nsubj:pass")]:
+                vs, vk, vs_cr = ent_of(v, persons, places, coref, table)
+                for ag in [g for c in tok.children if c.dep_ == "agent"
+                           for g in c.children if g.dep_ == "pobj"]:
+                    as_, ak, as__cr = ent_of(ag, persons, places, coref, table)
+                    if (vs and as_ and vk == ak == "person" and usable(v)
+                            and usable(ag) and not simile(doc, v, ag)):
+                        # "X was told by Y" puts the speaker in the agent slot,
+                        # so speech passives invert; defeat passives already read
+                        # victim-then-victor, and combat is symmetric.
+                        if pred == "speaksTo":
+                            emit(out, as_, pred, vs, tag + "_passive", r,
+                                 doc.text, (as__cr, vs_cr))
+                        else:
+                            emit(out, vs, pred, as_, tag + "_passive", r,
+                                 doc.text, (vs_cr, as__cr))
+
+        # "Krishna spoke to Arjuna". The addressee sits behind "to".
+        if lemma in SPEAK_TO and tok.pos_ == "VERB" and not negated:
+            addressees = [g for c in tok.children
+                          if c.dep_ == "prep" and c.text.lower() == "to"
+                          for g in c.children if g.dep_ == "pobj"]
+            for s_ in [c for c in tok.children if c.dep_ == "nsubj"]:
+                ss, sk, ss_cr = ent_of(s_, persons, places, coref, table)
+                for o in addressees:
+                    os_, ok, os__cr = ent_of(o, persons, places, coref, table)
+                    if ss and os_ and sk == ok == "person" and usable(o):
+                        emit(out, ss, "speaksTo", os_, "speech_to", r, doc.text,
+                             (ss_cr, os__cr))
+
         if lemma in CURSE and tok.pos_ == "VERB" and not negated:
             for s in [c for c in tok.children if c.dep_ == "nsubj"]:
-                ss, sk, ss_cr = ent_of(s, persons, places, coref)
+                ss, sk, ss_cr = ent_of(s, persons, places, coref, table)
                 for o in [c for c in tok.children if c.dep_ in ("dobj", "obj")]:
-                    os_, ok, os__cr = ent_of(o, persons, places, coref)
+                    os_, ok, os__cr = ent_of(o, persons, places, coref, table)
                     if ss and os_ and sk == ok == "person":
                         emit(out, os_, "cursedBy", ss, "active_dobj", r, doc.text,
                              (os__cr, ss_cr))
             for v in [c for c in tok.children if c.dep_ in ("nsubjpass", "nsubj:pass")]:
-                vs, vk, vs_cr = ent_of(v, persons, places, coref)
+                vs, vk, vs_cr = ent_of(v, persons, places, coref, table)
                 for a in [g for c in tok.children if c.dep_ == "agent"
                           for g in c.children if g.dep_ == "pobj"]:
-                    as_, ak, as__cr = ent_of(a, persons, places, coref)
+                    as_, ak, as__cr = ent_of(a, persons, places, coref, table)
                     if vs and as_ and vk == ak == "person":
                         emit(out, vs, "cursedBy", as_, "passive_agent", r, doc.text,
                              (vs_cr, as__cr))
 
         if lemma in MARRY and tok.pos_ == "VERB" and not negated:
             for s in [c for c in tok.children if c.dep_ == "nsubj"]:
-                ss, sk, ss_cr = ent_of(s, persons, places, coref)
+                ss, sk, ss_cr = ent_of(s, persons, places, coref, table)
                 for o in [c for c in tok.children if c.dep_ in ("dobj", "obj")]:
-                    os_, ok, os__cr = ent_of(o, persons, places, coref)
+                    os_, ok, os__cr = ent_of(o, persons, places, coref, table)
                     if ss and os_ and sk == ok == "person":
                         emit(out, ss, "hasSpouse", os_, "active_dobj", r, doc.text,
                              (ss_cr, os__cr))
@@ -294,9 +383,9 @@ def extract_sentence(doc, r, persons, places, out, coref=None):
         if lemma in TEACH and tok.pos_ == "VERB" and not negated and not any(
                 c.dep_ in ("xcomp", "ccomp") for c in tok.children):
             for s in [c for c in tok.children if c.dep_ == "nsubj"]:
-                ss, sk, ss_cr = ent_of(s, persons, places, coref)
+                ss, sk, ss_cr = ent_of(s, persons, places, coref, table)
                 for o in [c for c in tok.children if c.dep_ in ("dobj", "obj")]:
-                    os_, ok, os__cr = ent_of(o, persons, places, coref)
+                    os_, ok, os__cr = ent_of(o, persons, places, coref, table)
                     if ss and os_ and sk == ok == "person":
                         emit(out, os_, "instructedBy", ss, "active_dobj", r, doc.text,
                              (os__cr, ss_cr))
@@ -326,11 +415,11 @@ def extract_sentence(doc, r, persons, places, out, coref=None):
             if tok.dep_ in ("attr", "acomp"):
                 bearers += [c for c in tok.head.children if c.dep_ == "nsubj"] if tok.head else []
             for h in holders:
-                hs, hk, hs_cr = ent_of(h, persons, places, coref)
+                hs, hk, hs_cr = ent_of(h, persons, places, coref, table)
                 if not hs:
                     continue
                 for b in bearers:
-                    bs, bk, bs_cr = ent_of(b, persons, places, coref)
+                    bs, bk, bs_cr = ent_of(b, persons, places, coref, table)
                     if bs and bk == hk == "person" and usable(b) and usable(h):
                         pat = "poss_kinship" if any(c.dep_ == "poss" for c in tok.children) else "of_kinship"
                         emit(out, bs, pred, hs, pat, r, doc.text, (bs_cr, hs_cr))
@@ -343,9 +432,9 @@ def extract_sentence(doc, r, persons, places, out, coref=None):
             if tok.dep_ == "appos" and tok.head is not None:
                 bearers.append(tok.head)
             for p in places_:
-                ps, pk, ps_cr = ent_of(p, persons, places, coref)
+                ps, pk, ps_cr = ent_of(p, persons, places, coref, table)
                 for b in bearers:
-                    bs, bk, bs_cr = ent_of(b, persons, places, coref)
+                    bs, bk, bs_cr = ent_of(b, persons, places, coref, table)
                     if ps and bs and pk == "place" and bk == "person" and usable(b):
                         emit(out, bs, "rules", ps, "noun_role", r, doc.text,
                              (bs_cr, ps_cr))
@@ -420,11 +509,25 @@ def main():
         if k in depth_all:
             last[r["parva"]] = depth_all[k]
         r["depth"] = last.get(r["parva"], 0)
-    out = []
+    # Two passes. The first reads the prose with no link table and produces the
+    # directly read graph; the second links descriptions such as "Bharadvaja's
+    # son" against it. The corpus is parsed twice rather than held in memory, and
+    # the table is never rebuilt from the second pass, so a run reproduces from
+    # nothing and one wrong parent edge cannot breed a family. See src/nplink.py.
     texts = [r["sentence"] for r in rows]
-    for r, doc in zip(rows, nlp.pipe(texts, batch_size=256, n_process=1)):
-        coref = coref_all.get((r["parva"], int(r["sent_id"])))
-        extract_sentence(doc, r, persons, places, out, coref)
+
+    def sweep(table):
+        out = []
+        for r, doc in zip(rows, nlp.pipe(texts, batch_size=256, n_process=1)):
+            coref = coref_all.get((r["parva"], int(r["sent_id"])))
+            extract_sentence(doc, r, persons, places, out, coref, table)
+        return out
+
+    first = pd.DataFrame(sweep(None))
+    table = nplink.build_table(first)
+    out = sweep(table)
+    print("nplink table: %d parents, %d places; %s"
+          % (len(table["children"]), len(table["rulers"]), dict(table["stats"])))
 
     # speaksTo from Phase 3 tellings: narrator addresses the vocative narratee
     tel = pd.read_parquet("build/tellings.parquet")

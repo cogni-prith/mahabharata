@@ -569,3 +569,85 @@ existing guards, whether the clause asserts anything, and whether the descriptio
 heads a person. The Phase 6 entry gate still fails on all three conditions: 861
 distinct triples against 10,000, 82 entities of degree 5 or more against 500, and
 hasBiologicalParent at 42.6% against a 40% ceiling. Nothing was trained.
+
+## D17. Predicate expansion to fourteen, and noun-phrase linking
+
+Both were done on the instruction "do both, expand predicates and add
+noun-phrase linking". The predicate expansion needs that instruction recorded,
+because CLAUDE.md caps the hand-authored inventory at twelve and says the list
+must not drift past twelve without a deliberate, recorded decision. This is that
+decision. The list is now fourteen.
+
+### What the evidence said
+
+`src/phase4d_verbs.py` measures, over all 55,519 sentences, every clause where a
+verb has a subject and an object that both resolve to a person and the clause is
+assertive. That is an upper bound on anything a verb-based extractor can reach.
+The answer is 2,641 clauses across 249 verbs, of which 822 have both arguments
+read directly. The table is in `build/phase4d_verbs.md`.
+
+The expansion was chosen from that table rather than from the ontology. The
+three largest recoverable blocks are combat verbs (pierce 314, strike 136,
+attack 110, and a long tail), speech verbs (tell 274, ask 133, reply 106, say
+66, address 49), and defeat verbs (defeat 23, vanquish 13). So:
+
+- `foughtWith`, new. Symmetric. It records an exchange of blows in a described
+  encounter and says nothing about who prevailed or about standing enmity.
+- `defeatedBy`, new. Antisymmetric, and deliberately distinct from `slainBy`,
+  which is fatal.
+- Speech verbs feed the existing `speaksTo`, which until now came only from the
+  vocative addressee of a Phase 3 telling. No new predicate.
+
+`isEnemyOf` was not derived from repeated combat, although the data would
+support it trivially. Two warriors exchanging arrows often is a co-occurrence
+statistic, and building a predicate on it is the co-occurrence character network
+the anti-goals rule out.
+
+`foughtWith` being symmetric is a Phase 6 obligation, not a note. Symmetric pairs
+are deduplicated before the split, not after.
+
+### Noun-phrase linking
+
+`src/nplink.py` resolves descriptions such as "Bharadvaja's son" or "the king of
+Kosala" against the graph the extractor has already read directly. It runs as a
+second sweep: the first sweep builds the graph with no table, the table is built
+only from directly-read triples, and it is never rebuilt from the second sweep,
+so one wrong parent edge cannot breed a family and a run reproduces from
+nothing.
+
+It refuses rather than guesses. If the holder has more than one candidate child
+or ruler it emits nothing (543 refusals), and if the holder is not in the graph
+it emits nothing (101). It never uses gender. Yield: 78 children and 29 rulers,
+46 triples.
+
+### Measured outcome
+
+3,225 instances, 1,949 distinct triples, 9 predicates in use, up from 1,627 and
+861. Precision on a fresh 250-row sample of the new patterns plus every
+noun-phrase-linked row (`build/phase4e_gate.md`, seed 20260915) is 0.764
+overall, and by argument provenance: directly read 0.928, coreference 0.726,
+noun-phrase linked 0.630.
+
+The noun-phrase linking figure is the weakest thing here and it is reported
+rather than tuned away. A row was judged false whenever the evidence sentence
+does not itself settle the link, so a link the graph may have got right still
+counts against it. On 46 rows the interval is wide. The yield is 46 triples out
+of 3,225 and the honest summary is that it is not carrying the project.
+
+### The Phase 6 gate still fails
+
+| condition | required | measured |
+|---|---|---|
+| distinct triples | 10,000 | 1,949 |
+| entities of degree >= 5 | 500 | 182 |
+| largest relation share | <= 40% | 39.9% |
+
+The share condition now passes, which it did not before; `hasBiologicalParent`
+was 42.6% and is now 19.1%. The other two fail and nothing was trained.
+
+The ceiling in `build/phase4d_verbs.md` says why more verbs will not close it.
+Every remaining verb in that table together is worth under 1,000 clauses, and
+the ones large enough to matter (see, have, approach, follow, bring) do not
+denote a relation worth a predicate. Verb-based extraction over this corpus
+tops out around 2,600 clauses. Reaching 10,000 needs a different source of
+triples, not a longer verb list.

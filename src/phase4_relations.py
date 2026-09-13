@@ -212,6 +212,30 @@ def usable(tok):
     return not in_name_list(tok) and not epithet_head(tok)
 
 
+def adjacent(bearer, role):
+    """True if the bearer abuts the role phrase, ignoring punctuation.
+
+    "Madri, the daughter of the king of Madra" and "Kunti's son Yudhishthira"
+    both abut. A name several list members away does not: "The king of Kashi,
+    with the great bow, and maharatha Shikhandi, Dhrishtadyumna, Virata and
+    Satyaki, Drupada" attached Drupada to that role and made him king of Kashi,
+    which then resolved five later "king of Kashi" descriptions to him. The
+    parser puts apposition and coordination in the same shape and the distance
+    is the only thing that separates them reliably here.
+    """
+    doc = role.doc
+    lo, hi = sorted((bearer.i, role.i))
+    # Nothing coordinated may stand between them. The role noun's own subtree
+    # swallows the whole list when the list hangs off it, so the subtree edges
+    # cannot be used as the boundary.
+    if any(doc[i].dep_ == "conj" or doc[i].pos_ == "CCONJ" for i in range(lo + 1, hi)):
+        return False
+    span = range(role.right_edge.i + 1, bearer.i) if bearer.i > role.i \
+        else range(bearer.i + 1, role.left_edge.i)
+    return all(doc[i].pos_ in ("PUNCT", "DET", "ADJ", "ADP", "PROPN", "NOUN")
+               for i in span)
+
+
 def ent_of(tok, persons, places, coref=None, table=None):
     """The entity string a token denotes, if any.
 
@@ -221,6 +245,11 @@ def ent_of(tok, persons, places, coref=None, table=None):
     provenance recorded.
     """
     t = tok.text.strip()
+    # A sentence-initial imperative is capitalised and the annotation labelled
+    # several of them PERSON: "Tell me", "Look at", "Know me to be behaviour".
+    # The name list cannot tell them apart on shape, the parse can.
+    if tok.pos_ in ("VERB", "AUX"):
+        return None, None, None
     if t in persons:
         return t, "person", None
     if t in places:
@@ -395,7 +424,12 @@ def extract_sentence(doc, r, persons, places, out, coref=None, table=None):
         roles.update(PARENT_NOUNS)
         roles.update(SPOUSE_NOUNS)
         roles.update(TEACHER_NOUNS)
-        if lemma in roles and tok.pos_ == "NOUN":
+        # usable(tok) guards the role noun itself, not only its arguments. In
+        # "Hridika's son, Kripa, Drona's son, Duryodhana, Shakuni" the parser
+        # makes "Drona's son" a conj of Kripa, and the block read it as Kripa
+        # being Drona's child. Every one of the seven children the graph gave
+        # Drona came from that shape and every one was wrong.
+        if lemma in roles and tok.pos_ == "NOUN" and usable(tok):
             pred = roles[lemma]
             foster = any(c.lemma_.lower() in FOSTER for c in tok.children)
             if foster and pred.endswith("hasBiologicalParent"):
@@ -420,12 +454,14 @@ def extract_sentence(doc, r, persons, places, out, coref=None, table=None):
                     continue
                 for b in bearers:
                     bs, bk, bs_cr = ent_of(b, persons, places, coref, table)
-                    if bs and bk == hk == "person" and usable(b) and usable(h):
+                    if (bs and bk == hk == "person" and usable(b) and usable(h)
+                            and adjacent(b, tok)):
                         pat = "poss_kinship" if any(c.dep_ == "poss" for c in tok.children) else "of_kinship"
                         emit(out, bs, pred, hs, pat, r, doc.text, (bs_cr, hs_cr))
 
         # "the king of Hastinapura", "ruler of Panchala"
-        if lemma in ("king", "ruler", "lord", "sovereign") and tok.pos_ == "NOUN":
+        if (lemma in ("king", "ruler", "lord", "sovereign")
+                and tok.pos_ == "NOUN" and usable(tok)):
             places_ = [g for c in tok.children if c.dep_ == "prep" and c.text.lower() == "of"
                        for g in c.children if g.dep_ == "pobj"]
             bearers = [c for c in tok.children if c.dep_ == "appos"]
@@ -435,7 +471,8 @@ def extract_sentence(doc, r, persons, places, out, coref=None, table=None):
                 ps, pk, ps_cr = ent_of(p, persons, places, coref, table)
                 for b in bearers:
                     bs, bk, bs_cr = ent_of(b, persons, places, coref, table)
-                    if ps and bs and pk == "place" and bk == "person" and usable(b):
+                    if (ps and bs and pk == "place" and bk == "person"
+                            and usable(b) and adjacent(b, tok)):
                         emit(out, bs, "rules", ps, "noun_role", r, doc.text,
                              (bs_cr, ps_cr))
 

@@ -30,18 +30,29 @@ CHILD_NOUNS = {"son", "daughter", "child", "offspring"}
 RULER_NOUNS = {"king", "ruler", "lord", "sovereign", "monarch"}
 
 
+# An edge has to be read off more than one sentence before a description is
+# allowed to rest on it. One parse error is otherwise enough to breed a family:
+# a single wrong row made "Krishna" the sole asserted parent of Bhishma, and
+# every later "Krishna's son" then resolved to Bhishma. That was four of the 250
+# judged rows and it is the failure this module was built to avoid.
+MIN_EVIDENCE = 2
+
+
 def build_table(rel):
     """Parent to children, and place to rulers, from the directly read graph."""
     d = rel[rel.coref_subject.isna() & rel.coref_object.isna()]
     if "nplink_subject" in d.columns:
         d = d[d.nplink_subject.isna() & d.nplink_object.isna()]
+    seen = collections.defaultdict(set)
+    for t in d.itertuples():
+        if t.predicate in ("hasBiologicalParent", "rules"):
+            seen[(t.predicate, t.object, t.subject)].add((t.parva, t.sent_id))
     children = collections.defaultdict(set)
     rulers = collections.defaultdict(set)
-    for t in d.itertuples():
-        if t.predicate == "hasBiologicalParent":
-            children[t.object].add(t.subject)
-        elif t.predicate == "rules":
-            rulers[t.object].add(t.subject)
+    for (pred, obj, subj), ev in seen.items():
+        if len(ev) < MIN_EVIDENCE:
+            continue
+        (children if pred == "hasBiologicalParent" else rulers)[obj].add(subj)
     return {"children": dict(children), "rulers": dict(rulers),
             "stats": collections.Counter()}
 

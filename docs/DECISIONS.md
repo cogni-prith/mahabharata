@@ -651,3 +651,79 @@ the ones large enough to matter (see, have, approach, follow, bring) do not
 denote a relation worth a predicate. Verb-based extraction over this corpus
 tops out around 2,600 clauses. Reaching 10,000 needs a different source of
 triples, not a longer verb list.
+
+## D18. Four extractor faults found by reading the judged sample
+
+The 250-row sample drawn for D17 was re-read for error classes rather than for
+a score. Four faults had a single root cause each and all four are fixed at the
+root rather than in the pattern that surfaced them.
+
+**Capitalised imperatives read as names.** "Tell me", "Look", "Know me to be
+behaviour". The annotation labels several of these PERSON and they arrive
+sentence-initially, so the shape test in `load_entities` cannot reject them.
+`ent_of` now refuses any token the parser tags VERB or AUX, whatever the name
+list says.
+
+**A comma list read as apposition, in the role-noun block.** "Hridika's son,
+Kripa, Drona's son, Duryodhana, Shakuni" made Kripa the son of Drona. The block
+already applied `usable` to the bearer and the holder but never to the role noun
+itself, which is the token sitting in the list. It does now. Every one of the
+seven children the graph gave Drona came from this shape and every one was
+wrong.
+
+**One wrong parent edge breeding a family.** `src/nplink.py` promised that
+building its table only from directly-read triples would stop this, and it did
+not: two wrong rows were enough to make Kripa the sole asserted child of Drona,
+after which every "Drona's son" in the corpus resolved to Kripa. That was 25 of
+60 rows in a sample of the linked arguments. An edge now has to be read off two
+distinct sentences before a description may rest on it, and with the list fault
+fixed Drona has four candidate children, so the phrase is refused as ambiguous
+instead. Noun-phrase link precision went from 0.630 to 0.800.
+
+**Appositive bearers taken from across a coordination.** A bearer must now abut
+the role phrase with no coordinated token in between. This one is partial: two
+`rules` rows survive it and Drupada is still recorded as ruling Kashi. It is
+recorded as open rather than described as fixed.
+
+### What the fixes cost and what they bought
+
+Distinct triples fell from 1,949 to 1,845, which is the point: the removed rows
+were wrong. Precision on the judgements still standing is 0.808 over 260 rows,
+against 0.764 before, and by provenance directly read 0.959, coreference 0.725,
+noun-phrase linked 0.800.
+
+### The Phase 6 gate now fails all three conditions
+
+| condition | required | measured |
+|---|---|---|
+| distinct triples | 10,000 | 1,845 |
+| entities of degree >= 5 | 500 | 169 |
+| largest relation share | <= 40% | 42.6% (speaksTo) |
+
+The share condition passed at 39.9% before these fixes and fails now, because
+the fixes deleted wrong `hasBiologicalParent` rows and `speaksTo` did not
+shrink. Restoring it by deleting speech triples would be arithmetic on the gate
+rather than work on the graph, so it was not done.
+
+### Three further sources were measured and rejected
+
+Before concluding, the remaining candidate sources were measured rather than
+argued about.
+
+- **Clan membership.** "of the Bharata lineage" occurs 2,762 times, but almost
+  all of them are the vocative form of address, which names no bearer. Over
+  12,000 candidate sentences the pattern with a resolvable bearer fired 38
+  times. A predicate was not added for 38 instances.
+- **Alias folding.** `build/appellations.csv` holds 246 appellations, all with
+  status `ambiguous`. Folding them would raise the degree of the entities it
+  merged while removing entities from the count, and the gate asks for 500
+  entities of degree 5 or more out of a total of about 700. The condition
+  cannot be reached by merging.
+- **Dialogue turns from the telling layer.** 5,092 tellings, of which 510 carry
+  a vocative narratee and are already used. Pairing adjacent turns would add
+  `speaksTo` instances to the one predicate that is already over the 40%
+  ceiling.
+
+The conclusion of D17 stands and is now tested three more ways: this corpus does
+not yield 10,000 grounded triples by dependency extraction. Reaching the gate
+needs a different source, not a longer pattern list. Nothing was trained.

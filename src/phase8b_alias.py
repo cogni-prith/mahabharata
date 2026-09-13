@@ -33,6 +33,7 @@ def main():
     ei = {n: i for i, n in enumerate(ents)}
 
     rel = pd.read_parquet("build/relations.parquet")
+    n_triples = len(rel[["subject", "predicate", "object"]].drop_duplicates())
     deg = pd.concat([rel.subject, rel.object]).value_counts()
 
     a = pd.read_csv("build/appellations.csv")
@@ -72,7 +73,7 @@ def main():
     b = pd.DataFrame(best)
 
     L = ["# Phase 8b. Cosine similarity as an alias candidate generator", "",
-         "**Below the Phase 6 entry gate.** The model was trained on 1,845 triples",
+         "**Below the Phase 6 entry gate.** The model was trained on %d triples" % n_triples,
          "against a stated floor of 10,000, on instruction. Nothing below is merged and",
          "nothing below is asserted. Every row is a hypothesis for a human ruling.", "",
          "There is no gold alias mapping for this corpus, so none of this is precision.",
@@ -126,6 +127,18 @@ def main():
                  % (r.appellation, r.candidate, r.cos, r.cos_rank, r.evidence,
                     r.status, r.prior if isinstance(r.prior, str) else "none",
                     c if isinstance(c, str) else "**uncited**"))
+    # The ruling is a reading, so the passage is printed here rather than left
+    # as an address to go and find. Verbatim from the master CSV through Phase 2.
+    ex = a.set_index(["appellation", "candidate_entity"]).evidence_sentence
+    L += ["", "### The passages, in the same order", ""]
+    for r in sl.itertuples():
+        s = ex.get((r.appellation, r.candidate), None)
+        L += ["**%s &rarr; %s**, %s" % (r.appellation, r.candidate,
+                                        fc.get((r.appellation, r.candidate)) or "**uncited**"),
+              "" if not isinstance(s, str) else "> " + s.strip(),
+              "" if isinstance(s, str) else
+              "> No apposition span behind this pair. The prior claims it and the text "
+              "never writes the two names together.", ""]
     dup = sl.candidate.value_counts()
     dup = dup[dup > 1]
     if len(dup):

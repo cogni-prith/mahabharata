@@ -10,7 +10,7 @@ agree with fifteen cosine neighbours. Degree is reported on every row and the
 ranked table is cut at degree >= k so the head of the list is not just the
 sparse tail of the graph. The unrestricted list is written underneath.
 
-Below the Phase 6 entry gate. The overlaps measure a model fitted to 1,845
+Below the Phase 6 entry gate. The overlaps measure a model fitted to a few
 triples, so a low overlap here is a lead to check against the text, not a
 finding about the epic.
 """
@@ -32,6 +32,7 @@ def main():
     ei = {n: i for i, n in enumerate(ents)}
     w = collections.Counter()
     rel = pd.read_parquet("build/relations.parquet")
+    n_triples = len(rel[["subject", "predicate", "object"]].drop_duplicates())
     for t in rel.itertuples():
         if t.subject in ei and t.object in ei and t.subject != t.object:
             a, b = sorted((t.subject, t.object))
@@ -65,7 +66,7 @@ def main():
 
     hi = d[d.degree >= K]
     L = ["# Phase 8. Graph versus embedding neighbourhoods", "",
-         "**Below the Phase 6 entry gate.** The embedding was trained on 1,845",
+         "**Below the Phase 6 entry gate.** The embedding was trained on %d" % n_triples,
          "triples against a stated floor of 10,000, on instruction. A low overlap",
          "below is a candidate to check against Debroy's prose, not a result about",
          "the Mahabharata.", "",

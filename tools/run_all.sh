@@ -17,6 +17,7 @@ $PY src/phase2_audit.py                # canonical_id failure counts
 $PY src/phase3_tellings.py             # speech frames and diegetic depth
 $PY src/phase3_spotcheck.py            # Phase 3 gate: the Gita and the Nala tale, asserts
 $PY src/phase4b_coref.py               # coreference over the prose, feeds phase 4
+$PY src/test_possessed_kin.py          # the possessed-kinship guard, asserts. D21
 $PY src/phase4_relations.py            # relation extraction, two passes, writes relations.parquet and ttl
 $PY src/phase4d_verbs.py               # verb ceiling measurement, evidence for the predicate set
 $PY src/phase4_sample.py               # draw the precision sample
@@ -24,13 +25,14 @@ $PY src/phase4e_sample.py              # draw the sample for the expanded patter
 # HUMAN: judge the samples into build/phase4e_wrong.txt and build/phase4g_judged.csv
 $PY src/phase4_precision.py            # precision from the judgements on record
 $PY src/phase5_propose.py              # proposals, separate graph, never asserted
-# HUMAN: the blind 300-500 sentence calibration set, which the Phase 5 gate needs
+$PY src/phase5_blind_sample.py         # draw the blind set, docs/PHASE5_SAMPLING.md, seed 20260913
+# HUMAN: annotate build/blind_calibration_sheet.csv blind. Do not open the key file first
 $PY src/phase6_gate.py                 # entry gate. FAILS on all three conditions
 $PY src/phase6_train.py                # RotatE. Below the gate, on instruction. D19
 $PY src/phase7_project.py              # UMAP, projection.json, projection.js
 node src/phase7_check.js               # the three query modes end to end
 $PY src/phase8_divergence.py           # graph vs embedding neighbourhoods
 $PY src/phase8b_alias.py               # cosine as an alias candidate generator
-$PY src/validate_outputs.py            # 24 integrity checks over out/. Non-zero exit on any failure
+$PY src/validate_outputs.py            # 25 integrity checks over out/. Non-zero exit on any failure
 
 echo "Open out/index.html in a browser. No server needed."

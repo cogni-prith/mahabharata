@@ -61,7 +61,10 @@ def person_names(df):
 
 
 def appositions(df, names):
-    """Adjacent name-name pairs, with a citation for each instance.
+    """Adjacent name-name pairs, with a citation and the sentence for each.
+
+    The sentence is kept because every human ruling this phase asks for is a
+    reading of the passage, and a citation with no text means hunting for it.
 
     Both orders are recorded because the translation uses both ("Partha
     Dhananjaya", "Dharmaraja Yudhishthira"). Direction is resolved later by
@@ -73,7 +76,7 @@ def appositions(df, names):
         for m in _APPOS.finditer(r.sentence):
             a, b = m.group(1), m.group(2)
             if a in names and b in names and a != b:
-                ev[(a, b)].append((r.parva, r.adhyaya_ordinal))
+                ev[(a, b)].append((r.parva, r.adhyaya_ordinal, r.sentence))
     return ev
 
 
@@ -215,7 +218,7 @@ def write_appellations(res, cites, path):
         w = csv.writer(f)
         w.writerow(["appellation", "candidate_entity", "confidence", "evidence_count",
                     "status", "prior_says", "apposition_share", "runner_up_share",
-                    "first_citation"])
+                    "first_citation", "evidence_sentence"])
         for dep in sorted(res):
             r = res[dep]
             for c in r["candidates"]:
@@ -224,7 +227,8 @@ def write_appellations(res, cites, path):
                             "" if c["confidence"] is None else c["confidence"],
                             c["evidence"], r["status"], r["prior"] or "",
                             r["share"], r["rival"],
-                            "%s/%s" % cc[0] if cc else ""])
+                            "%s/%s" % cc[0][:2] if cc else "",
+                            cc[0][2] if cc else ""])
 
 
 def write_entities_ttl(res, names, path, counts=None, places=()):
@@ -299,6 +303,13 @@ def main():
         res, names, "out/entities.ttl",
         counts={n: int(counts[n]) for n in persons}, places=places)
     write_appellations(res, cites, "build/appellations.csv")
+    # One example sentence per candidate link, so the human audit reads the
+    # passage instead of going looking for it.
+    for dep, r in res.items():
+        for c in r["candidates"]:
+            cc = cites.get((dep, c["entity"]), [])
+            c["citation"] = "%s/%s" % cc[0][:2] if cc else None
+            c["example"] = cc[0][2] if cc else None
     json.dump(res, open("build/phase2_resolution.json", "w"), indent=1)
     by = collections.Counter(r["status"] for r in res.values())
     print("evidence_names=%d apposition_pairs=%d entities=%d places=%d merged=%d"

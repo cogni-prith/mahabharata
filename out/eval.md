@@ -4,51 +4,51 @@ Checked before training, as required. No model was trained.
 
 | condition | required | measured | result |
 |---|---|---|---|
-| distinct asserted triples | >= 10,000 | 1845 | **FAIL** |
-| entities of degree >= 5 | >= 500 | 169 | **FAIL** |
-| largest relation share | <= 40% | 42.6% (speaksTo) | **FAIL** |
+| distinct asserted triples | >= 10,000 | 1771 | **FAIL** |
+| entities of degree >= 5 | >= 500 | 162 | **FAIL** |
+| largest relation share | <= 40% | 42.2% (speaksTo) | **FAIL** |
 
 **The gate does not pass. Nothing was trained.**
 
 Proposed triples, held separately and not eligible: 26.
-Entities appearing in the asserted graph: 688.
+Entities appearing in the asserted graph: 683.
 
 ## Degree distribution
 
 | degree | entities |
 |---|---|
-| 1 | 300 |
-| 2 | 112 |
-| 3 | 65 |
-| 4 | 42 |
-| 5 | 31 |
-| 6 | 26 |
-| 7 | 11 |
-| 8 | 11 |
-| 9 | 8 |
-| 10 | 9 |
+| 1 | 302 |
+| 2 | 116 |
+| 3 | 60 |
+| 4 | 43 |
+| 5 | 30 |
+| 6 | 24 |
+| 7 | 12 |
+| 8 | 10 |
+| 9 | 6 |
+| 10 | 10 |
 | 11 | 9 |
-| 12 | 4 |
-| 13 | 6 |
-| 14 | 3 |
-| 15 | 2 |
+| 12 | 5 |
+| 13 | 2 |
+| 14 | 5 |
+| 16 | 1 |
 | 17 | 1 |
-| 18 | 4 |
-| 19 | 4 |
-| 20+ | 40 |
+| 18 | 6 |
+| 19 | 5 |
+| 20+ | 36 |
 
 ## Relation shares
 
 | relation | triples | share |
 |---|---|---|
-| speaksTo | 786 | 42.6% |
-| foughtWith | 509 | 27.6% |
-| hasBiologicalParent | 289 | 15.7% |
-| slainBy | 109 | 5.9% |
-| hasSpouse | 40 | 2.2% |
+| speaksTo | 748 | 42.2% |
+| foughtWith | 483 | 27.3% |
+| hasBiologicalParent | 286 | 16.1% |
+| slainBy | 104 | 5.9% |
+| hasSpouse | 40 | 2.3% |
 | rules | 38 | 2.1% |
-| defeatedBy | 38 | 2.1% |
-| cursedBy | 20 | 1.1% |
+| defeatedBy | 37 | 2.1% |
+| cursedBy | 19 | 1.1% |
 | instructedBy | 16 | 0.9% |
 
 ---
@@ -70,37 +70,37 @@ puts the floor for meaningful vectors at roughly 5,000 triples.
 | negative sampling | basic, uniform corruption of head or tail |
 | negatives per positive | 32 |
 | split | 80/10/10 by triple, seed 20260917 |
-| train / valid / test | 1408 / 176 / 177 |
-| entities / relations | 688 / 9 |
+| train / valid / test | 1355 / 169 / 170 |
+| entities / relations | 683 / 9 |
 
 ## Leakage checks
 
-- Symmetric: `foughtWith` pairs ordered canonically and deduplicated before the split. 84 of 1845 distinct triples removed as the same fact written both ways.
+- Symmetric: `foughtWith` pairs ordered canonically and deduplicated before the split. 77 of 1771 distinct triples removed as the same fact written both ways.
 - Inverse: no inverse relation is materialised in this graph and `create_inverse_triples` is off. Predicate pairs sharing an entity pair in opposite order, measured rather than assumed:
 
 | predicate a | predicate b | shared reversed pairs |
 |---|---|---|
-| speaksTo | speaksTo | 224 |
-| foughtWith | speaksTo | 32 |
-| hasBiologicalParent | speaksTo | 25 |
-| foughtWith | slainBy | 21 |
-| defeatedBy | foughtWith | 8 |
+| speaksTo | speaksTo | 208 |
+| foughtWith | speaksTo | 28 |
+| hasBiologicalParent | speaksTo | 20 |
+| foughtWith | slainBy | 19 |
 | foughtWith | hasBiologicalParent | 8 |
+| defeatedBy | foughtWith | 7 |
 | hasBiologicalParent | hasBiologicalParent | 6 |
 | hasSpouse | speaksTo | 6 |
 | instructedBy | speaksTo | 5 |
 | slainBy | speaksTo | 5 |
-| cursedBy | speaksTo | 4 |
 | defeatedBy | speaksTo | 4 |
+| hasSpouse | hasSpouse | 4 |
 
 ## Filtered ranking, test set
 
 | metric | head | tail | both |
 |---|---|---|---|
-| MRR | 0.1488 | 0.1384 | 0.1436 |
-| Hits@1 | 0.0452 | 0.0621 | 0.0537 |
-| Hits@3 | 0.1751 | 0.1469 | 0.1610 |
-| Hits@10 | 0.3277 | 0.3164 | 0.3220 |
+| MRR | 0.1622 | 0.1283 | 0.1453 |
+| Hits@1 | 0.0647 | 0.0529 | 0.0588 |
+| Hits@3 | 0.1529 | 0.1118 | 0.1324 |
+| Hits@10 | 0.3765 | 0.2941 | 0.3353 |
 
 Filtered ranking, realistic rank definition, as PyKEEN reports it.
 PyKEEN 1.11.1.

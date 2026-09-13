@@ -848,3 +848,54 @@ every number measured against it stand unchanged.
 What the validator cannot check is whether a triple is true. That is what the
 precision samples are for, and two of them are still waiting on a human. The
 ledger of what is done, what failed and what is blocked is `docs/STATUS.md`.
+
+## D21. The possessed-kinship guard, the blind sample, and the retrain
+
+Three changes, one cause: the rebuilt interface was read rather than admired, and
+it showed a wrong edge on the first question anyone would ask of it.
+
+**A description is not a name.** `who killed Abhimanyu` returned
+`(Abhimanyu, slainBy, Drona)`, cited to `07_Drona 31`, evidence "Abhimanyu is then
+killed by Duhshasana's son." The citation and the sentence were both real. The
+agent is a possessed kinship noun, coreference resolved it to the nearest
+plausible antecedent, and the result was an assertion on the one fact CLAUDE.md
+names as contested. Fixed at the root rather than by deleting the row:
+`possessed_kin` in `src/phase4_relations.py` returns true for a kinship-noun head
+carrying a `poss` child or an `of` complement, and `ent_of` refuses a coreference
+argument that matches. Direct name arguments are untouched, so only the guessed
+links are dropped. `src/test_possessed_kin.py` asserts the Abhimanyu sentence,
+"the son of Drona", "His brother", and two negatives.
+
+Cost and effect: 3,060 extracted rows to 2,935, 1,845 distinct triples to 1,771,
+coreference-argument rows 1,212 to 1,087, and `(Abhimanyu, slainBy, *)` empty.
+Precision on the judged sample is unchanged at 0.838 over 240 rows, because the
+judgements key on the triple rather than on a row number. The guard is a blunt
+instrument and it will drop true edges where the text names a son whose name the
+text also gives; that is the intended trade, since an honest gap beats a
+plausible guess.
+
+**The Phase 5 blind set is drawn, procedure first.** `docs/PHASE5_SAMPLING.md`
+was written before any sampling: 11,560 eligible sentences (chapter-anchored, at
+least 60 characters, at least two distinct PERSON surfaces, with the annotation
+used only as a retrieval index and never as evidence), two strata of 200 split on
+whether the pipeline produced a triple, proportional by parva with a floor of 5,
+seed 20260913. `src/phase5_blind_sample.py` implements exactly that and writes the
+sheet and the key as separate files, because an annotator who can see the
+pipeline's answer is not blind. All 18 parvas appear, Drona 60 down to
+Svargarohana 5. `src/phase5_calibrate.py` does not exist and will not be written
+until annotations do, so there is no path by which a number gets reported against
+an empty sheet.
+
+**Retrained, still below the gate.** 683 entities, 9 relations, 77 symmetric
+duplicates removed before splitting, MRR 0.1453 and Hits@10 0.3353, seed 20260917.
+The gate still fails on all three conditions: 1,771 triples against 10,000, 162
+entities of degree 5 or more against 500, `speaksTo` at 42.2% against 40%. Every
+hardcoded triple count was removed from the generators at the same time, so the
+below-gate labels are computed from the data and cannot drift from it again.
+
+Phase 8 moved on one entity in a way worth recording. Duryodhana is now the
+single highest-overlap entity, six shared neighbours of ten, where before he sat
+at two with the rest of the tie. The mechanism is the same one Karna shows in
+reverse: Duryodhana's asserted edges are not mostly combat, so for him adjacency
+and similarity point the same way. The overall finding does not move, 616 of 683
+entities still tie at zero overlap.

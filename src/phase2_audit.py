@@ -156,13 +156,15 @@ def main():
 
     # Sampled candidate links for a human audit. Seeded.
     res = json.load(open("build/phase2_resolution.json"))
-    links = [(a, c["entity"], r["status"], c["confidence"], c["evidence"])
+    links = [(a, c["entity"], r["status"], c["confidence"], c["evidence"],
+              c.get("citation") or "", c.get("example") or "")
              for a, r in res.items() for c in r["candidates"] if c["entity"]]
     random.Random(SEED).shuffle(links)
     with open("build/entity_audit_sample.csv", "w", newline="", encoding="utf-8") as f:
         wr = csv.writer(f)
         wr.writerow(["appellation", "candidate_entity", "status", "confidence",
-                     "evidence_count", "correct_yes_no", "note"])
+                     "evidence_count", "citation", "evidence_sentence",
+                     "correct_yes_no", "note"])
         for row in links[:SAMPLE_N]:
             wr.writerow(list(row) + ["", ""])
     print("rewrites=%d anchors=%d verdicts=%s links=%d sampled=%d seed=%d"

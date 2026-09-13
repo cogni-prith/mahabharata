@@ -50,7 +50,7 @@
 </style>
 <header>
  <h1>Mahabharata knowledge graph embedding</h1><span class="stats" id="stats"></span>
- <div class="warn"><b>Below the Phase 6 entry gate.</b> Trained on 1,845 asserted triples
+ <div class="warn"><b>Below the Phase 6 entry gate.</b> Trained on <span id="ntrip"></span> asserted triples
   against a stated floor of 10,000, on explicit instruction. Nothing here is a result about
   the Mahabharata. Rows marked <span class="tag a">asserted</span> come from the text and
   carry a passage. Rows marked <span class="tag p">predicted</span> are model hypotheses.</div>
@@ -359,6 +359,7 @@ function draw3d(){
 }
 
 /* ---------- boot ---------- */
+document.getElementById('ntrip').textContent=K.edges.length.toLocaleString();
 document.getElementById('stats').textContent=
  N.toLocaleString()+' entities · '+K.edges.length.toLocaleString()+' asserted relations · '+
  K.relations.length+' predicates · RotatE '+H+'d complex';

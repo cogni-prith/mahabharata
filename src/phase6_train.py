@@ -2,7 +2,7 @@
 
 The entry gate does not pass. It is re-checked here and its result is written
 into every output this script produces, because the gate exists to stop numbers
-from this run being read as a result. They are not one. 1,845 distinct triples
+from this run being read as a result. They are not one. The distinct triple count
 is below the 5,000 the plan calls the floor for meaningful vectors, and the
 metrics below describe how well a model fits a small graph, not how well the
 Mahabharata embeds.
@@ -120,7 +120,7 @@ def main():
     L += ["", "---", "", "# Phase 6 training run", "",
           "**The entry gate above does not pass and this model was trained anyway,",
           "on instruction. Every number in this section describes how a model fits",
-          "1,845 triples. None of them is a result about the Mahabharata.** The plan",
+          "%d triples. None of them is a result about the Mahabharata.** The plan" % len(t),
           "puts the floor for meaningful vectors at roughly 5,000 triples.", "",
           "| setting | value |", "|---|---|",
           "| model | RotatE |",

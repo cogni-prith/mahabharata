@@ -166,6 +166,25 @@ def person_head(tok):
     return tok.pos_ in ("PRON", "PROPN") or tok.lemma_.lower() in PERSON_HEADS
 
 
+# A kinship noun with a possessor names a person by relation, not by name.
+# "Abhimanyu is then killed by Duhshasana's son" resolved that agent to Drona
+# and asserted the one slaying CLAUDE.md names as contested. Coreference is
+# sometimes right on these, "Drona's son" for Ashvatthama, but the referent is a
+# description and picking one antecedent silently is the thing the hard rules
+# forbid. The triple is left unasserted rather than guessed.
+KIN_HEADS = {"son", "daughter", "child", "father", "mother", "brother",
+             "sister", "wife", "husband", "consort", "grandfather", "grandson",
+             "uncle", "nephew", "descendant", "offspring"}
+
+
+def possessed_kin(tok):
+    """True for "X's son", "his son", "the son of X"."""
+    if tok.lemma_.lower() not in KIN_HEADS:
+        return False
+    return any(c.dep_ == "poss" for c in tok.children) or \
+        any(c.dep_ == "prep" and c.lower_ == "of" for c in tok.children)
+
+
 MODALS = {"will", "would", "shall", "should", "can", "could", "may", "might",
           "must", "'ll", "'d"}
 HYPO = {"if", "whether", "unless", "lest", "though"}
@@ -246,7 +265,7 @@ def ent_of(tok, persons, places, coref=None, table=None):
         name = nplink.resolve(tok, table, persons, places)
         if name:
             return name, "person", "np"
-    if coref and person_head(tok):
+    if coref and person_head(tok) and not possessed_kin(tok):
         for start, end, name, person in coref:
             if person not in ALLOW_PERSON:
                 continue

@@ -1,55 +1,94 @@
 <!doctype html>
 <meta charset="utf-8">
-<title>Mahabharata embedding</title>
+<title>Mahabharata knowledge graph embedding</title>
 <script src="projection.js"></script>
 <style>
- body{font:14px/1.5 Georgia,serif;margin:0;color:#222;background:#fbfaf7}
- header{padding:14px 18px;border-bottom:1px solid #ddd}
- h1{font-size:17px;margin:0 0 6px}
- .warn{background:#fff4d6;border:1px solid #e0c98a;padding:8px 10px;margin:8px 0;font-size:13px}
- input{width:520px;max-width:70vw;padding:7px;font:14px Georgia,serif}
- .hint{color:#666;font-size:12px;margin-top:4px}
- main{display:flex;gap:14px;padding:14px 18px;align-items:flex-start}
- .pane{flex:1;min-width:0;border:1px solid #ddd;background:#fff}
- .pane h2{font-size:13px;margin:0;padding:7px 10px;background:#f2f0ea;border-bottom:1px solid #ddd;font-weight:normal;letter-spacing:.04em;text-transform:uppercase}
- svg,canvas{display:block;width:100%}
- section{padding:0 18px 28px}
- table{border-collapse:collapse;width:100%;font-size:13px;background:#fff}
- th,td{border:1px solid #ddd;padding:4px 8px;text-align:left}
- th{background:#f2f0ea;font-weight:normal}
- .tag{font-size:11px;background:#eee;border:1px solid #ccc;padding:0 4px;margin-right:3px}
+ :root{--ink:#20201d;--dim:#6b6660;--rule:#ddd8cf;--bg:#fbfaf7;--card:#fff}
+ *{box-sizing:border-box}
+ body{font:14px/1.55 Georgia,serif;margin:0;color:var(--ink);background:var(--bg)}
+ header{padding:12px 18px 10px;border-bottom:1px solid var(--rule)}
+ h1{font-size:19px;margin:0;display:inline}
+ .stats{color:var(--dim);font-size:12px;margin-left:10px;letter-spacing:.03em}
+ .warn{background:#fff4d6;border:1px solid #e0c98a;padding:7px 10px;margin:8px 0;font-size:12.5px}
+ .bar{display:flex;gap:8px;margin-top:8px}
+ #q{flex:1;padding:9px 11px;font:14px Georgia,serif;border:1px solid #bbb5ab;background:#fff}
+ button{padding:9px 16px;font:14px Georgia,serif;border:1px solid #444;background:#20201d;color:#fff;cursor:pointer}
+ .chips{margin-top:7px;display:flex;flex-wrap:wrap;gap:5px}
+ .chip{font-size:12px;border:1px solid var(--rule);background:#fff;padding:2px 8px;cursor:pointer;color:#3a3a36}
+ .chip:hover{background:#f1eee7}
+ #msg{color:#a33;font-size:13px;min-height:18px;margin-top:5px}
+ main{display:flex;gap:12px;padding:12px 18px;align-items:stretch}
+ .pane{border:1px solid var(--rule);background:var(--card);min-width:0;display:flex;flex-direction:column}
+ .pane h2{font-size:11.5px;margin:0;padding:6px 10px;background:#f2f0ea;border-bottom:1px solid var(--rule);
+   font-weight:normal;letter-spacing:.09em;text-transform:uppercase;color:#54504a}
+ #left{flex:1.55}
+ #right{flex:1;max-width:460px}
+ #gwrap{overflow:auto;flex:1}
+ .body{padding:10px 12px;overflow:auto;flex:1;font-size:13px}
+ .ent{font:17px "Courier New",monospace;letter-spacing:.02em}
+ .kind{color:var(--dim);font-size:12px}
+ .grp{margin-top:11px;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#54504a;
+   border-top:1px solid #eee;padding-top:7px}
+ .grp i{display:inline-block;width:8px;height:8px;margin-right:5px;font-style:normal}
+ .row{margin:3px 0}
+ .row b{font-weight:normal;color:var(--dim)}
+ section{padding:0 18px 26px;display:flex;gap:12px;align-items:flex-start}
+ #sc{flex:1;max-width:520px}
+ #tab{flex:1.3;min-width:0}
+ canvas{display:block;background:#fff;cursor:grab}
+ table{border-collapse:collapse;width:100%;font-size:12.5px;background:#fff}
+ th,td{border:1px solid var(--rule);padding:3px 7px;text-align:left;vertical-align:top}
+ th{background:#f2f0ea;font-weight:normal;letter-spacing:.03em}
+ .tag{font-size:10px;background:#eee;border:1px solid #ccc;padding:0 4px;margin-right:3px;white-space:nowrap}
  .tag.p{background:#e7eefc;border-color:#a9bfe8}
  .tag.u{background:#f6e7e7;border-color:#e0b3b3}
+ .tag.a{background:#e6f3e6;border-color:#a8ccA8}
+ .ev{color:var(--dim);font-size:11.5px}
  a{color:#0645ad;cursor:pointer;text-decoration:none}
  a:hover{text-decoration:underline}
- #msg{color:#a33}
+ .foot{color:var(--dim);font-size:11.5px;padding:0 18px 22px}
 </style>
 <header>
- <h1>Mahabharata knowledge graph embedding</h1>
- <div class="warn"><b>Below the Phase 6 entry gate.</b> This model was trained on
-  1,845 asserted triples against a stated floor of 10,000, on explicit instruction.
-  Nothing on this page is a result about the Mahabharata. Every scored row is a
-  model hypothesis, not a statement about the text.</div>
- <input id="q" placeholder="Arjuna   |   Duryodhana foughtWith ?   |   Arjuna - Kunti + Gandhari" autofocus>
- <div class="hint">An entity name for nearest neighbours, an incomplete triple with <code>?</code> in any slot for link prediction, or an analogy with <code>+</code> and <code>-</code>.</div>
+ <h1>Mahabharata knowledge graph embedding</h1><span class="stats" id="stats"></span>
+ <div class="warn"><b>Below the Phase 6 entry gate.</b> Trained on 1,845 asserted triples
+  against a stated floor of 10,000, on explicit instruction. Nothing here is a result about
+  the Mahabharata. Rows marked <span class="tag a">asserted</span> come from the text and
+  carry a passage. Rows marked <span class="tag p">predicted</span> are model hypotheses.</div>
+ <div class="bar"><input id="q" placeholder="Ask a question, or type a name" autofocus><button onclick="run(document.getElementById('q').value)">Answer</button></div>
+ <div class="chips" id="chips"></div>
  <div id="msg"></div>
 </header>
 <main>
- <div class="pane"><h2>Graph neighbourhood, asserted edges</h2><svg id="g" height="420"></svg></div>
- <div class="pane"><h2>Embedding, UMAP 2D</h2><canvas id="c" width="760" height="420"></canvas></div>
+ <div class="pane" id="left"><h2>Graph neighbourhood, asserted edges only</h2><div id="gwrap"><svg id="g"></svg></div></div>
+ <div class="pane" id="right"><h2 id="ph">Entity</h2><div class="body" id="panel"></div></div>
 </main>
 <section>
- <h2 id="rh" style="font-size:13px;letter-spacing:.04em;text-transform:uppercase;font-weight:normal">Results</h2>
- <table id="res"></table>
- <p class="hint" id="prov"></p>
+ <div class="pane" id="sc"><h2>Embedding, UMAP 3D. Drag to rotate</h2><canvas id="c" width="520" height="420"></canvas></div>
+ <div class="pane" id="tab"><h2 id="rh">Results</h2><div class="body" style="padding:0"><table id="res"></table></div></div>
 </section>
+<p class="foot" id="foot"></p>
 <script>
 const K=window.KG, N=K.entities.length, D=K.dim, H=D/2;
 const E=Float32Array.from(K.emb), R=Float32Array.from(K.rel_emb);
 const id={}; K.entities.forEach((n,i)=>id[n.toLowerCase()]=i);
 const rid={}; K.relations.forEach((n,i)=>rid[n.toLowerCase()]=i);
-const adj={}; K.edges.forEach(([s,r,o,a])=>{(adj[s]=adj[s]||[]).push([r,o,1,a]);(adj[o]=adj[o]||[]).push([r,s,-1,a]);});
+// edge: [s, rel, o, citation, support, cited, evidence, confidence, depth]
+const adj={}; K.edges.forEach(e=>{(adj[e[0]]=adj[e[0]]||[]).push([e,1]);(adj[e[2]]=adj[e[2]]||[]).push([e,-1]);});
+const COL=['#c0392b','#2980b9','#27ae60','#8e44ad','#d35400','#16a085','#7f8c8d','#b7950b'];
 
+// Predicate groups, purely for reading order in the panel. Names as written.
+const GROUP=[['kinship','#2f6b3a',['hasBiologicalParent','hasSpouse']],
+             ['conflict','#a03232',['foughtWith','slainBy','defeatedBy']],
+             ['rule and tutelage','#1f5d86',['rules','instructedBy']],
+             ['divine and fated','#6b3f8e',['cursedBy']],
+             ['the telling','#8a6d1f',['speaksTo']]];
+const WORDS={hasBiologicalParent:['parent','child'],hasSpouse:['spouse','spouse'],
+ foughtWith:['fought','fought'],slainBy:['slain by','slew'],defeatedBy:['defeated by','defeated'],
+ rules:['rules','ruled by'],instructedBy:['instructed by','instructed'],cursedBy:['cursed by','cursed'],
+ speaksTo:['speaks to','spoken to by']};
+const SYM={foughtWith:1,hasSpouse:1};
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function vec(i){return E.subarray(i*D,(i+1)*D);}
 function cos(a,b){let d=0,x=0,y=0;for(let i=0;i<D;i++){d+=a[i]*b[i];x+=a[i]*a[i];y+=b[i]*b[i];}return d/(Math.sqrt(x*y)+1e-9);}
 // RotatE: score = -|| h o r - t ||, complex product, stored [re,im,re,im,...]
@@ -57,79 +96,119 @@ function rotate(h,r){const o=new Float32Array(D);
  for(let k=0;k<H;k++){const a=h[2*k],b=h[2*k+1],c=r[2*k],d=r[2*k+1];o[2*k]=a*c-b*d;o[2*k+1]=a*d+b*c;}return o;}
 function dist(a,b){let s=0;for(let i=0;i<D;i++){const d=a[i]-b[i];s+=d*d;}return Math.sqrt(s);}
 function score(h,ri,t){return -dist(rotate(vec(h),R.subarray(ri*D,(ri+1)*D)),vec(t));}
-
-let focus=0;
 function nearest(v,skip,n){const out=[];for(let i=0;i<N;i++){if(i===skip)continue;out.push([i,cos(v,vec(i))]);}
  return out.sort((a,b)=>b[1]-a[1]).slice(0,n);}
+function link(i){return '<a onclick="run(K.entities['+i+'])">'+esc(K.entities[i])+'</a>';}
+function resolve(t){const i=id[String(t).trim().toLowerCase()];return i===undefined?null:i;}
+function table(head,rows){document.getElementById('res').innerHTML=
+ '<tr>'+head.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+(rows.join('')||'<tr><td colspan=9>Nothing to show.</td></tr>');}
+function msg(t){document.getElementById('msg').innerHTML=t;}
 
-function tags(){return '<span class="tag p">predicted</span><span class="tag u">uncited</span>';}
-function link(i){return '<a onclick="run(K.entities['+i+'])">'+K.entities[i]+'</a>';}
+/* ---------- natural language ---------- */
+// Pattern list. Each entry: regex, which capture group holds the name, the
+// predicate, and whether the name sits in the subject slot ('s') or the
+// object slot ('o'). No model does this parsing, it is a lookup table, and an
+// unmatched question says so rather than guessing.
+const NL=[
+ [/^who (?:killed|slew|slayed|slays|kills) (.+)$/,1,'slainBy','s'],
+ [/^who (?:did|does) (.+?) (?:kill|slay)\??$/,1,'slainBy','o'],
+ [/^who (?:is|was) (.+?)(?:'s|s')? (?:killer|slayer)$/,1,'slainBy','s'],
+ [/^who (?:fought|battled|fights|fought against|fought with) (?:with )?(.+)$/,1,'foughtWith','s'],
+ [/^who (?:are|were) (.+?)(?:'s|s')? (?:enemies|opponents|foes)$/,1,'foughtWith','s'],
+ [/^who defeated (.+)$/,1,'defeatedBy','s'],
+ [/^who(?:m)? did (.+?) defeat\??$/,1,'defeatedBy','o'],
+ [/^who (?:is|are|was|were) (?:the )?(?:father|mother|parents?) of (.+)$/,1,'hasBiologicalParent','s'],
+ [/^who (?:is|are|was|were) (.+?)(?:'s|s')? (?:father|mother|parents?)$/,1,'hasBiologicalParent','s'],
+ [/^who (?:are|is|were) (?:the )?(?:children|sons?|daughters?) of (.+)$/,1,'hasBiologicalParent','o'],
+ [/^who (?:are|is|were) (.+?)(?:'s|s')? (?:children|sons?|daughters?)$/,1,'hasBiologicalParent','o'],
+ [/^who (?:is|was) (.+?) married to\??$/,1,'hasSpouse','s'],
+ [/^who (?:is|are|was|were) (?:the )?(?:wife|husband|spouse|wives|spouses) of (.+)$/,1,'hasSpouse','s'],
+ [/^who (?:is|are|was|were) (.+?)(?:'s|s')? (?:wife|husband|spouse|wives)$/,1,'hasSpouse','s'],
+ [/^who (?:does|did) (.+?) (?:speak|talk) to\??$/,1,'speaksTo','s'],
+ [/^who speaks to (.+)$/,1,'speaksTo','o'],
+ [/^who(?:m)? (?:does|did) (.+?) address\??$/,1,'speaksTo','s'],
+ [/^who rules (.+)$/,1,'rules','o'],
+ [/^what (?:does|did) (.+?) rule\??$/,1,'rules','s'],
+ [/^who (?:taught|instructed|trained) (.+)$/,1,'instructedBy','s'],
+ [/^who (?:did|does) (.+?) (?:study|train) under\??$/,1,'instructedBy','s'],
+ [/^who studied under (.+)$/,1,'instructedBy','o'],
+ [/^who cursed (.+)$/,1,'cursedBy','s'],
+ [/^who(?:m)? did (.+?) curse\??$/,1,'cursedBy','o'],
+ [/^who (?:is|are) (?:like|similar to|closest to|near) (.+)$/,1,'~',''],
+ [/^(?:who|what) (?:is|was) (.+)$/,1,'',''],
+ [/^tell me about (.+)$/,1,'',''],
+];
+const CHIPS=['who killed Karna','who are Bhishma\'s enemies','who is Arjuna\'s father',
+ 'who are Dhritarashtra\'s children','who does Krishna speak to','who studied under Drona',
+ 'who rules Madra','who is like Karna','who is Droupadi','Arjuna - Kunti + Gandhari','Duryodhana foughtWith ?'];
 
-function table(head,rows){document.getElementById('res').innerHTML='<tr>'+head.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+rows.join('');}
-
-function drawGraph(f){
- const svg=document.getElementById('g'),W=svg.clientWidth||700,Hh=420;
- const seen={},es=[];(adj[f]||[]).forEach(([r,o,dir,a])=>{const k=r+':'+o+':'+dir;if(seen[k])return;seen[k]=1;es.push([r,o,dir,a]);});
- const show=es.slice(0,28);
- let s='<circle cx="'+W/2+'" cy="'+Hh/2+'" r="6" fill="#c0392b"/><text x="'+(W/2+9)+'" y="'+(Hh/2+4)+'" font-size="13">'+K.entities[f]+'</text>';
- show.forEach(([r,o,dir,a],n)=>{const th=2*Math.PI*n/show.length-Math.PI/2;
-  const x=W/2+Math.min(W,Hh)*0.38*Math.cos(th), y=Hh/2+Hh*0.40*Math.sin(th);
-  s+='<line x1="'+W/2+'" y1="'+Hh/2+'" x2="'+x+'" y2="'+y+'" stroke="#bbb"/>';
-  s+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="#2c3e50"/>';
-  const tx=x+(Math.cos(th)<0?-6:6), an=Math.cos(th)<0?'end':'start';
-  s+='<text x="'+tx+'" y="'+(y-5)+'" font-size="10" fill="#666" text-anchor="'+an+'">'+K.relations[r]+(dir<0?' ←':' →')+'</text>';
-  s+='<text x="'+tx+'" y="'+(y+9)+'" font-size="11" text-anchor="'+an+'"><tspan onclick="run(K.entities['+o+'])" style="cursor:pointer;fill:#0645ad">'+K.entities[o]+'</tspan></text>';});
- svg.innerHTML=s;
- document.getElementById('prov').textContent=es.length+' asserted edges'+(es.length>show.length?', 28 drawn':'')+
-  '. Citations: '+show.slice(0,3).map(e=>e[3]).join('; ')+'.';
+function parse(q){
+ const s=q.trim().replace(/[’‘]/g,"'").replace(/\s+/g,' ').replace(/[?.!]+$/,'').toLowerCase();
+ for(const [re,g,p,slot] of NL){const m=s.match(re); if(!m)continue;
+  const i=resolve(m[g]); if(i===null)continue;      // try a later pattern first
+  return {e:i,p:p,slot:slot};}
+ return null;
 }
 
-function drawScatter(f,hi){
- const cv=document.getElementById('c'),x=cv.getContext('2d');
- const W=cv.width,Hh=cv.height,P=18,col=['#c0392b','#2980b9','#27ae60','#8e44ad','#d35400','#16a085','#7f8c8d','#b7950b'];
- x.clearRect(0,0,W,Hh);
- const px=i=>P+K.xy[i][0]*(W-2*P), py=i=>P+(1-K.xy[i][1])*(Hh-2*P);
- for(let i=0;i<N;i++){x.globalAlpha=.35;x.fillStyle=col[K.cluster[i]%8];x.beginPath();x.arc(px(i),py(i),2.2,0,7);x.fill();}
- x.globalAlpha=1;
- (hi||[]).forEach(i=>{x.fillStyle='#111';x.beginPath();x.arc(px(i),py(i),3.4,0,7);x.fill();
-  x.font='11px Georgia';x.fillText(K.entities[i],px(i)+5,py(i)-4);});
- if(f!=null){x.fillStyle='#c0392b';x.beginPath();x.arc(px(f),py(f),6,0,7);x.fill();
-  x.font='bold 13px Georgia';x.fillText(K.entities[f],px(f)+8,py(f)-6);}
-}
-
-function resolve(t){const i=id[t.toLowerCase()];return i===undefined?null:i;}
-
+/* ---------- the three modes ---------- */
 function run(qs){
- const q=qs.trim(); document.getElementById('msg').textContent='';
- if(!q)return;
- document.getElementById('q').value=q;
- if(/[+\-]/.test(q) && !q.includes('?')) return analogy(q);
- if(q.includes('?')) return triple(q);
- const i=resolve(q);
- if(i===null) return fail(q);
- focus=i; document.getElementById('rh').textContent='Nearest neighbours in vector space, cosine';
- const nn=nearest(vec(i),i,15);
- const gn=new Set((adj[i]||[]).map(e=>e[1]));
- table(['rank','entity','cosine','also a graph neighbour'],
-  nn.map(([j,c],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+'</td><td>'+c.toFixed(4)+'</td><td>'+(gn.has(j)?'yes':'no')+'</td></tr>'));
- drawGraph(i); drawScatter(i,nn.map(r=>r[0]));
+ const q=(qs||'').trim(); if(!q)return;
+ document.getElementById('q').value=q; msg('');
+ if(/[+\-]/.test(q)&&!q.includes('?')) return analogy(q);
+ if(q.includes('?')&&/\s/.test(q.replace(/\?/g,' ').trim())&&q.split(/\s+/).length===3) return triple(q);
+ const direct=resolve(q); if(direct!==null) return profile(direct);
+ const p=parse(q);
+ if(!p) return fail(q);
+ if(p.p==='') return profile(p.e);
+ if(p.p==='~') return neighbours(p.e);
+ return question(p.e,p.p,p.slot,q);
 }
+
+function question(e,pred,slot,q){
+ const r=rid[pred.toLowerCase()], sym=SYM[pred];
+ // slot 's' means the named entity is the subject and we rank tails.
+ const tailQ=(slot==='s');
+ const asserted=[];
+ (adj[e]||[]).forEach(([ed,dir])=>{
+  if(ed[1]!==r)return;
+  const outgoing=dir>0;
+  if(!sym&&outgoing!==tailQ)return;
+  asserted.push([outgoing?ed[2]:ed[0],ed]);});
+ const seen=new Set(asserted.map(a=>a[0]));
+ const pred_rows=[];
+ for(let i=0;i<N;i++){if(i===e||seen.has(i))continue;
+  pred_rows.push([i,tailQ?score(e,r,i):score(i,r,e)]);}
+ pred_rows.sort((a,b)=>b[1]-a[1]);
+ const w=WORDS[pred][tailQ?0:1];
+ document.getElementById('rh').textContent=
+  esc(K.entities[e])+' '+w+' : '+asserted.length+' asserted, then the model’s ranking';
+ const rows=asserted.map(([j,ed])=>'<tr><td>&mdash;</td><td>'+link(j)+'</td><td>'+
+   (ed[5]?esc(ed[3]):'<span class="tag u">uncited</span>')+'</td><td><span class="tag a">asserted</span> '+
+   ed[4]+' sentence'+(ed[4]>1?'s':'')+', conf '+ed[7]+
+   '<div class="ev">'+esc(ed[6])+'</div></td></tr>')
+  .concat(pred_rows.slice(0,12).map(([j,s],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+
+   '</td><td>'+s.toFixed(3)+'</td><td><span class="tag p">predicted</span><span class="tag u">uncited</span></td></tr>'));
+ table(['rank','entity','citation / score','status'],rows);
+ focusOn(e,asserted.map(a=>a[0]).concat(pred_rows.slice(0,8).map(r=>r[0])));
+}
+
+function neighbours(i){
+ const nn=nearest(vec(i),i,15), gn=new Set((adj[i]||[]).map(([e,d])=>d>0?e[2]:e[0]));
+ document.getElementById('rh').textContent='Nearest neighbours of '+K.entities[i]+' in vector space, cosine';
+ table(['rank','entity','cosine','also a graph neighbour'],
+  nn.map(([j,c],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+'</td><td>'+c.toFixed(4)+'</td><td>'+
+   (gn.has(j)?'yes':'no')+'</td></tr>'));
+ focusOn(i,nn.map(r=>r[0]));
+}
+function profile(i){neighbours(i);}
 
 function triple(q){
  const p=q.replace(/[(),]/g,' ').split(/\s+/).filter(Boolean);
- if(p.length!==3) return msg('A triple query needs three parts, one of them ?. Example: Duryodhana foughtWith ?');
  const r=rid[p[1].toLowerCase()];
- if(r===undefined) return msg('Unknown relation "'+p[1]+'". Known: '+K.relations.join(', '));
- const tailQ=p[2]==='?', head=tailQ?resolve(p[0]):resolve(p[2]);
- if(head===null) return fail(tailQ?p[0]:p[2]);
- const out=[];for(let i=0;i<N;i++){if(i===head)continue;out.push([i,tailQ?score(head,r,i):score(i,r,head)]);}
- out.sort((a,b)=>b[1]-a[1]);
- const asserted=new Set(K.edges.filter(e=>e[1]===r&&(tailQ?e[0]===head:e[2]===head)).map(e=>tailQ?e[2]:e[0]));
- focus=head; document.getElementById('rh').textContent='Link prediction, RotatE score, filtered view';
- table(['rank','candidate','score','status'],
-  out.slice(0,20).map(([j,s],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+'</td><td>'+s.toFixed(3)+'</td><td>'+
-   (asserted.has(j)?'<span class="tag">asserted in graph</span>':tags())+'</td></tr>'));
- drawGraph(head); drawScatter(head,out.slice(0,10).map(r=>r[0]));
+ if(r===undefined) return msg('Unknown relation "'+esc(p[1])+'". Known: '+K.relations.join(', '));
+ const tailQ=p[2]==='?', e=tailQ?resolve(p[0]):resolve(p[2]);
+ if(e===null) return fail(tailQ?p[0]:p[2]);
+ return question(e,K.relations[r],tailQ?'s':'o',q);
 }
 
 function analogy(q){
@@ -139,18 +218,153 @@ function analogy(q){
   const i=resolve(t); if(i===null){fail(t);ok=false;return;}
   used.push(i); const e=vec(i); for(let k=0;k<D;k++)v[k]+=sign*e[k]; sign=1;});
  if(!ok)return;
- const nn=nearest(v,-1,20).filter(([j])=>!used.includes(j)).slice(0,15);
- focus=used[0]; document.getElementById('rh').textContent='Analogy by vector arithmetic, cosine to the result vector';
+ const nn=nearest(v,-1,25).filter(([j])=>!used.includes(j)).slice(0,15);
+ document.getElementById('rh').textContent='Analogy by vector arithmetic, cosine to the result vector';
  table(['rank','entity','cosine','status'],
-  nn.map(([j,c],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+'</td><td>'+c.toFixed(4)+'</td><td>'+tags()+'</td></tr>'));
- drawGraph(used[0]); drawScatter(nn[0][0],used.concat(nn.slice(0,8).map(r=>r[0])));
+  nn.map(([j,c],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+'</td><td>'+c.toFixed(4)+
+   '</td><td><span class="tag p">predicted</span><span class="tag u">uncited</span></td></tr>'));
+ focusOn(used[0],used.concat(nn.slice(0,8).map(r=>r[0])));
 }
 
-function msg(t){document.getElementById('msg').textContent=t;}
-function fail(t){const l=t.toLowerCase();
- const near=K.entities.filter(n=>n.toLowerCase().startsWith(l.slice(0,3))).slice(0,8);
- msg('"'+t+'" is not in the graph.'+(near.length?' Did you mean: '+near.join(', ')+'?':''));}
+function fail(t){const l=String(t).toLowerCase().replace(/^(who|what|where) /,'');
+ const key=l.split(/\s+/).filter(w=>w.length>2).pop()||l;
+ const near=K.entities.filter(n=>n.toLowerCase().startsWith(key.slice(0,3))).slice(0,8);
+ msg('Not understood, or not in the graph: "'+esc(t)+'". The parser is a fixed pattern list over nine predicates, not a language model.'+
+  (near.length?'<br>Did you mean: '+near.map(n=>'<a onclick="run(\''+n+'\')">'+n+'</a>').join(', ')+'?':''));}
 
+/* ---------- panels ---------- */
+function focusOn(i,hi){focus=i;drawGraph(i);drawPanel(i);hilite=hi||[];draw3d();}
+let focus=0, hilite=[];
+
+function edgesOf(i){const seen={},out=[];
+ (adj[i]||[]).forEach(([e,dir])=>{const other=dir>0?e[2]:e[0], k=e[1]+':'+other+':'+(SYM[K.relations[e[1]]]?0:dir);
+  if(seen[k])return; seen[k]=1; out.push([e,dir,other]);});
+ return out;}
+
+// Fan layout: incoming edges left, outgoing right, grouped by predicate, the
+// focus in a box in the middle. Curves rather than straight lines only because
+// thirty labels on straight spokes overlap.
+function drawGraph(f){
+ const svg=document.getElementById('g'), W=Math.max(560,document.getElementById('gwrap').clientWidth-4);
+ const es=edgesOf(f), CAP=17;
+ const side={'-1':[], '1':[]};
+ es.forEach(t=>side[SYM[K.relations[t[0][1]]]?1:t[1]].push(t));
+ const order=t=>K.relations[t[0][1]];
+ side[1].sort((a,b)=>order(a).localeCompare(order(b)));
+ side[-1].sort((a,b)=>order(a).localeCompare(order(b)));
+ const L=side[-1].slice(0,CAP), Rt=side[1].slice(0,CAP);
+ const rows=Math.max(L.length,Rt.length,1), Hh=Math.max(300,rows*26+40), mid=Hh/2;
+ const cx=W/2, boxw=170;
+ let s='', lab='';
+ function column(list,dirLeft){
+  const x=dirLeft?150:W-150, n=list.length, top=mid-(n-1)*13;
+  let prev='';
+  list.forEach(([e,dir,other],k)=>{
+   const y=top+k*26, c=COL[K.cluster[other]%8];
+   const ax=dirLeft?x+34:x-34, bx=dirLeft?cx-boxw/2:cx+boxw/2;
+   s+='<path d="M'+ax+' '+y+' C'+((ax+bx)/2)+' '+y+' '+((ax+bx)/2)+' '+mid+' '+bx+' '+mid+
+      '" fill="none" stroke="'+c+'" stroke-opacity=".55"/>';
+   const name=K.entities[other], tw=Math.max(52,name.length*7.4+12);
+   s+='<rect x="'+(dirLeft?x+34-tw:x-34)+'" y="'+(y-11)+'" width="'+tw+'" height="21" fill="#fff" stroke="#ccc"/>';
+   s+='<text x="'+(dirLeft?x+28-tw+6:x-28)+'" y="'+(y+4)+'" font-family="Courier New" font-size="12">'+
+      '<tspan onclick="run(K.entities['+other+'])" style="cursor:pointer;fill:#0645ad">'+esc(name)+'</tspan></text>';
+   const w=WORDS[K.relations[e[1]]][dir>0?0:1];
+   if(w!==prev){prev=w;
+    lab+='<text x="'+(dirLeft?14:W-14)+'" y="'+(y+4)+'" font-size="10.5" fill="#54504a" letter-spacing="1" '+
+         'text-anchor="'+(dirLeft?'start':'end')+'">'+w.toUpperCase()+'</text>';}
+   if(!e[5])s+='<text x="'+(dirLeft?x+38:x+38)+'" y="'+(y+4)+'" font-size="9" fill="#b06">'+(dirLeft?'':'')+'</text>';
+  });
+ }
+ column(L,true); column(Rt,false);
+ s+='<rect x="'+(cx-boxw/2)+'" y="'+(mid-21)+'" width="'+boxw+'" height="42" fill="#20201d"/>';
+ s+='<text x="'+cx+'" y="'+(mid-2)+'" text-anchor="middle" fill="#fff" font-family="Courier New" font-size="15">'+esc(K.entities[f])+'</text>';
+ s+='<text x="'+cx+'" y="'+(mid+13)+'" text-anchor="middle" fill="#9a958d" font-size="10">'+
+    es.length+' asserted edge'+(es.length===1?'':'s')+'</text>';
+ svg.setAttribute('width',W); svg.setAttribute('height',Hh);
+ svg.innerHTML=s+lab;
+ const cited=es.filter(t=>t[0][5]).length;
+ document.getElementById('foot').textContent=
+  'Focus '+K.entities[f]+'. '+es.length+' distinct asserted edges, '+cited+' carry a chapter citation, '+
+  (es.length-cited)+' anchor at parva level only. '+(es.length>CAP?'Each side of the fan shows at most '+CAP+'. ':'')+
+  'RotatE, dim '+H+' complex, training seed '+K.train_seed+', UMAP seed '+K.umap_seed+'.';
+}
+
+function drawPanel(f){
+ const name=K.entities[f], m=K.meta[name]||{}, es=edgesOf(f);
+ document.getElementById('ph').textContent='Entity';
+ let h='<div class="ent">'+esc(name)+'</div><div class="kind">'+
+  (m.mentions?m.mentions.toLocaleString()+' mentions in the corpus':'no counted mentions')+
+  (m.tells?' · narrates '+m.tells+' tellings':'')+
+  ' · degree '+es.length+' · cluster '+K.cluster[f]+'</div>';
+ const al=K.alias[name];
+ if(al&&al.length){h+='<div class="grp"><i style="background:#8a6d1f"></i>appellation candidates, unresolved</div>';
+  h+='<div class="row">'+al.slice(0,8).map(a=>esc(a[0])+' <b>'+a[1].toFixed(2)+', '+a[2]+
+   ' sighting'+(a[2]===1?'':'s')+', '+esc(a[3])+'</b>').join('<br>')+'</div>';
+  h+='<div class="ev">Candidate set from apposition in Phase 2. Not merged, not asserted. '+
+     'A genuinely ambiguous referent keeps its set.</div>';}
+ GROUP.forEach(([label,colour,preds])=>{
+  const rows=[];
+  preds.forEach(p=>{const r=rid[p.toLowerCase()]; if(r===undefined)return;
+   [1,-1].forEach(dirWanted=>{
+    const hits=es.filter(([e,dir])=>e[1]===r&&(SYM[p]?dirWanted===1:dir===dirWanted));
+    if(!hits.length)return;
+    const w=WORDS[p][dirWanted>0?0:1];
+    const cited=hits.filter(t=>t[0][5]);
+    rows.push('<div class="row">'+w+' '+hits.slice(0,14).map(t=>link(t[2])).join(', ')+
+     (hits.length>14?' <b>and '+(hits.length-14)+' more</b>':'')+
+     ' <span class="tag'+(cited.length?'':' u')+'">'+(cited.length?cited.length+' cited':'uncited')+'</span></div>');});});
+  if(rows.length)h+='<div class="grp"><i style="background:'+colour+'"></i>'+label+'</div>'+rows.join('');});
+ const c=es.filter(t=>t[0][5]).slice(0,2);
+ if(c.length)h+='<div class="grp">first passages</div>'+c.map(t=>
+  '<div class="row"><b>'+esc(t[0][3])+'</b><div class="ev">'+esc(t[0][6])+'</div></div>').join('');
+ document.getElementById('panel').innerHTML=h;
+}
+
+/* ---------- 3D scatter ---------- */
+// Hand-rolled projection. A 3D library would be a dependency for one scatter
+// plot; this is a rotation matrix and a painter's-algorithm sort.
+let ry=0.6, rx=-0.35, drag=null;
+const cv=document.getElementById('c');
+cv.addEventListener('mousedown',e=>{drag=[e.clientX,e.clientY,ry,rx];cv.style.cursor='grabbing';});
+addEventListener('mouseup',()=>{drag=null;cv.style.cursor='grab';});
+addEventListener('mousemove',e=>{if(!drag)return;
+ ry=drag[2]+(e.clientX-drag[0])*.008; rx=drag[3]+(e.clientY-drag[1])*.008; draw3d();});
+cv.addEventListener('click',e=>{const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+ let best=null,bd=14;
+ pts().forEach(p=>{const d=Math.hypot(p.x-mx,p.y-my); if(d<bd){bd=d;best=p.i;}});
+ if(best!==null)run(K.entities[best]);});
+
+function pts(){const W=cv.width,Hh=cv.height,cs=Math.cos(ry),sn=Math.sin(ry),cp=Math.cos(rx),sp=Math.sin(rx);
+ const out=[];
+ for(let i=0;i<N;i++){const p=K.xyz[i],X=p[0]-.5,Y=p[1]-.5,Z=p[2]-.5;
+  const x1=X*cs-Z*sn, z1=X*sn+Z*cs, y1=Y*cp-z1*sp, z2=Y*sp+z1*cp;
+  const k=1/(2.0-z2)*Hh*1.5;
+  out.push({i:i,x:W/2+x1*k,y:Hh/2+y1*k,z:z2});}
+ return out;}
+
+function draw3d(){
+ const x=cv.getContext('2d'),W=cv.width,Hh=cv.height;
+ x.clearRect(0,0,W,Hh);
+ const hs=new Set(hilite), P=pts().sort((a,b)=>a.z-b.z);
+ P.forEach(p=>{const on=hs.has(p.i)||p.i===focus;
+  x.globalAlpha=on?1:.2+.35*(p.z+.5);
+  x.fillStyle=p.i===focus?'#c0392b':(on?'#20201d':COL[K.cluster[p.i]%8]);
+  x.beginPath(); x.arc(p.x,p.y,p.i===focus?6:(on?3.4:1.6+1.4*(p.z+.5)),0,7); x.fill();});
+ x.globalAlpha=1; x.fillStyle='#20201d'; x.font='11px Georgia';
+ P.filter(p=>hs.has(p.i)).slice(-14).forEach(p=>x.fillText(K.entities[p.i],p.x+5,p.y-4));
+ const f=P.find(p=>p.i===focus);
+ if(f){x.fillStyle='#c0392b';x.font='bold 13px Georgia';x.fillText(K.entities[focus],f.x+8,f.y-6);}
+ x.fillStyle='#6b6660';x.font='10px Georgia';
+ x.fillText('UMAP 3D, cosine, seed '+K.umap_seed+'. Colour is k-means k=8 on the vectors, not a faction label.',8,Hh-8);
+}
+
+/* ---------- boot ---------- */
+document.getElementById('stats').textContent=
+ N.toLocaleString()+' entities · '+K.edges.length.toLocaleString()+' asserted relations · '+
+ K.relations.length+' predicates · RotatE '+H+'d complex';
+document.getElementById('chips').innerHTML=
+ CHIPS.map(c=>'<span class="chip" onclick="run(this.textContent)">'+esc(c)+'</span>').join('');
 document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')run(e.target.value);});
-run('Arjuna');
+addEventListener('resize',()=>drawGraph(focus));
+run('Karna');
 </script>

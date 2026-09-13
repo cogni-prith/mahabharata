@@ -77,6 +77,28 @@ declares it unresolved, no `owl:sameAs`, the predicate set inside the recorded
 inventory, and the embedding artefacts agreeing with the graph and carrying their
 seeds and their below-gate flag. All 25 pass.
 
+## A known bad edge, found by reading the interface
+
+The rebuilt page answers `who killed Abhimanyu` with one asserted edge,
+`(Abhimanyu, slainBy, Drona)`, cited to `07_Drona 31`. Its evidence sentence is
+"Abhimanyu is then killed by Duhshasana's son." The agent of that sentence is a
+possessed kinship noun, not a name, and coreference resolved it to Drona. The
+citation is real and the sentence is real; the entity link is wrong, and it is
+wrong on the one fact CLAUDE.md names as contested.
+
+The shape of the fault: when the argument of a clause is "X's son" or "X's
+brother", the referent is a description rather than a name, and resolving it to
+a single antecedent is exactly the silent choice the hard rules forbid. The fix
+belongs in `ent_of` in `src/phase4_relations.py`, which should refuse a
+coreference argument whose mention head is a possessed kinship noun and leave
+the triple unasserted.
+
+Sizing, not a precision number: 1,212 of 3,060 extracted rows use at least one
+coreference-recovered argument, 63 of them `slainBy`. 108 of those 1,212 sit in
+a sentence that contains a possessed kinship noun, 3 of them `slainBy`. Those
+108 are the rows to read. The fix has not been applied because it changes the
+relation set and therefore requires a retrain, which is item 3 below.
+
 ## The three things a human has to do
 
 Nothing in the list below can be produced by running a script, and the first two

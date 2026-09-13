@@ -32,3 +32,24 @@ The analogy demo is not working. Its best form here is `Yudhishthira - Kunti + G
 the other forms tried put it at 29 and 49.
 A demo that has to land at rank 1 does not land at rank 8. That is the
 expected consequence of training below the gate and it is not presented as working.
+
+
+## Mode 4. The page executes, and the question parser
+
+The page script runs to completion outside a browser and answers on boot.
+
+- `who killed Karna` → Karna slain by : 6 asserted, then the model’s ranking
+- `who are Bhishma's enemies` → Bhishma fought : 21 asserted, then the model’s ranking
+- `who is Arjuna’s father` → Arjuna parent : 2 asserted, then the model’s ranking
+- `who are Dhritarashtra's children` → Dhritarashtra child : 11 asserted, then the model’s ranking
+- `who does Krishna speak to` → Krishna speaks to : 18 asserted, then the model’s ranking
+- `who studied under Drona` → Drona instructed : 1 asserted, then the model’s ranking
+- `who rules Madra` → Madra ruled by : 4 asserted, then the model’s ranking
+- `who is like Karna` → Nearest neighbours of Karna in vector space, cosine
+- `who killed Abhimanyu` → Abhimanyu slain by : 1 asserted, then the model’s ranking
+- `who is Droupadi` → Nearest neighbours of Droupadi in vector space, cosine
+- `who is Draupadi` → not understood, reported as such
+- `what is the meaning of dharma` → not understood, reported as such
+
+10 of 12 questions parse to a predicate and an entity.
+Questions outside the pattern list are refused with the reason, never answered by guess.

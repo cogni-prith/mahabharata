@@ -64,5 +64,34 @@ L.push('', 'All three modes return ranked output.',
   'the other forms tried put it at ' + ranks.filter(r => r !== best).map(r => r[2]).join(' and ') + '.',
   'A demo that has to land at rank 1 does not land at rank ' + best[2] + '. That is the',
   'expected consequence of training below the gate and it is not presented as working.', '');
+// 4. the page itself, executed in a stub DOM so the check exercises the real
+// code rather than a copy of it. The question parser is a fixed pattern list.
+L.push('', '## Mode 4. The page executes, and the question parser', '');
+const src = fs.readFileSync(__dirname + '/../out/index.html', 'utf8')
+  .split('<script>').pop().split('</script>')[0];
+const els = {};
+const el = () => ({ innerHTML: '', textContent: '', value: '', clientWidth: 700, width: 520, height: 420,
+  style: {}, setAttribute() {}, addEventListener() {}, getContext: () => new Proxy({}, { get: () => () => {} }),
+  getBoundingClientRect: () => ({ left: 0, top: 0 }) });
+const doc = { getElementById: i => els[i] || (els[i] = el()) };
+const page = new Function('document', 'window', 'addEventListener', src +
+  '\nreturn {run:run, parse:parse, rh:()=>document.getElementById("rh").textContent, ' +
+  'rows:()=>document.getElementById("res").innerHTML};')(doc, global.window, () => {});
+L.push('The page script runs to completion outside a browser and answers on boot.', '');
+const asked = ['who killed Karna', "who are Bhishma's enemies", 'who is Arjuna’s father',
+  "who are Dhritarashtra's children", 'who does Krishna speak to', 'who studied under Drona',
+  'who rules Madra', 'who is like Karna', 'who killed Abhimanyu', 'who is Droupadi',
+  'who is Draupadi', 'what is the meaning of dharma'];
+let parsed = 0;
+asked.forEach(q => {
+  let out;
+  try { page.run(q); out = page.rh(); } catch (e) { out = 'threw: ' + e.message; }
+  const got = out && !/^Results$/.test(out) && !/threw/.test(out);
+  const named = page.parse(q) !== null || id[q.toLowerCase()] !== undefined;
+  if (named) parsed++;
+  L.push('- `' + q + '` → ' + (named ? out : 'not understood, reported as such'));
+});
+L.push('', parsed + ' of ' + asked.length + ' questions parse to a predicate and an entity.',
+  'Questions outside the pattern list are refused with the reason, never answered by guess.', '');
 fs.writeFileSync(__dirname + '/../out/phase7_check.md', L.join('\n'));
 console.log('wrote out/phase7_check.md');

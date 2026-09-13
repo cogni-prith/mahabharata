@@ -19,6 +19,8 @@ of its mentions to Arjuna.
 import bisect, collections, csv, json, re, sys
 import pandas as pd
 
+import vocab
+
 BASE = "http://example.org/mbh/"   # provisional, does not resolve, nothing published
 
 # Titles and honorifics are capitalized in the translation and are not names.
@@ -225,13 +227,20 @@ def write_appellations(res, cites, path):
                             "%s/%s" % cc[0] if cc else ""])
 
 
-def write_entities_ttl(res, names, path):
+def write_entities_ttl(res, names, path, counts=None, places=()):
     """Entities, merged appellations, and candidate links that stay unresolved.
 
     An asserted appellation becomes `skos:altLabel` on its entity. Anything else
     keeps a node of its own with `mbh:designatesCandidate` links, each carrying a
     confidence and an evidence count, so no silent choice is made and the
     unresolved cases stay visible rather than disappearing into a merge.
+
+    Every surface the annotation labelled as an entity is declared here, not only
+    the ones frequent enough to carry apposition evidence. The ten-mention
+    threshold is what a merge needs; it is not what existing needs. While it
+    governed this file the graph referred to 251 entity nodes that had no
+    declaration anywhere. Each node carries its mention count, so the evidence
+    tier stays visible as data instead of as an absence.
     """
     lines = ["@prefix mbh: <%s> ." % BASE,
              "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .",
@@ -241,13 +250,19 @@ def write_entities_ttl(res, names, path):
     alt = collections.defaultdict(list)
     for d, e in merged.items():
         alt[e].append(d)
-    ents = sorted(set(names) | set(merged.values()))
+    ents = sorted(set(names) | set(merged.values()) | set(counts or ()))
     for n in ents:
         if n in merged:
             continue
-        lines.append("%s a mbh:Person ; rdfs:label %s ." % (iri(n), json.dumps(n)))
+        mc = ' ; mbh:mentionCount %d' % counts[n] if counts is not None and n in counts else ""
+        lines.append("%s a mbh:Person ; rdfs:label %s%s ." % (iri(n), json.dumps(n), mc))
         for a in sorted(alt.get(n, [])):
             lines.append("%s skos:altLabel %s ." % (iri(n), json.dumps(a)))
+        lines.append("")
+    for n in sorted(places):
+        mc = ' ; mbh:mentionCount %d' % counts[n] if counts is not None and n in counts else ""
+        lines.append("%s a mbh:Place ; rdfs:label %s%s ." % (iri(n), json.dumps(n), mc))
+    if places:
         lines.append("")
     for dep in sorted(res):
         r = res[dep]
@@ -279,11 +294,15 @@ def main():
     res = resolve(cand, prior, risk)
     json.dump({k: v for k, v in sorted(risk.items())},
               open("build/phase2_homonym_risk.json", "w"), indent=1)
-    n_ent, n_merged = write_entities_ttl(res, names, "out/entities.ttl")
+    persons, places, counts, _ = vocab.vocabulary(df)
+    n_ent, n_merged = write_entities_ttl(
+        res, names, "out/entities.ttl",
+        counts={n: int(counts[n]) for n in persons}, places=places)
     write_appellations(res, cites, "build/appellations.csv")
     json.dump(res, open("build/phase2_resolution.json", "w"), indent=1)
     by = collections.Counter(r["status"] for r in res.values())
-    print("names=%d apposition_pairs=%d entities=%d merged=%d" % (len(names), len(ev), n_ent, n_merged))
+    print("evidence_names=%d apposition_pairs=%d entities=%d places=%d merged=%d"
+          % (len(names), len(ev), n_ent, len(places), n_merged))
     print("appellations by status: %s" % dict(by))
     print("heads blocked as homonymy risks: %d" % len(risk))
 

@@ -792,3 +792,59 @@ graph of alliance and kinship; this graph is 35% combat, so adjacency means
 enmity, and the sign of the expected effect flips. The graph places Karna among
 Pandavas and the vector places him among Kauravas. The hypothesis needs restating
 before it can be tested.
+
+## D20. Four defects the output validator found, and one vocabulary
+
+`src/validate_outputs.py` was written to close the project, on the principle that a
+hard rule which nothing checks is a hope. It runs 25 checks over `out/` and exits
+non-zero on any failure. It found four real defects on its first run.
+
+**Two vocabularies for the same question.** Phase 2 declared entities in
+`out/entities.ttl` from PERSON surfaces seen at least ten times, which is the
+threshold its apposition evidence needs before it will consider a merge. Phase 4
+linked relations to any PERSON surface of the right shape. So the asserted graph
+referred to 251 entity nodes that were never declared anywhere: 235 people and 16
+places. The evidence threshold for a merge had leaked into the question of whether
+an entity exists, and those are different questions. An entity exists if the
+annotation labelled a surface as one. The rule now lives once, in `src/vocab.py`,
+and both phases import it. `entities.ttl` declares 2,995 people and 872 places,
+each carrying its mention count so the evidence tier is visible as data rather than
+as an absence. `build/appellations.csv` is byte-identical after the change, which
+is the check that matters: the merge logic did not move, so nothing measured
+against it moved either.
+
+**The Gita's innermost narrator was not rejected, it was never seen.** Phase 3's
+opener pattern requires a capitalised name before the speech verb. Debroy prints
+Krishna's turns in the Gita as "The lord said", fourteen times in Bhishma Parva,
+so the pattern did not match, no rejection was counted, and the most famous
+embedded discourse in the epic produced no `Telling` at all. Titular openers are
+now emitted as tellings with `mbh:narratorUnresolved true` and the surface
+recorded, 373 of them corpus-wide, the commonest being "The brahmana" at 68. No
+referent is chosen. That "The lord" is Krishna is obvious to a reader of the Gita
+and is still a guess by the extractor, and the rule is not to guess an entity
+link. The consequence is worth stating plainly: the diegetic spine of the Gita is
+recovered to three levels with its innermost speaker unresolved, and that is a
+fact about the translation's frame formatting rather than a gap to fill.
+
+**Telling graph IRIs were not unique.** The IRI was keyed on
+`(parva, sent_id)`, but a sentence can open two frames. 220 tellings collided and
+vanished from `out/tellings.ttl` while surviving in `build/tellings.parquet`, and
+51 collisions merged a named narrator with an unresolved one in a single node. The
+IRI now carries the opener's character offset. 5,465 tellings in the parquet,
+5,465 in the Turtle.
+
+**The Phase 3 gate had never been closed.** It asks for a spot-check of the Gita
+and one embedded tale. The depth distribution had been reported; the spot-checks
+had not. `src/phase3_spotcheck.py` checks both against frames known independently
+of this corpus, as asserts rather than as prose, and writes
+`build/phase3_spotcheck.md`. The Gita span carries Sanjaya and Arjuna, nests to
+depth 4, and holds twelve unresolved titular narrators. Nala and Damayanti is
+narrated by Brihadashva 31 times in Aranyaka 50 to 78.
+
+Phase 4 was not re-run. The vocabulary refactor was verified to return the same
+2,985 persons and 872 places the old code did, so `build/relations.parquet` and
+every number measured against it stand unchanged.
+
+What the validator cannot check is whether a triple is true. That is what the
+precision samples are for, and two of them are still waiting on a human. The
+ledger of what is done, what failed and what is blocked is `docs/STATUS.md`.

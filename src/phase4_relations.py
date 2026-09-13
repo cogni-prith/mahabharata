@@ -17,6 +17,7 @@ import pandas as pd
 import spacy
 
 import nplink
+import vocab
 
 BASE = "http://example.org/mbh/"
 
@@ -101,23 +102,10 @@ NPLINK_PENALTY = 0.85
 ALLOW_PERSON = {3}
 
 
-# Capitalized forms the corpus labels PERSON that are not names. They arrive
-# sentence-initially, so the shape test cannot reject them.
-NOT_A_NAME = {"You", "He", "She", "They", "We", "It", "Thus", "Then", "Having",
-              "There", "Here", "This", "That", "These", "Those", "But", "And",
-              "His", "Her", "Their", "Your", "Who", "What", "When", "Where",
-              "Thou", "Thee", "Thy", "Yet", "Now", "One", "Some", "All"}
-
-
 def load_entities():
-    """Surfaces that Phase 1 labelled as entities, so extraction only links to
-    strings the annotation already treated as entities."""
-    df = pd.read_parquet("build/mentions.parquet")
-    lab = df.groupby(df.surface.str.strip()).label.agg(lambda x: x.value_counts().idxmax())
-    persons = {s for s, l in lab.items()
-               if l == "PERSON" and re.fullmatch(r"[A-Z][a-z]{2,}", s)
-               and s not in NOT_A_NAME}
-    places = {s for s, l in lab.items() if l in ("GPE", "LOC") and re.fullmatch(r"[A-Z][a-z]{2,}", s)}
+    """The shared vocabulary, so extraction links only to strings the annotation
+    already treated as entities. One definition, in src/vocab.py."""
+    persons, places, _, df = vocab.vocabulary()
     return persons, places, df
 
 

@@ -727,3 +727,68 @@ argued about.
 The conclusion of D17 stands and is now tested three more ways: this corpus does
 not yield 10,000 grounded triples by dependency extraction. Reaching the gate
 needs a different source, not a longer pattern list. Nothing was trained.
+
+## D19. Trained below the Phase 6 entry gate, on instruction
+
+The hard rule says never train before the Phase 6 entry gate passes, because
+embeddings trained on too little data produce noise that looks like results. The
+gate was checked, reported, and failed on all three conditions. It was reported
+three times. The instruction was then given to continue with the remaining
+phases. That is the user's call and it is recorded here rather than left in a
+transcript.
+
+State of the gate at the moment of training, from `out/eval.md`:
+
+| condition | required | measured | result |
+|---|---|---|---|
+| distinct asserted triples | >= 10,000 | 1,845 | FAIL |
+| entities of degree >= 5 | >= 500 | 169 | FAIL |
+| largest relation share | <= 40% | 42.6% (speaksTo) | FAIL |
+
+What was done to keep the rule's purpose intact even though the rule itself was
+overridden. Every output carries the failure on its face, so no number from this
+run can be lifted out of context and read as a result:
+
+- `out/eval.md` keeps the gate table as its first section and opens the training
+  section by stating that the gate does not pass and what that means.
+- `out/phase7_check.md` and `build/divergence.md` repeat it in their headers.
+- `out/index.html` shows it in a standing banner above the query bar, and
+  `projection.js` carries `below_gate: true` in the data itself.
+- `docs/PHASE8_INSPECTION.md` states it and then declines to draw a conclusion
+  about the epic from a model at MRR 0.14.
+
+Training settings, so the run reproduces: RotatE, 200 complex dimensions stored
+as 400 float32, seed 20260917 for both the split and the training run, 400
+epochs, Adam at 1e-3, batch 512, basic (uniform) negative sampling at 32
+negatives per positive, 80/10/10 split by triple, filtered ranking. Results, all
+below-gate: MRR 0.1436, Hits@1 0.0537, Hits@3 0.1610, Hits@10 0.3220.
+
+Both leakage traps were handled before the split. `foughtWith` pairs were ordered
+canonically and deduplicated, which removed 84 of 1,845 triples that were the same
+fact written both ways. No inverse relations are materialised in this graph and
+`create_inverse_triples` is off; rather than assert that, the check counts
+predicate pairs that hold the same entity pair in opposite order and prints them.
+The largest count is `speaksTo` against itself at 224, which is not leakage but
+the fact that conversation is mutual. UMAP seed 20260917, cosine metric,
+n_neighbors 15, min_dist 0.1, recorded in `out/projection.json`.
+
+The page is opened from disk and browsers refuse `fetch()` on `file://`, so the
+embedding ships as `out/projection.js`, one global assignment loaded by a script
+tag. 5.7 MB. `out/projection.json` holds the coordinates and the projection seed
+and is the named deliverable; the page does not read it.
+
+What this run cost in credibility, stated plainly. The analogy demo does not work:
+`Arjuna - Kunti + Gandhari` puts Duryodhana at rank 29 of 685, and the best form
+tried reaches rank 8. The divergence analysis returns a ranked list in which 618
+of 688 entities tie at zero overlap, so the ranking orders the tie by degree. Both
+are what the gate exists to prevent. Neither is presented as a result.
+
+Two findings from Phase 8 survive the caveat because they are about the method
+rather than about the Mahabharata, and both are written up in
+`docs/PHASE8_INSPECTION.md`. Cosine similarity groups an entity with its own
+epithets, unprompted, which makes it a candidate generator for the appellation
+merge Phase 2 left at `ambiguous`. And the Karna hypothesis as written assumed a
+graph of alliance and kinship; this graph is 35% combat, so adjacency means
+enmity, and the sign of the expected effect flips. The graph places Karna among
+Pandavas and the vector places him among Kauravas. The hypothesis needs restating
+before it can be tested.

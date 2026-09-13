@@ -1,0 +1,156 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Mahabharata embedding</title>
+<script src="projection.js"></script>
+<style>
+ body{font:14px/1.5 Georgia,serif;margin:0;color:#222;background:#fbfaf7}
+ header{padding:14px 18px;border-bottom:1px solid #ddd}
+ h1{font-size:17px;margin:0 0 6px}
+ .warn{background:#fff4d6;border:1px solid #e0c98a;padding:8px 10px;margin:8px 0;font-size:13px}
+ input{width:520px;max-width:70vw;padding:7px;font:14px Georgia,serif}
+ .hint{color:#666;font-size:12px;margin-top:4px}
+ main{display:flex;gap:14px;padding:14px 18px;align-items:flex-start}
+ .pane{flex:1;min-width:0;border:1px solid #ddd;background:#fff}
+ .pane h2{font-size:13px;margin:0;padding:7px 10px;background:#f2f0ea;border-bottom:1px solid #ddd;font-weight:normal;letter-spacing:.04em;text-transform:uppercase}
+ svg,canvas{display:block;width:100%}
+ section{padding:0 18px 28px}
+ table{border-collapse:collapse;width:100%;font-size:13px;background:#fff}
+ th,td{border:1px solid #ddd;padding:4px 8px;text-align:left}
+ th{background:#f2f0ea;font-weight:normal}
+ .tag{font-size:11px;background:#eee;border:1px solid #ccc;padding:0 4px;margin-right:3px}
+ .tag.p{background:#e7eefc;border-color:#a9bfe8}
+ .tag.u{background:#f6e7e7;border-color:#e0b3b3}
+ a{color:#0645ad;cursor:pointer;text-decoration:none}
+ a:hover{text-decoration:underline}
+ #msg{color:#a33}
+</style>
+<header>
+ <h1>Mahabharata knowledge graph embedding</h1>
+ <div class="warn"><b>Below the Phase 6 entry gate.</b> This model was trained on
+  1,845 asserted triples against a stated floor of 10,000, on explicit instruction.
+  Nothing on this page is a result about the Mahabharata. Every scored row is a
+  model hypothesis, not a statement about the text.</div>
+ <input id="q" placeholder="Arjuna   |   Duryodhana foughtWith ?   |   Arjuna - Kunti + Gandhari" autofocus>
+ <div class="hint">An entity name for nearest neighbours, an incomplete triple with <code>?</code> in any slot for link prediction, or an analogy with <code>+</code> and <code>-</code>.</div>
+ <div id="msg"></div>
+</header>
+<main>
+ <div class="pane"><h2>Graph neighbourhood, asserted edges</h2><svg id="g" height="420"></svg></div>
+ <div class="pane"><h2>Embedding, UMAP 2D</h2><canvas id="c" width="760" height="420"></canvas></div>
+</main>
+<section>
+ <h2 id="rh" style="font-size:13px;letter-spacing:.04em;text-transform:uppercase;font-weight:normal">Results</h2>
+ <table id="res"></table>
+ <p class="hint" id="prov"></p>
+</section>
+<script>
+const K=window.KG, N=K.entities.length, D=K.dim, H=D/2;
+const E=Float32Array.from(K.emb), R=Float32Array.from(K.rel_emb);
+const id={}; K.entities.forEach((n,i)=>id[n.toLowerCase()]=i);
+const rid={}; K.relations.forEach((n,i)=>rid[n.toLowerCase()]=i);
+const adj={}; K.edges.forEach(([s,r,o,a])=>{(adj[s]=adj[s]||[]).push([r,o,1,a]);(adj[o]=adj[o]||[]).push([r,s,-1,a]);});
+
+function vec(i){return E.subarray(i*D,(i+1)*D);}
+function cos(a,b){let d=0,x=0,y=0;for(let i=0;i<D;i++){d+=a[i]*b[i];x+=a[i]*a[i];y+=b[i]*b[i];}return d/(Math.sqrt(x*y)+1e-9);}
+// RotatE: score = -|| h o r - t ||, complex product, stored [re,im,re,im,...]
+function rotate(h,r){const o=new Float32Array(D);
+ for(let k=0;k<H;k++){const a=h[2*k],b=h[2*k+1],c=r[2*k],d=r[2*k+1];o[2*k]=a*c-b*d;o[2*k+1]=a*d+b*c;}return o;}
+function dist(a,b){let s=0;for(let i=0;i<D;i++){const d=a[i]-b[i];s+=d*d;}return Math.sqrt(s);}
+function score(h,ri,t){return -dist(rotate(vec(h),R.subarray(ri*D,(ri+1)*D)),vec(t));}
+
+let focus=0;
+function nearest(v,skip,n){const out=[];for(let i=0;i<N;i++){if(i===skip)continue;out.push([i,cos(v,vec(i))]);}
+ return out.sort((a,b)=>b[1]-a[1]).slice(0,n);}
+
+function tags(){return '<span class="tag p">predicted</span><span class="tag u">uncited</span>';}
+function link(i){return '<a onclick="run(K.entities['+i+'])">'+K.entities[i]+'</a>';}
+
+function table(head,rows){document.getElementById('res').innerHTML='<tr>'+head.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+rows.join('');}
+
+function drawGraph(f){
+ const svg=document.getElementById('g'),W=svg.clientWidth||700,Hh=420;
+ const seen={},es=[];(adj[f]||[]).forEach(([r,o,dir,a])=>{const k=r+':'+o+':'+dir;if(seen[k])return;seen[k]=1;es.push([r,o,dir,a]);});
+ const show=es.slice(0,28);
+ let s='<circle cx="'+W/2+'" cy="'+Hh/2+'" r="6" fill="#c0392b"/><text x="'+(W/2+9)+'" y="'+(Hh/2+4)+'" font-size="13">'+K.entities[f]+'</text>';
+ show.forEach(([r,o,dir,a],n)=>{const th=2*Math.PI*n/show.length-Math.PI/2;
+  const x=W/2+Math.min(W,Hh)*0.38*Math.cos(th), y=Hh/2+Hh*0.40*Math.sin(th);
+  s+='<line x1="'+W/2+'" y1="'+Hh/2+'" x2="'+x+'" y2="'+y+'" stroke="#bbb"/>';
+  s+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="#2c3e50"/>';
+  const tx=x+(Math.cos(th)<0?-6:6), an=Math.cos(th)<0?'end':'start';
+  s+='<text x="'+tx+'" y="'+(y-5)+'" font-size="10" fill="#666" text-anchor="'+an+'">'+K.relations[r]+(dir<0?' ←':' →')+'</text>';
+  s+='<text x="'+tx+'" y="'+(y+9)+'" font-size="11" text-anchor="'+an+'"><tspan onclick="run(K.entities['+o+'])" style="cursor:pointer;fill:#0645ad">'+K.entities[o]+'</tspan></text>';});
+ svg.innerHTML=s;
+ document.getElementById('prov').textContent=es.length+' asserted edges'+(es.length>show.length?', 28 drawn':'')+
+  '. Citations: '+show.slice(0,3).map(e=>e[3]).join('; ')+'.';
+}
+
+function drawScatter(f,hi){
+ const cv=document.getElementById('c'),x=cv.getContext('2d');
+ const W=cv.width,Hh=cv.height,P=18,col=['#c0392b','#2980b9','#27ae60','#8e44ad','#d35400','#16a085','#7f8c8d','#b7950b'];
+ x.clearRect(0,0,W,Hh);
+ const px=i=>P+K.xy[i][0]*(W-2*P), py=i=>P+(1-K.xy[i][1])*(Hh-2*P);
+ for(let i=0;i<N;i++){x.globalAlpha=.35;x.fillStyle=col[K.cluster[i]%8];x.beginPath();x.arc(px(i),py(i),2.2,0,7);x.fill();}
+ x.globalAlpha=1;
+ (hi||[]).forEach(i=>{x.fillStyle='#111';x.beginPath();x.arc(px(i),py(i),3.4,0,7);x.fill();
+  x.font='11px Georgia';x.fillText(K.entities[i],px(i)+5,py(i)-4);});
+ if(f!=null){x.fillStyle='#c0392b';x.beginPath();x.arc(px(f),py(f),6,0,7);x.fill();
+  x.font='bold 13px Georgia';x.fillText(K.entities[f],px(f)+8,py(f)-6);}
+}
+
+function resolve(t){const i=id[t.toLowerCase()];return i===undefined?null:i;}
+
+function run(qs){
+ const q=qs.trim(); document.getElementById('msg').textContent='';
+ if(!q)return;
+ document.getElementById('q').value=q;
+ if(/[+\-]/.test(q) && !q.includes('?')) return analogy(q);
+ if(q.includes('?')) return triple(q);
+ const i=resolve(q);
+ if(i===null) return fail(q);
+ focus=i; document.getElementById('rh').textContent='Nearest neighbours in vector space, cosine';
+ const nn=nearest(vec(i),i,15);
+ const gn=new Set((adj[i]||[]).map(e=>e[1]));
+ table(['rank','entity','cosine','also a graph neighbour'],
+  nn.map(([j,c],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+'</td><td>'+c.toFixed(4)+'</td><td>'+(gn.has(j)?'yes':'no')+'</td></tr>'));
+ drawGraph(i); drawScatter(i,nn.map(r=>r[0]));
+}
+
+function triple(q){
+ const p=q.replace(/[(),]/g,' ').split(/\s+/).filter(Boolean);
+ if(p.length!==3) return msg('A triple query needs three parts, one of them ?. Example: Duryodhana foughtWith ?');
+ const r=rid[p[1].toLowerCase()];
+ if(r===undefined) return msg('Unknown relation "'+p[1]+'". Known: '+K.relations.join(', '));
+ const tailQ=p[2]==='?', head=tailQ?resolve(p[0]):resolve(p[2]);
+ if(head===null) return fail(tailQ?p[0]:p[2]);
+ const out=[];for(let i=0;i<N;i++){if(i===head)continue;out.push([i,tailQ?score(head,r,i):score(i,r,head)]);}
+ out.sort((a,b)=>b[1]-a[1]);
+ const asserted=new Set(K.edges.filter(e=>e[1]===r&&(tailQ?e[0]===head:e[2]===head)).map(e=>tailQ?e[2]:e[0]));
+ focus=head; document.getElementById('rh').textContent='Link prediction, RotatE score, filtered view';
+ table(['rank','candidate','score','status'],
+  out.slice(0,20).map(([j,s],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+'</td><td>'+s.toFixed(3)+'</td><td>'+
+   (asserted.has(j)?'<span class="tag">asserted in graph</span>':tags())+'</td></tr>'));
+ drawGraph(head); drawScatter(head,out.slice(0,10).map(r=>r[0]));
+}
+
+function analogy(q){
+ const terms=q.replace(/\s*([+\-])\s*/g,' $1 ').split(/\s+/).filter(Boolean);
+ const v=new Float32Array(D); let sign=1, used=[], ok=true;
+ terms.forEach(t=>{if(t==='+'){sign=1;return;} if(t==='-'){sign=-1;return;}
+  const i=resolve(t); if(i===null){fail(t);ok=false;return;}
+  used.push(i); const e=vec(i); for(let k=0;k<D;k++)v[k]+=sign*e[k]; sign=1;});
+ if(!ok)return;
+ const nn=nearest(v,-1,20).filter(([j])=>!used.includes(j)).slice(0,15);
+ focus=used[0]; document.getElementById('rh').textContent='Analogy by vector arithmetic, cosine to the result vector';
+ table(['rank','entity','cosine','status'],
+  nn.map(([j,c],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+'</td><td>'+c.toFixed(4)+'</td><td>'+tags()+'</td></tr>'));
+ drawGraph(used[0]); drawScatter(nn[0][0],used.concat(nn.slice(0,8).map(r=>r[0])));
+}
+
+function msg(t){document.getElementById('msg').textContent=t;}
+function fail(t){const l=t.toLowerCase();
+ const near=K.entities.filter(n=>n.toLowerCase().startsWith(l.slice(0,3))).slice(0,8);
+ msg('"'+t+'" is not in the graph.'+(near.length?' Did you mean: '+near.join(', ')+'?':''));}
+
+document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')run(e.target.value);});
+run('Arjuna');
+</script>

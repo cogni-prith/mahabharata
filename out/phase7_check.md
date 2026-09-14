@@ -1,7 +1,8 @@
 # Phase 7 gate. The three query modes end to end
 
-**Below the Phase 6 entry gate.** The model was trained on 1771 triples against
-a stated floor of 10,000, on instruction. This report shows the modes execute on
+**Below the Phase 6 entry gate.** The model was trained on 1694 of 1771 asserted triples,
+77 removed as symmetric duplicates, against a stated floor of 10,000,
+on instruction. This report shows the modes execute on
 real data and returns their output verbatim. The rankings are model hypotheses,
 labelled `predicted` and `uncited` on the page.
 

@@ -33,7 +33,6 @@ def main():
     ei = {n: i for i, n in enumerate(ents)}
 
     rel = pd.read_parquet("build/relations.parquet")
-    n_triples = len(rel[["subject", "predicate", "object"]].drop_duplicates())
     deg = pd.concat([rel.subject, rel.object]).value_counts()
 
     a = pd.read_csv("build/appellations.csv")
@@ -73,9 +72,12 @@ def main():
     b = pd.DataFrame(best)
 
     L = ["# Phase 8b. Cosine similarity as an alias candidate generator", "",
-         "**Below the Phase 6 entry gate.** The model was trained on %d triples" % n_triples,
-         "against a stated floor of 10,000, on instruction. Nothing below is merged and",
-         "nothing below is asserted. Every row is a hypothesis for a human ruling.", "",
+         "**Below the Phase 6 entry gate.** The model was trained on %d of %d asserted"
+         % (idx["n_trained"], idx["n_asserted"]),
+         "triples, %d removed as symmetric duplicates, against a stated floor of 10,000,"
+         % idx["sym_removed"],
+         "on instruction. Nothing below is merged and nothing below is asserted. Every",
+         "row is a hypothesis for a human ruling.", "",
          "There is no gold alias mapping for this corpus, so none of this is precision.",
          "It is agreement between two independent signals: apposition read off the prose",
          "in Phase 2, and cosine distance in the trained embedding.", "",

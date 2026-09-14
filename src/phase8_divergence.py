@@ -32,7 +32,6 @@ def main():
     ei = {n: i for i, n in enumerate(ents)}
     w = collections.Counter()
     rel = pd.read_parquet("build/relations.parquet")
-    n_triples = len(rel[["subject", "predicate", "object"]].drop_duplicates())
     for t in rel.itertuples():
         if t.subject in ei and t.object in ei and t.subject != t.object:
             a, b = sorted((t.subject, t.object))
@@ -66,10 +65,12 @@ def main():
 
     hi = d[d.degree >= K]
     L = ["# Phase 8. Graph versus embedding neighbourhoods", "",
-         "**Below the Phase 6 entry gate.** The embedding was trained on %d" % n_triples,
-         "triples against a stated floor of 10,000, on instruction. A low overlap",
-         "below is a candidate to check against Debroy's prose, not a result about",
-         "the Mahabharata.", "",
+         "**Below the Phase 6 entry gate.** The embedding was trained on %d of %d"
+         % (idx["n_trained"], idx["n_asserted"]),
+         "asserted triples, %d removed as symmetric duplicates, against a stated"
+         % idx["sym_removed"],
+         "floor of 10,000, on instruction. A low overlap below is a candidate to",
+         "check against Debroy's prose, not a result about the Mahabharata.", "",
          "k = %d. Graph neighbours ranked by the number of asserted triples joining" % K,
          "the pair. Embedding neighbours ranked by cosine. Overlap is the size of the",
          "intersection over k, or over the degree where the degree is below k.", "",

@@ -106,9 +106,15 @@ def main():
 
     ents = [k for k, _ in sorted(tf.entity_to_id.items(), key=lambda kv: kv[1])]
     rels = [k for k, _ in sorted(tf.relation_to_id.items(), key=lambda kv: kv[1])]
+    # n_asserted is what the gate is measured against. n_trained is what the
+    # model actually saw, which is smaller because symmetric pairs are
+    # deduplicated before the split. Everything downstream reads these rather
+    # than counting edges, which says the asserted number.
     json.dump({"entities": ents, "relations": rels,
                "entity_dim": e.shape[1], "relation_dim": r.shape[1],
-               "seed": SEED, "model": "RotatE", "below_gate": True},
+               "seed": SEED, "model": "RotatE", "below_gate": True,
+               "n_asserted": n_raw, "n_trained": len(t),
+               "sym_removed": sym_removed},
               open("out/embedding_index.json", "w"))
 
     mr = res.metric_results.to_dict()

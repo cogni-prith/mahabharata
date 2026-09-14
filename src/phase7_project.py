@@ -92,7 +92,9 @@ def main():
             "rel_emb": np.round(r, 4).ravel().tolist(),
             "edges": edges, "meta": meta, "alias": alias,
             "umap_seed": SEED, "train_seed": idx["seed"],
-            "model": idx["model"], "below_gate": True}
+            "model": idx["model"], "below_gate": True,
+            "n_asserted": idx["n_asserted"], "n_trained": idx["n_trained"],
+            "sym_removed": idx["sym_removed"]}
     with open("out/projection.js", "w") as f:
         f.write("window.KG=")
         json.dump(data, f, separators=(",", ":"))

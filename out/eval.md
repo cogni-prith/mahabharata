@@ -57,7 +57,7 @@ Entities appearing in the asserted graph: 683.
 
 **The entry gate above does not pass and this model was trained anyway,
 on instruction. Every number in this section describes how a model fits
-1,845 triples. None of them is a result about the Mahabharata.** The plan
+1694 triples. None of them is a result about the Mahabharata.** The plan
 puts the floor for meaningful vectors at roughly 5,000 triples.
 
 | setting | value |

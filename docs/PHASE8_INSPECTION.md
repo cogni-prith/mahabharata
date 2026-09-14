@@ -5,8 +5,9 @@ list are interesting or artifacts of low degree. Neither, as it turns out. The
 list is an artifact of something else, and the artifact is the finding.
 
 Read `build/divergence.md` alongside this. Everything here is below the Phase 6
-entry gate: the model was trained on 1,771 triples against a stated floor of
-10,000, on instruction, so none of it is a claim about the Mahabharata.
+entry gate: the model was trained on 1,694 of 1,771 asserted triples, 77 removed
+as symmetric duplicates, against a stated floor of 10,000, on instruction, so
+none of it is a claim about the Mahabharata.
 
 ## The ranking does not discriminate
 
@@ -110,6 +111,6 @@ own side, so for him adjacency and similarity point the same way.
 - Two things must happen before this analysis can say anything about the epic.
   The appellation merge has to be resolved, since a visible share of the cosine
   slots is currently spent on aliases of the entity itself. And the gate has to pass, since a model
-  fitted to 1,771 triples at MRR 0.15 is not a reliable source of neighbourhoods.
+  fitted to 1,694 triples at MRR 0.15 is not a reliable source of neighbourhoods.
 
 Neither is work that can be done by rerunning a script.

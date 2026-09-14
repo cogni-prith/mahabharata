@@ -19,8 +19,10 @@ const score = (h, r, t) => -dist(rot(vec(h), R.subarray(r * D, (r + 1) * D)), ve
 function nn(v, skip, n) { const o = []; for (let i = 0; i < N; i++) { if (i === skip) continue; o.push([K.entities[i], cos(v, vec(i))]); } return o.sort((a, b) => b[1] - a[1]).slice(0, n); }
 const fmt = a => a.map(([n, s], i) => (i + 1) + '. ' + n + ' ' + s.toFixed(4)).join(', ');
 const L = ['# Phase 7 gate. The three query modes end to end', '',
-  '**Below the Phase 6 entry gate.** The model was trained on ' + K.edges.length + ' triples against',
-  'a stated floor of 10,000, on instruction. This report shows the modes execute on',
+  '**Below the Phase 6 entry gate.** The model was trained on ' + K.n_trained + ' of ' +
+  K.n_asserted + ' asserted triples,',
+  K.sym_removed + ' removed as symmetric duplicates, against a stated floor of 10,000,',
+  'on instruction. This report shows the modes execute on',
   'real data and returns their output verbatim. The rankings are model hypotheses,',
   'labelled `predicted` and `uncited` on the page.', '',
   'Entities ' + N + ', relations ' + K.relations.length + ', stored dimension ' + D +

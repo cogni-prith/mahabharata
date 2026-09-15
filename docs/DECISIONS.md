@@ -912,8 +912,10 @@ This is the decision to build the instrument, and the faults it exposed on the
 way. Faults 1 to 5 came out of building it. Faults 6 and 7 came out of running
 the whole chain afterwards to check that it had not broken anything, and both
 were already there before this entry started: a judgement keyed on a row number
-that had moved, and a recorded seed that did not reproduce the layout. Nothing
-here judges anything. Every one of the three gates is still open.
+that had moved, and a recorded seed that did not reproduce the layout. Faults 8
+and 9 came out of auditing this entry's own claims against the code afterwards,
+and one of the two is a wrong number in a report that was already being read.
+Nothing here judges anything. Every one of the three gates is still open.
 
 ### The instrument
 
@@ -1069,10 +1071,16 @@ marked. It is no longer read by anything.
 
 ### Fault 7: the recorded seed did not reproduce the projection
 
-`out/entity_emb.bin` and `out/projection.json` were the only two outputs in the
-repo that did not reproduce byte for byte across a full chain re-run.
-`relations.parquet`, `proposed.parquet` and the three Turtle graphs all matched
-on md5. The blind sheet and its key matched because `src/phase5_blind_sample.py`
+`out/entity_emb.bin` and `out/projection.json` did not reproduce byte for byte
+across a full chain re-run. `out/projection.js` holds the same coordinates,
+written from the same array by `src/phase7_project.py`, so it did not reproduce
+either. This entry first said those two were the only outputs that moved, and
+that `relations.parquet`, `proposed.parquet` and "the three Turtle graphs"
+matched on md5. Both counts were wrong, which is Fault 9. `projection.js` moved
+as well, and the chain writes five Turtle graphs, `passages`, `entities`,
+`tellings`, `relations` and `proposed`. Which of them the comparison covered is
+not on record, so the sentence stands only for the files it names.
+The blind sheet and its key matched because `src/phase5_blind_sample.py`
 refuses to overwrite them and did not rewrite either file, which is the freeze
 working and is not a reproducibility measurement.
 
@@ -1149,8 +1157,54 @@ assumption is wrong and the right answer is to drop `bornTo` from the proposal
 layer instead. Nothing has been annotated yet, so the cost of reversing it now
 is one regenerated page.
 
+### Fault 8: a boolean column that was not boolean, and a count that was not a count
+
+`src/phase4_precision.py` joins the judgements to the current graph and marks
+each one present or absent. `m["present"] = m.present.fillna(False)` leaves the
+column at dtype `object`, holding real Python bools. Filtering on it works,
+because pandas takes the truth of each element, so `judged`, `live` and the
+precision itself were all correct. Negating it does not work: `~True` on a
+Python bool is the integer `-2` and `~False` is `-1`, and both are true. The two
+masks that were supposed to select the removed rows collapsed into `~ok` and
+`ok`, so the line reporting them printed the judged-false and judged-true split
+of the whole set instead.
+
+`build/phase4_precision.md` therefore read "Judgements on record: 293. Still
+present after the guards: 206. Removed by the guards: 68 judged false, 225
+judged true." 68 and 225 sum to 293, every judgement on record, where only 87
+rows were removed. The right numbers are 37 and 50. The file contradicted itself
+two lines apart and nothing caught it, because the figure the gate reports is
+the precision, and the precision was right.
+
+The fix is `.astype(bool)` on that one line. The measurement it restores is the
+one the docstring promises and the only one that says whether a guard removed
+errors or removed evidence: of the 87 rows the guards took out, 37 were
+judged wrong and 50 were judged right.
+
+`src/phase5_calibrate.py` had a smaller version of the same kind of fault. The
+counter keyed "matched, annotator marked the triple unclear" is incremented
+inside the branch for triples that did match and had already scored as grounded,
+and it was then printed in the table headed "Unmatched assertions, in named
+buckets". It is now reported on its own line above that table.
+`docs/PHASE5_SAMPLING.md` described three buckets where the code emits five and
+called the matched one unmatched; it now names them as the code counts them.
+Neither report exists yet, so nothing published was wrong.
+
+### Fault 9: the reproduction claim counted the wrong files
+
+Fault 7's own record said `out/entity_emb.bin` and `out/projection.json` were
+the only two outputs that did not reproduce, and that "the three Turtle graphs"
+matched on md5. `out/projection.js` is written from the same array as
+`projection.json` by the same script, so it cannot have reproduced when that
+one did not, and the chain writes five Turtle graphs, not three. The sentence
+is corrected above. It is worth recording rather than quietly editing, because
+the failure is the one this project keeps warning about in other people's work:
+an enumeration written from memory of a run instead of from the file list the
+run actually touched.
+
 ### What this does not do
 
 It does not judge anything. The three gates are still blocked on a human, and
 the instrument only makes the judging possible without contaminating it. No
-number in this repo moved because of this entry.
+number in this repo moved because of this entry, except the removed-row counts
+in `build/phase4_precision.md`, which were wrong and are now right.

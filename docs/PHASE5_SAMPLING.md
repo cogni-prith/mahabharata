@@ -299,8 +299,11 @@ It computes, per predicate and with the strata kept apart at every line:
   on it is a miss by construction and a rate there is 100% by definition. The
   honest form is how many triples per 200 sentences, and of what kind.
 - Unmatched rows in named buckets: a surface mismatch where the predicate and
-  one name agree, a predicate the extractor cannot emit, and a triple the
-  annotator marked `unclear`.
+  one name agree, a sentence the annotator read as stating no relation, a triple
+  the annotator wrote nothing matching for, and a predicate the annotator used
+  that the extractor cannot emit. A triple that matched but which the annotator
+  marked `unclear` is reported on its own line above that table, not inside it,
+  because it matched and has already counted as grounded.
 
 Counts, not rates, below n=10, with the threshold stated in the report. The
 number that reaches the gate is the per-predicate stratum A rate; everything

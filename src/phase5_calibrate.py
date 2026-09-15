@@ -180,7 +180,10 @@ def main():
              % (sum(a_g.values()), sum(a_t.values()), cell(sum(a_g.values()), sum(a_t.values()))))
     if below:
         L += ["", "Reported as counts, under n=%d: %s." % (MIN_N, ", ".join(below))]
-    L += ["", "### Unmatched assertions, in named buckets", "",
+    L += ["", "Matched and counted as grounded above, but the annotator marked the"
+          " triple unclear: %d."
+          % a_b.pop("matched, annotator marked the triple unclear", 0),
+          "", "### Unmatched assertions, in named buckets", "",
           "| bucket | triples |", "|---|---|"]
     L += ["| %s | %d |" % (k, v) for k, v in a_b.most_common()] or ["| none | 0 |"]
 

@@ -36,7 +36,7 @@ j = pd.concat([e[K + ["ok"]], g[K + ["ok"]]]).drop_duplicates(K)
 
 cur = rel[K].drop_duplicates().assign(present=True)
 m = j.merge(cur, on=K, how="left")
-m["present"] = m.present.fillna(False)
+m["present"] = m.present.fillna(False).astype(bool)
 live = m[m.present]
 
 src = rel.assign(source=[
@@ -46,11 +46,18 @@ src = rel.assign(source=[
                           rel.coref_subject, rel.coref_object)])
 live = live.merge(src[K + ["source"]].drop_duplicates(K), on=K, how="left")
 
+gone = ~m.present
+cut_false, cut_true = int(((~m.ok) & gone).sum()), int((m.ok & gone).sum())
+# The two removed counts partition the rows the guards took out. They did not,
+# while present was an object column: ~True is -2 and ~False is -1, both true,
+# so each mask collapsed to the judgement alone and the line printed the whole
+# judged set. D22 Fault 8.
+assert cut_false + cut_true == len(m) - len(live), "removed counts are not a partition"
+
 L = ["# Phase 4 precision on the current graph", "",
      "Judgements on record: %d. Still present after the guards: %d."
      % (len(m), len(live)),
-     "Removed by the guards: %d judged false, %d judged true."
-     % (int(((~m.ok) & (~m.present)).sum()), int((m.ok & (~m.present)).sum())),
+     "Removed by the guards: %d judged false, %d judged true." % (cut_false, cut_true),
      "", "| pattern | judged | precision |", "|---|---|---|"]
 for k, x in live.groupby("pattern"):
     L.append("| %s | %d | %.3f |" % (k, len(x), x.ok.mean()))

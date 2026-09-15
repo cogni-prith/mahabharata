@@ -34,6 +34,13 @@ MIN_EVIDENCE = 3      # apposition instances supporting the winning bearer
 MIN_SHARE = 0.90      # winning bearer's share of this epithet's apposition evidence
 MAX_RIVAL = 0.10      # any rival above this share blocks the merge
 
+# Sightings kept per candidate link in build/appellation_evidence.json. 970
+# sightings support 235 links, but the distribution is not flat: the median link
+# has 1 and the largest has 102. At 8, three quarters of the links are carried
+# whole and only the evidence-rich ones truncate, which are the ones a reader
+# needs least. Every entry records its own total, so a truncation is visible.
+K_EV = 8
+
 _POSS = re.compile(r"['’]s\b", re.IGNORECASE)
 _NAME = re.compile(r"\b([A-Z][a-z]{2,})\b")
 _APPOS = re.compile(r"\b([A-Z][a-z]{2,})\s+([A-Z][a-z]{2,})\b")
@@ -78,6 +85,16 @@ def appositions(df, names):
             if a in names and b in names and a != b:
                 ev[(a, b)].append((r.parva, r.adhyaya_ordinal, r.sentence))
     return ev
+
+
+def label_map(df):
+    """Majority corpus label per surface.
+
+    A candidate link is only a person-to-person claim if both ends are people.
+    "Pandava Bhimasena" is a correct apposition, but Pandava is a DYNASTY, so
+    the link is a different kind of statement and a judge has to be told which.
+    """
+    return df.groupby(df.surface.str.strip()).label.agg(lambda x: x.value_counts().idxmax())
 
 
 def bare_counts(df, names):
@@ -231,6 +248,31 @@ def write_appellations(res, cites, path):
                             cc[0][2] if cc else ""])
 
 
+def write_evidence(cites, labels, path):
+    """Up to K_EV sightings per candidate link, with the corpus label of each end.
+
+    The appellations CSV keeps one example sentence per link because it is a
+    spreadsheet. One sentence is not enough to rule on a link: a patronymic
+    apposed once reads as a merge and apposed to three different bearers reads
+    as a conflation, and the difference is only visible with the sightings side
+    by side. 970 sightings exist and 246 reached disk; this is the rest of them.
+    """
+    out = {}
+    for (dep, head), inst in sorted(cites.items()):
+        out["%s||%s" % (dep, head)] = {
+            "appellation": dep, "candidate_entity": head,
+            "appellation_label": labels.get(dep), "entity_label": labels.get(head),
+            "total": len(inst), "kept": min(len(inst), K_EV),
+            "sightings": [{"parva": p, "adhyaya": None if a != a else int(a), "sentence": s}
+                          for p, a, s in inst[:K_EV]]}
+    json.dump({"k": K_EV, "links": len(out),
+               "total_sightings": sum(v["total"] for v in out.values()),
+               "kept_sightings": sum(v["kept"] for v in out.values()),
+               "links_carried_whole": sum(1 for v in out.values() if v["total"] <= K_EV),
+               "evidence": out}, open(path, "w"), indent=1)
+    return out
+
+
 def write_entities_ttl(res, names, path, counts=None, places=()):
     """Entities, merged appellations, and candidate links that stay unresolved.
 
@@ -303,6 +345,7 @@ def main():
         res, names, "out/entities.ttl",
         counts={n: int(counts[n]) for n in persons}, places=places)
     write_appellations(res, cites, "build/appellations.csv")
+    ev_out = write_evidence(cites, label_map(df), "build/appellation_evidence.json")
     # One example sentence per candidate link, so the human audit reads the
     # passage instead of going looking for it.
     for dep, r in res.items():
@@ -316,6 +359,10 @@ def main():
           % (len(names), len(ev), n_ent, len(places), n_merged))
     print("appellations by status: %s" % dict(by))
     print("heads blocked as homonymy risks: %d" % len(risk))
+    print("evidence: %d links, %d of %d sightings kept at K=%d, %d links carried whole"
+          % (len(ev_out), sum(v["kept"] for v in ev_out.values()),
+             sum(v["total"] for v in ev_out.values()), K_EV,
+             sum(1 for v in ev_out.values() if v["total"] <= K_EV)))
 
 
 if __name__ == "__main__":

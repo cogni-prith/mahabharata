@@ -37,3 +37,4 @@ __pycache__/
 *.bak2
 .claude/
 .serena/
+node_modules/

@@ -1,9 +1,25 @@
 """Phase 4 gate: precision on the current graph, from the judgements on record.
 
-Two hand-judged sets are carried: build/phase4e_precision_sample.csv with
-build/phase4e_wrong.txt, 250 rows over the patterns the predicate expansion
-added, and build/phase4g_judged.csv, 64 rows over the noun-phrase-linked
-arguments. Both are keyed on the triple and its pattern rather than on a row
+Two hand-judged sets are carried: annotations/phase4e_judged.csv, 250 rows over
+the patterns the predicate expansion added, and annotations/phase4g_judged.csv,
+64 rows over the noun-phrase-linked arguments.
+
+The 4e set used to be 59 row ids in annotations/phase4e_wrong.txt resolved
+against build/phase4e_precision_sample.csv. A row id is a position in
+build/relations.parquet, so the resolution was only correct while that file did
+not change, and D21 changed it. Regenerating the sample moved every id and this
+script reported 0.965 instead of 0.838 with nothing saying anything had moved.
+tools/recover_phase4e_judgements.py rebuilt the set from the worksheet the human
+judged and keyed it on the triple. The row-id file stays as the raw record and
+is no longer read.
+
+The judgements live in annotations/ and not in build/ because build/ is
+gitignored as regenerable, and a human's judgement is the one thing here that is
+not. Deleting build/ would have destroyed 314 judged rows with no way to get
+them back. The sample they judge is still generated into build/, which is
+correct: the sample is derived, the judgement is not.
+
+Both are keyed on the triple and its pattern rather than on a row
 number, so a judgement survives a re-run of the extractor and a guard can be
 scored against work already done. Rows the guards have since removed drop out
 and are reported separately, which is the only measurement that says whether a
@@ -14,9 +30,8 @@ import pandas as pd
 K = ["subject", "predicate", "object", "pattern"]
 rel = pd.read_parquet("build/relations.parquet")
 
-e = pd.read_csv("build/phase4e_precision_sample.csv")
-e["ok"] = ~e.row_id.isin({int(x) for x in open("build/phase4e_wrong.txt").read().split()})
-g = pd.read_csv("build/phase4g_judged.csv")
+e = pd.read_csv("annotations/phase4e_judged.csv")
+g = pd.read_csv("annotations/phase4g_judged.csv")
 j = pd.concat([e[K + ["ok"]], g[K + ["ok"]]]).drop_duplicates(K)
 
 cur = rel[K].drop_duplicates().assign(present=True)

@@ -54,7 +54,7 @@ def main():
     # excluded using the corpus label: "Pandava Bhimasena" is a correct
     # apposition but Pandava is a DYNASTY, not an individual, so it cannot be a
     # bearer and counting it swamped every share.
-    label = df.groupby(df.surface.str.strip()).label.agg(lambda x: x.value_counts().idxmax())
+    label = P.label_map(df)
     persons = {t for t in names if label.get(t) == "PERSON"}
     raw = collections.defaultdict(collections.Counter)
     for (a, b), inst in ev.items():
@@ -154,22 +154,26 @@ def main():
                      r["kinship_example"]))
     json.dump(rows, open("build/canonical_id_audit.json", "w"), indent=1)
 
-    # Sampled candidate links for a human audit. Seeded.
+    # Every candidate link, for a human audit. This was a seeded sample of 200
+    # out of 246, which bought nothing: the population is small enough to read
+    # whole, and a sample means reporting precision with a confidence interval
+    # over a set that could simply have been judged. The 46 it dropped included
+    # two of the Phase 8b alias pairs, so the sample was not merely smaller than
+    # the census, it was missing rows another phase needed.
     res = json.load(open("build/phase2_resolution.json"))
     links = [(a, c["entity"], r["status"], c["confidence"], c["evidence"],
               c.get("citation") or "", c.get("example") or "")
              for a, r in res.items() for c in r["candidates"] if c["entity"]]
-    random.Random(SEED).shuffle(links)
+    links.sort(key=lambda t: (-int(t[4]), t[0], t[1]))   # most evidence first
     with open("build/entity_audit_sample.csv", "w", newline="", encoding="utf-8") as f:
         wr = csv.writer(f)
-        wr.writerow(["appellation", "candidate_entity", "status", "confidence",
-                     "evidence_count", "citation", "evidence_sentence",
-                     "correct_yes_no", "note"])
-        for row in links[:SAMPLE_N]:
-            wr.writerow(list(row) + ["", ""])
-    print("rewrites=%d anchors=%d verdicts=%s links=%d sampled=%d seed=%d"
-          % (len(rewrites), len(anchors), dict(tally), len(links),
-             min(SAMPLE_N, len(links)), SEED))
+        wr.writerow(["appellation", "appellation_label", "candidate_entity", "entity_label",
+                     "status", "confidence", "evidence_count", "citation",
+                     "evidence_sentence", "correct_yes_no", "note"])
+        for a, e, st, cf, n, cit, ex in links:
+            wr.writerow([a, label.get(a, ""), e, label.get(e, ""), st, cf, n, cit, ex, "", ""])
+    print("rewrites=%d anchors=%d verdicts=%s links=%d (census, not sampled)"
+          % (len(rewrites), len(anchors), dict(tally), len(links)))
 
 
 if __name__ == "__main__":

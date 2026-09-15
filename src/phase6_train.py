@@ -24,10 +24,22 @@ Both leakage traps are handled before the split, not after:
   same entity pair in opposite order across the corpus often enough to be an
   inverse pair, and reports what it found rather than assuming it.
 """
+import os
+# Before torch touches cuBLAS. A seeded run on this GPU was reproducible only to
+# 4e-7, because the gradient scatter over the embedding reduces in whatever order
+# the blocks finish in. That is invisible in the metrics, which agree to four
+# decimals either way, and fatal one step later: UMAP is deterministic given
+# identical input and chaotic given nearly identical input, so 4e-7 was enough to
+# move 638 of 683 entities by more than 0.05 and drop the layout's top-10
+# neighbour overlap against its own rerun to 0.32. A recorded seed that does not
+# reproduce the projection is the screenshot the plan warns about.
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
 import collections, json, sys
 import numpy as np
 import pandas as pd
 import torch
+
+torch.use_deterministic_algorithms(True)
 from pykeen.pipeline import pipeline
 from pykeen.triples import TriplesFactory
 
@@ -140,6 +152,10 @@ def main():
           "| train / valid / test | %d / %d / %d |"
           % (train.num_triples, valid.num_triples, test.num_triples),
           "| entities / relations | %d / %d |" % (tf.num_entities, tf.num_relations),
+          "| device | %s |" % res.model.device,
+          "| determinism | `torch.use_deterministic_algorithms(True)`, "
+          "`CUBLAS_WORKSPACE_CONFIG=:4096:8`; two runs at this seed are "
+          "bit-identical |",
           "", "## Leakage checks", "",
           "- Symmetric: `foughtWith` pairs ordered canonically and deduplicated "
           "before the split. %d of %d distinct triples removed as the same fact "

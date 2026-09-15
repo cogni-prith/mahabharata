@@ -17,10 +17,27 @@ Nothing is merged. The output is a ranked shortlist for a human, and every row
 in it is a hypothesis from a model trained below the Phase 6 entry gate.
 """
 import json
+import os
 import numpy as np
 import pandas as pd
 
 KS = (1, 5, 10, 25)
+RULINGS = "annotations/phase2_entities.json"
+
+
+def alias_rulings(path=RULINGS):
+    """Human rulings from the Phase 2 census, keyed on the pair.
+
+    Empty until the census is ruled on, which is the normal state and not an
+    error. The shortlist is a reason to read a passage either way; the ruling
+    column records what the reading concluded, and a `yes` here still does not
+    merge anything.
+    """
+    if not os.path.exists(path):
+        return {}
+    rows = json.load(open(path, encoding="utf-8"))["rows"]
+    return {(r["source"]["appellation"], r["source"]["candidate_entity"]): r["status"]
+            for r in rows if r["status"] != "undecided"}
 
 
 def main():
@@ -118,17 +135,19 @@ def main():
     sl = sl[sl.apply(lambda r: b.set_index("appellation").loc[r.appellation, "agree"]
                      if r.appellation in set(b.appellation) else False, axis=1)]
     sl = sl.sort_values("cos", ascending=False)
-    L += ["| appellation | candidate | cosine | cosine rank | apposition sightings | Phase 2 status | canonical_id prior | citation |",
-          "|---|---|---|---|---|---|---|---|"]
+    ruled = alias_rulings()
+    L += ["| appellation | candidate | cosine | cosine rank | apposition sightings | Phase 2 status | canonical_id prior | citation | human ruling |",
+          "|---|---|---|---|---|---|---|---|---|"]
     fc = a.set_index(["appellation", "candidate_entity"]).first_citation
     for r in sl.itertuples():
         c = fc.get((r.appellation, r.candidate), None)
         # A prior_only row has no apposition span behind it, so it has no address.
         # It stays on the list and stays visibly uncited rather than borrowing one.
-        L.append("| %s | %s | %.3f | %d | %d | %s | %s | %s |"
+        L.append("| %s | %s | %.3f | %d | %d | %s | %s | %s | %s |"
                  % (r.appellation, r.candidate, r.cos, r.cos_rank, r.evidence,
                     r.status, r.prior if isinstance(r.prior, str) else "none",
-                    c if isinstance(c, str) else "**uncited**"))
+                    c if isinstance(c, str) else "**uncited**",
+                    ruled.get((r.appellation, r.candidate), "not yet ruled")))
     # The ruling is a reading, so the passage is printed here rather than left
     # as an address to go and find. Verbatim from the master CSV through Phase 2.
     ex = a.set_index(["appellation", "candidate_entity"]).evidence_sentence
@@ -151,12 +170,27 @@ def main():
               "shared by a lineage collapsing onto one bearer. Bhargava is every",
               "descendant of Bhrigu, not one man. Read the passages before merging any of",
               "these, and expect some of them to stay unmerged."]
+    pairs = list(zip(sl.appellation, sl.candidate))
+    have = [p for p in pairs if p in ruled]
     L += ["", "%d pairs. " % len(sl) +
           "Every one of them still needs a reading of the cited passage: two",
           "weak signals agreeing is a reason to look, not a resolution. The hard rule",
-          "stands, a genuinely ambiguous referent keeps its candidate set.", ""]
+          "stands, a genuinely ambiguous referent keeps its candidate set.", "",
+          "Ruled so far: %d of %d, from the Phase 2 census in `%s`."
+          % (len(have), len(pairs), RULINGS)]
+    if have:
+        got = pd.Series([ruled[p] for p in have]).value_counts().to_dict()
+        L += ["Rulings on this shortlist: %s."
+              % ", ".join("%s %d" % kv for kv in sorted(got.items())),
+              "", "A `yes` is a reading of one passage and still merges nothing. Any merge",
+              "is a decision recorded in `docs/DECISIONS.md` first."]
+    L += [""]
     open("build/alias_candidates.md", "w", encoding="utf-8").write("\n".join(L) + "\n")
     d.to_csv("build/alias_candidates.csv", index=False)
+    # The shortlist itself was never written to disk, so the 17 rows a human is
+    # asked to rule on existed only inside a markdown table.
+    sl.assign(human_ruling=[ruled.get(p, "") for p in pairs]) \
+        .to_csv("build/alias_shortlist.csv", index=False)
     print("scored %d pairs / %d appellations; top10 %.1f%% vs chance %.1f%%; "
           "same pick %.1f%%; shortlist %d"
           % (len(d), d.appellation.nunique(), 100.0 * (d.cos_rank <= 10).mean(),

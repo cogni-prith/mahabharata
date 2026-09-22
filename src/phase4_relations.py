@@ -5,8 +5,11 @@ Sanskrit, so extraction runs on Debroy's English prose with spaCy. Every relatio
 in this graph is therefore mediated by one translator's word choices. That is
 recorded in docs/DECISIONS.md D7 and belongs in the paper.
 
-Twelve predicates, fixed. Adding to this list is a deliberate decision, not a
-code change.
+Fourteen predicates, fixed. Adding to this list is a deliberate decision, not a
+code change. The list is a subset of the recorded inventory in
+docs/PHASE5_SAMPLING.md and is checked against it by src/validate_outputs.py.
+The docstring said twelve while the dict held fourteen; the dict was right and
+the count is now taken from it.
 
 Entities are surface forms, not merged identities, because Phase 2 asserted no
 merges. A triple therefore links the strings the text used. Phase 2's candidate
@@ -18,6 +21,7 @@ import spacy
 
 import nplink
 import vocab
+from phase5_propose import GODS
 
 BASE = "http://example.org/mbh/"
 
@@ -42,7 +46,7 @@ PREDICATES = {
 
 # Verb lemma to predicate. Direction is recorded per entry: "agent" means the
 # grammatical agent fills the object slot of the triple.
-KILL = {"kill", "slay", "slaughter", "behead", "murder", "destroy", "fell"}
+KILL = {"kill", "slay", "slaughter", "behead", "murder"}
 
 # Combat. Measured in build/phase4d_verbs.md as the largest recoverable block in
 # the corpus, about 700 clauses with two resolvable person arguments. The verbs
@@ -61,9 +65,14 @@ SPEAK_TO = {"speak", "say", "reply", "talk", "call"}
 CURSE = {"curse"}
 MARRY = {"marry", "wed"}
 TEACH = {"teach", "instruct", "train"}
-PARENT_NOUNS = {"son": "hasBiologicalParent", "daughter": "hasBiologicalParent",
-                "child": "hasBiologicalParent", "offspring": "hasBiologicalParent",
-                "father": "INV_hasBiologicalParent", "mother": "INV_hasBiologicalParent"}
+# A bare parentage noun says a parent relation holds and does not say which
+# kind, and this is the epic that turns on the difference: Karna is Radha's son
+# and Surya's, Yudhishthira is Pandu's and Dharma's. So these map to `bornTo`,
+# the inventory's term for birth with the kind unstated, and only an explicit
+# marker in the same sentence narrows it. D23.
+PARENT_NOUNS = {"son": "bornTo", "daughter": "bornTo",
+                "child": "bornTo", "offspring": "bornTo",
+                "father": "INV_bornTo", "mother": "INV_bornTo"}
 SPOUSE_NOUNS = {"wife": "INV_hasSpouse", "husband": "INV_hasSpouse",
                 "consort": "INV_hasSpouse"}
 FOSTER = {"foster", "adopted", "adoptive"}
@@ -230,6 +239,8 @@ def adjacent(bearer, role):
     parser puts apposition and coordination in the same shape and the distance
     is the only thing that separates them reliably here.
     """
+    if role.dep_ in ("attr", "acomp") and bearer.head == role.head and role.head.lemma_ == "be":
+        return True
     doc = role.doc
     lo, hi = sorted((bearer.i, role.i))
     # Nothing coordinated may stand between them. The role noun's own subtree
@@ -241,6 +252,47 @@ def adjacent(bearer, role):
         else range(bearer.i + 1, role.left_edge.i)
     return all(doc[i].pos_ in ("PUNCT", "DET", "ADJ", "ADP", "PROPN", "NOUN")
                for i in span)
+
+
+def role_bearers(role, persons):
+    """A single directly named bearer, never a choice across a list or coref."""
+    if role.dep_ == "appos" and role.head.dep_ in ("pobj", "dobj", "obj"):
+        following = next((t for t in role.doc[role.right_edge.i + 1:]
+                          if t.pos_ not in ("PUNCT", "ADV")), None)
+        # "towards Bhishma, Krishna's son roared" is a new subject after an
+        # introductory clause, not Bhishma's epithet. spaCy attaches it as one.
+        if following is not None and following.tag_ in ("VBD", "VBP", "VBZ", "MD"):
+            return []
+    bearers = [c for c in role.children if c.dep_ == "appos"]
+    if role.dep_ == "appos":
+        bearers.append(role.head)
+    if role.dep_ in ("attr", "acomp") and role.head.lemma_ == "be":
+        if non_assertive(role) or any(c.dep_ == "neg" for c in role.head.children):
+            return []
+        bearers += [c for c in role.head.children if c.dep_ == "nsubj"]
+    named = {t.i: t for t in bearers if t.pos_ == "PROPN" and t.text in persons}
+    # "Bhishma, Shantanu's son, Karna" offers two named bearers. Neither
+    # apposition attachment is reliable enough to choose one silently.
+    return list(named.values()) if len(named) == 1 else []
+
+
+def parent_kind(role, parent):
+    """The kinship primitive a parentage noun licenses, or None to stay at `bornTo`.
+
+    Only what the sentence itself marks narrows the kind. A god in the parent
+    slot is the one exception that does not need a modifier, because begetting
+    is the only parentage the text ever means there: no god fosters and none is
+    a legal parent. Everything else stays underspecified, which is an honest
+    gap rather than a guess. D23.
+    """
+    mods = {c.lemma_.lower() for c in role.children}
+    if mods & FOSTER:
+        return "hasFosterParent"
+    if parent in GODS:
+        return "hasDivineProgenitor"
+    if "biological" in mods:
+        return "hasBiologicalParent"
+    return None
 
 
 def ent_of(tok, persons, places, coref=None, table=None):
@@ -266,11 +318,20 @@ def ent_of(tok, persons, places, coref=None, table=None):
         if name:
             return name, "person", "np"
     if coref and person_head(tok) and not possessed_kin(tok):
+        if tok.lower_ in {"i", "me", "my", "mine", "myself", "we", "us", "our", "ours",
+                          "you", "your", "yours", "yourself", "thou", "thee", "thy"}:
+            return None, None, None
+        candidates = set()
         for start, end, name, person in coref:
             if person not in ALLOW_PERSON:
                 continue
             if tok.idx >= start and tok.idx + len(tok) <= end:
-                return name, "person", person
+                span = tok.doc.char_span(start, end, alignment_mode="strict")
+                if span is not None and span.root == tok:
+                    candidates.add((name, person))
+        if len(candidates) == 1:
+            name, person = next(iter(candidates))
+            return name, "person", person
     return None, None, None
 
 
@@ -287,6 +348,11 @@ def emit(out, subj, pred, obj, pattern, r, evidence, crs=(None, None)):
         crs = (crs[1], crs[0])
     if subj == obj:
         return
+    # Unverified antecedents turned "him" into Adhiratha and "the Pandava"
+    # into Pandu. Keep conflict assertions directly named; review retains the
+    # rejected passages separately rather than asserting a guessed opponent.
+    if pred in {"slainBy", "foughtWith", "defeatedBy"} and any(cr is not None for cr in crs):
+        return
     conf = MIN_CONF[pattern]
     for cr in crs:
         if cr == "np":
@@ -302,7 +368,7 @@ def emit(out, subj, pred, obj, pattern, r, evidence, crs=(None, None)):
                 "depth": r["depth"],
                 "parva": r["parva"], "adhyaya_ordinal": r["adhyaya_ordinal"],
                 "sent_id": r["sent_id"], "cited": r["chapter_cited"],
-                "evidence": evidence[:200]})
+                "evidence": evidence})
 
 
 def extract_sentence(doc, r, persons, places, out, coref=None, table=None):
@@ -319,10 +385,11 @@ def extract_sentence(doc, r, persons, places, out, coref=None, table=None):
             agents = [g for c in tok.children if c.dep_ == "agent"
                       for g in c.children if g.dep_ == "pobj"]
             for v in victims:
-                vs, vk, vs_cr = ent_of(v, persons, places, coref, table)
+                vs, vk, vs_cr = ent_of(v, persons, places)
                 for a in agents:
-                    as_, ak, as__cr = ent_of(a, persons, places, coref, table)
+                    as_, ak, as__cr = ent_of(a, persons, places)
                     if (vs and as_ and vk == "person" and ak == "person"
+                            and v.pos_ == a.pos_ == "PROPN" and usable(v) and usable(a)
                             and not simile(doc, v, a)):
                         emit(out, vs, "slainBy", as_, "passive_agent", r, doc.text,
                              (vs_cr, as__cr))
@@ -330,10 +397,11 @@ def extract_sentence(doc, r, persons, places, out, coref=None, table=None):
             subs = [c for c in tok.children if c.dep_ == "nsubj"]
             objs = [c for c in tok.children if c.dep_ in ("dobj", "obj")]
             for s in subs:
-                ss, sk, ss_cr = ent_of(s, persons, places, coref, table)
+                ss, sk, ss_cr = ent_of(s, persons, places)
                 for o in objs:
-                    os_, ok, os__cr = ent_of(o, persons, places, coref, table)
-                    if ss and os_ and sk == "person" and ok == "person":
+                    os_, ok, os__cr = ent_of(o, persons, places)
+                    if (ss and os_ and sk == ok == "person" and s.pos_ == o.pos_ == "PROPN"
+                            and usable(s) and usable(o) and not simile(doc, s, o)):
                         emit(out, os_, "slainBy", ss, "active_dobj", r, doc.text,
                              (os__cr, ss_cr))
 
@@ -438,46 +506,38 @@ def extract_sentence(doc, r, persons, places, out, coref=None, table=None):
         # Drona came from that shape and every one was wrong.
         if lemma in roles and tok.pos_ == "NOUN" and usable(tok):
             pred = roles[lemma]
-            foster = any(c.lemma_.lower() in FOSTER for c in tok.children)
-            if foster and pred.endswith("hasBiologicalParent"):
-                pred = pred.replace("hasBiologicalParent", "hasFosterParent")
             # possessive: "Kunti's son"
             holders = [c for c in tok.children if c.dep_ == "poss"]
             # "son of Kunti"
             holders += [g for c in tok.children if c.dep_ == "prep" and c.text.lower() == "of"
                         for g in c.children if g.dep_ == "pobj"]
-            # the bearer: apposition or the clause subject
-            bearers = [c for c in tok.children if c.dep_ == "appos"]
-            if tok.dep_ == "appos" and tok.head is not None:
-                bearers.append(tok.head)
-            # Only a copula subject is the bearer: "Nisha was Manu's wife".
-            # Taking any clause subject read "Brihaspati approached Utathya's
-            # wife" as Brihaspati being the spouse.
-            if tok.dep_ in ("attr", "acomp"):
-                bearers += [c for c in tok.head.children if c.dep_ == "nsubj"] if tok.head else []
+            bearers = role_bearers(tok, persons)
             for h in holders:
-                hs, hk, hs_cr = ent_of(h, persons, places, coref, table)
+                hs, hk, hs_cr = ent_of(h, persons, places)
                 if not hs:
                     continue
                 for b in bearers:
-                    bs, bk, bs_cr = ent_of(b, persons, places, coref, table)
+                    bs, bk, bs_cr = ent_of(b, persons, places)
                     if (bs and bk == hk == "person" and usable(b) and usable(h)
                             and adjacent(b, tok)):
                         pat = "poss_kinship" if any(c.dep_ == "poss" for c in tok.children) else "of_kinship"
-                        emit(out, bs, pred, hs, pat, r, doc.text, (bs_cr, hs_cr))
+                        typed = pred
+                        if pred.endswith("bornTo"):
+                            kind = parent_kind(tok, bs if pred.startswith("INV_") else hs)
+                            if kind:
+                                typed = pred.replace("bornTo", kind)
+                        emit(out, bs, typed, hs, pat, r, doc.text, (bs_cr, hs_cr))
 
         # "the king of Hastinapura", "ruler of Panchala"
         if (lemma in ("king", "ruler", "lord", "sovereign")
                 and tok.pos_ == "NOUN" and usable(tok)):
             places_ = [g for c in tok.children if c.dep_ == "prep" and c.text.lower() == "of"
                        for g in c.children if g.dep_ == "pobj"]
-            bearers = [c for c in tok.children if c.dep_ == "appos"]
-            if tok.dep_ == "appos" and tok.head is not None:
-                bearers.append(tok.head)
+            bearers = role_bearers(tok, persons)
             for p in places_:
-                ps, pk, ps_cr = ent_of(p, persons, places, coref, table)
+                ps, pk, ps_cr = ent_of(p, persons, places)
                 for b in bearers:
-                    bs, bk, bs_cr = ent_of(b, persons, places, coref, table)
+                    bs, bk, bs_cr = ent_of(b, persons, places)
                     if (ps and bs and pk == "place" and bk == "person"
                             and usable(b) and adjacent(b, tok)):
                         emit(out, bs, "rules", ps, "noun_role", r, doc.text,
@@ -621,6 +681,8 @@ def report(rel, n_sents):
         f.write("# Phase 4 run report\n\nGenerated by `src/phase4_relations.py`.\n\n")
         f.write("- Sentences parsed: %d\n- Triple instances: %d\n- Distinct triples: %d\n\n"
                 % (n_sents, len(rel), len(d)))
+        f.write("- Parentage recorded as `bornTo` where the sentence does not say the kind: %d\n\n"
+                % int(d.predicate.str.endswith("bornTo").sum()))
         f.write("## By predicate\n\n| predicate | instances | distinct | mean confidence |\n|---|---|---|---|\n")
         for p, g in rel.groupby("predicate"):
             f.write("| %s | %d | %d | %.2f |\n"

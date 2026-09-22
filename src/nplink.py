@@ -37,6 +37,12 @@ RULER_NOUNS = {"king", "ruler", "lord", "sovereign", "monarch"}
 # judged rows and it is the failure this module was built to avoid.
 MIN_EVIDENCE = 2
 
+# Any predicate that puts the object in the parent slot resolves "X's son",
+# whatever kind of parentage the sentence happened to mark. Most are `bornTo`,
+# because most sentences do not say the kind. D23.
+PARENT_PREDS = ("bornTo", "hasBiologicalParent", "hasFosterParent",
+                "hasDivineProgenitor")
+
 
 def build_table(rel):
     """Parent to children, and place to rulers, from the directly read graph."""
@@ -45,14 +51,15 @@ def build_table(rel):
         d = d[d.nplink_subject.isna() & d.nplink_object.isna()]
     seen = collections.defaultdict(set)
     for t in d.itertuples():
-        if t.predicate in ("hasBiologicalParent", "rules"):
-            seen[(t.predicate, t.object, t.subject)].add((t.parva, t.sent_id))
+        if t.predicate in PARENT_PREDS or t.predicate == "rules":
+            kind = "rules" if t.predicate == "rules" else "parent"
+            seen[(kind, t.object, t.subject)].add((t.parva, t.sent_id))
     children = collections.defaultdict(set)
     rulers = collections.defaultdict(set)
     for (pred, obj, subj), ev in seen.items():
         if len(ev) < MIN_EVIDENCE:
             continue
-        (children if pred == "hasBiologicalParent" else rulers)[obj].add(subj)
+        (children if pred == "parent" else rulers)[obj].add(subj)
     return {"children": dict(children), "rulers": dict(rulers),
             "stats": collections.Counter()}
 

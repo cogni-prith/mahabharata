@@ -1,99 +1,108 @@
-// Phase 7 gate. The three query modes, run against the same data file the page
-// loads and with the same scoring code, so the gate is checked rather than
-// asserted. Run: node src/phase7_check.js  (writes out/phase7_check.md)
-//
-// Below the Phase 6 entry gate. This checks that the modes execute and return
-// ranked output on real data. It does not claim the rankings are correct.
-const fs = require('fs');
+// Run the explorer's own query and scoring engine against the shipped vectors.
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const {create} = require('../out/kg-core.js');
 global.window = {};
 require('../out/projection.js');
-const K = window.KG, N = K.entities.length, D = K.dim, H = D / 2;
-const E = Float32Array.from(K.emb), R = Float32Array.from(K.rel_emb);
-const id = {}; K.entities.forEach((n, i) => id[n.toLowerCase()] = i);
-const rid = {}; K.relations.forEach((n, i) => rid[n.toLowerCase()] = i);
-const vec = i => E.subarray(i * D, (i + 1) * D);
-function cos(a, b) { let d = 0, x = 0, y = 0; for (let i = 0; i < D; i++) { d += a[i] * b[i]; x += a[i] * a[i]; y += b[i] * b[i]; } return d / (Math.sqrt(x * y) + 1e-9); }
-function rot(h, r) { const o = new Float32Array(D); for (let k = 0; k < H; k++) { const a = h[2 * k], b = h[2 * k + 1], c = r[2 * k], d = r[2 * k + 1]; o[2 * k] = a * c - b * d; o[2 * k + 1] = a * d + b * c; } return o; }
-function dist(a, b) { let s = 0; for (let i = 0; i < D; i++) { const d = a[i] - b[i]; s += d * d; } return Math.sqrt(s); }
-const score = (h, r, t) => -dist(rot(vec(h), R.subarray(r * D, (r + 1) * D)), vec(t));
-function nn(v, skip, n) { const o = []; for (let i = 0; i < N; i++) { if (i === skip) continue; o.push([K.entities[i], cos(v, vec(i))]); } return o.sort((a, b) => b[1] - a[1]).slice(0, n); }
-const fmt = a => a.map(([n, s], i) => (i + 1) + '. ' + n + ' ' + s.toFixed(4)).join(', ');
-const L = ['# Phase 7 gate. The three query modes end to end', '',
-  '**Below the Phase 6 entry gate.** The model was trained on ' + K.n_trained + ' of ' +
-  K.n_asserted + ' asserted triples,',
-  K.sym_removed + ' removed as symmetric duplicates, against a stated floor of 10,000,',
-  'on instruction. This report shows the modes execute on',
-  'real data and returns their output verbatim. The rankings are model hypotheses,',
-  'labelled `predicted` and `uncited` on the page.', '',
-  'Entities ' + N + ', relations ' + K.relations.length + ', stored dimension ' + D +
-  ' float32 (' + H + ' complex). Training seed ' + K.train_seed + ', UMAP seed ' + K.umap_seed + '.',
-  'Same data file and same scoring code as `out/index.html`.', ''];
-// 1. nearest neighbours
-L.push('## Mode 1. Nearest neighbours in vector space', '');
-['Arjuna', 'Karna', 'Droupadi', 'Duryodhana'].forEach(n => {
-  const i = id[n.toLowerCase()];
-  L.push('- **' + n + '**: ' + (i === undefined ? 'not in the graph' : fmt(nn(vec(i), i, 8))));
-});
-// 2. link prediction
-L.push('', '## Mode 2. Link prediction, incomplete triple', '');
-[['Duryodhana', 'foughtWith'], ['Arjuna', 'hasBiologicalParent'], ['Yudhishthira', 'speaksTo']].forEach(([n, p]) => {
-  const h = id[n.toLowerCase()], r = rid[p.toLowerCase()];
-  const asserted = new Set(K.edges.filter(e => e[1] === r && e[0] === h).map(e => e[2]));
-  const o = []; for (let i = 0; i < N; i++) if (i !== h) o.push([K.entities[i], score(h, r, i)]);
-  o.sort((a, b) => b[1] - a[1]);
-  L.push('- **(' + n + ', ' + p + ', ?)**: ' + fmt(o.slice(0, 8)) +
-    '. Of the top 8, ' + o.slice(0, 8).filter(x => asserted.has(id[x[0].toLowerCase()])).length +
-    ' are already asserted, the rest are predicted and uncited.');
-});
-// 3. analogy
-L.push('', '## Mode 3. Analogy by vector arithmetic', '');
-const ranks = [];
-[['Arjuna', 'Kunti', 'Gandhari', 'Duryodhana'], ['Arjuna', 'Pandu', 'Dhritarashtra', 'Duryodhana'],
- ['Yudhishthira', 'Kunti', 'Gandhari', 'Duryodhana']].forEach(([a, b, c, want]) => {
-  const va = vec(id[a.toLowerCase()]), vb = vec(id[b.toLowerCase()]), vc = vec(id[c.toLowerCase()]);
-  const v = new Float32Array(D); for (let i = 0; i < D; i++) v[i] = va[i] - vb[i] + vc[i];
-  const used = [a, b, c];
-  const all = nn(v, -1, N).filter(x => !used.includes(x[0]));
-  const rank = all.findIndex(x => x[0] === want) + 1;
-  ranks.push([a + ' - ' + b + ' + ' + c, want, rank]);
-  L.push('- **' + a + ' - ' + b + ' + ' + c + '**: ' + fmt(all.slice(0, 8)) +
-    '. ' + want + ' ranks ' + rank + ' of ' + all.length + '.');
-});
-const best = ranks.reduce((x, y) => y[2] < x[2] ? y : x);
-L.push('', 'All three modes return ranked output.',
-  'The analogy demo is not working. Its best form here is `' + best[0] + '`, which puts ' +
-  best[1] + ' at rank ' + best[2] + ';',
-  'the other forms tried put it at ' + ranks.filter(r => r !== best).map(r => r[2]).join(' and ') + '.',
-  'A demo that has to land at rank 1 does not land at rank ' + best[2] + '. That is the',
-  'expected consequence of training below the gate and it is not presented as working.', '');
-// 4. the page itself, executed in a stub DOM so the check exercises the real
-// code rather than a copy of it. The question parser is a fixed pattern list.
-L.push('', '## Mode 4. The page executes, and the question parser', '');
-const src = fs.readFileSync(__dirname + '/../out/index.html', 'utf8')
-  .split('<script>').pop().split('</script>')[0];
-const els = {};
-const el = () => ({ innerHTML: '', textContent: '', value: '', clientWidth: 700, width: 520, height: 420,
-  style: {}, setAttribute() {}, addEventListener() {}, getContext: () => new Proxy({}, { get: () => () => {} }),
-  getBoundingClientRect: () => ({ left: 0, top: 0 }) });
-const doc = { getElementById: i => els[i] || (els[i] = el()) };
-const page = new Function('document', 'window', 'addEventListener', src +
-  '\nreturn {run:run, parse:parse, rh:()=>document.getElementById("rh").textContent, ' +
-  'rows:()=>document.getElementById("res").innerHTML};')(doc, global.window, () => {});
-L.push('The page script runs to completion outside a browser and answers on boot.', '');
-const asked = ['who killed Karna', "who are Bhishma's enemies", 'who is Arjuna’s father',
-  "who are Dhritarashtra's children", 'who does Krishna speak to', 'who studied under Drona',
-  'who rules Madra', 'who is like Karna', 'who killed Abhimanyu', 'who is Droupadi',
-  'who is Draupadi', 'what is the meaning of dharma'];
-let parsed = 0;
-asked.forEach(q => {
-  let out;
-  try { page.run(q); out = page.rh(); } catch (e) { out = 'threw: ' + e.message; }
-  const got = out && !/^Results$/.test(out) && !/threw/.test(out);
-  const named = page.parse(q) !== null || id[q.toLowerCase()] !== undefined;
-  if (named) parsed++;
-  L.push('- `' + q + '` → ' + (named ? out : 'not understood, reported as such'));
-});
-L.push('', parsed + ' of ' + asked.length + ' questions parse to a predicate and an entity.',
-  'Questions outside the pattern list are refused with the reason, never answered by guess.', '');
-fs.writeFileSync(__dirname + '/../out/phase7_check.md', L.join('\n'));
-console.log('wrote out/phase7_check.md');
+require('../out/evidence.js');
+const c = create(window.KG, window.KGTeaching || [], window.KGReview), K = c.data;
+const toy = create({entities:['A','B'], relations:['rotation'], dim:2,
+  emb:[1,0,0,1], rel_emb:[0,1], edges:[]});
+assert(toy.score(0,0,1) === 0, 'Complex rotation should map A exactly onto B');
+assert.equal(toy.score(1,0,0), -2, 'Inverse query must preserve relation direction');
+assert.deepEqual(toy.predict(0,'rotation').map(x=>x[0]), [1,0]);
+assert.equal(toy.parse('A - ? + B'), null);
+const L = ['# Phase 7 explorer checks', '',
+  '**Below the Phase 6 entry gate.** The asserted graph contains '+K.n_asserted+
+  ' triples; '+K.n_trained+' remain after symmetric deduplication.',
+  'These checks verify execution, not historical truth or predictive accuracy.', '',
+  'The tests import `out/kg-core.js`, the same code used by `out/index.html`.',
+  'RotatE: '+c.D/2+' complex dimensions; seed '+K.train_seed+'. UMAP seed '+K.umap_seed+'.', '',
+  '## Natural-language queries', '', '| Query | Result |', '|---|---|'];
+const cases = [
+  ['Who fought Bhishma?', 'relation', 'Bhishma'],
+  ['Who was Karna killed by?', 'relation', 'Karna'],
+  ['Who is Arjuna’s father?', 'relation', 'Arjuna'],
+  ["Who are Dhritarashtra's children?", 'relation', 'Dhritarashtra'],
+  ['Who does Krishna speak to?', 'relation', 'Krishna'],
+  ['Who studied under Drona?', 'relation', 'Drona'],
+  ['Who rules Madra?', 'relation', 'Madra'],
+  ['Who is like Karna?', 'nearest', 'Karna'],
+  ['Who is Draupadi?', 'nearest', 'Droupadi'],
+  ['Who killed Abhimanyu?', 'contested', 'Abhimanyu'],
+  ["Who are Bhishma's enemies?", 'unavailable', 'Bhishma'],
+  ['What is the meaning of dharma?', 'error', null]
+];
+for (const [q, kind, name] of cases) {
+  const r = c.execute(q);
+  assert.equal(r.kind,kind,q);
+  if(name) assert.equal(K.entities[r.focus],name,q);
+  L.push('| '+q+' | '+kind+(name?' / '+name:'')+' |');
+}
+assert.equal(c.parse('? speaksTo Krishna').direction,'o');
+assert.equal(c.parse('Duryodhana foughtWith ?').direction,'s');
+assert.equal(c.parse('? speaksTo ?'),null);
+const teaching = c.execute('Who taught Karna?');
+assert(teaching.passages?.some(p => p.teacher === 'Bhargava' && p.student === 'Karna' && p.chapter === 24),
+  'Missing graph links must not hide the explicit Bhargava / Karna passage');
+assert.equal(teaching.edges.length, 0, 'Source retrieval must not insert an edge into the trained graph');
+for (const q of ["Who was Karna taught by?", "Who is Karna's teacher?"])
+  assert.equal(c.execute(q).passages.length, teaching.passages.length, q);
+assert(c.execute('Who studied under Bhargava?').passages.some(p=>p.student==='Karna'));
+const connection=c.execute('How is Karna related to Arjuna?');
+assert.equal(connection.kind,'path');
+assert(connection.sharedParentage?.some(p=>p.parent==='Kunti'), 'Related-to questions should expose the shared Kunti passages');
+assert(c.parentageOf(c.resolve('Arjuna')).some(p=>p.object==='Kunti'), 'Parentage must remain available in the normal profile');
+assert(!c.parentageOf(c.resolve('Bhishma')).some(p=>p.object==='Krishna'), 'Rejected archive candidates must not return as source parentage');
+for (const [relation,object] of [['bornTo','Krishna'],['rules','Chedi'],['rules','Madra']])
+  assert(!K.edges.some(e=>K.entities[e[0]]==='Bhishma' && K.relations[e[1]]===relation && K.entities[e[2]]===object), 'Introductory-clause attachment: '+relation+' '+object);
+const slayers = c.execute('who killed Karna').edges.map(i=>K.entities[K.edges[i][2]]);
+assert(!slayers.includes('Nakula')&&!slayers.includes('Vrisha'), 'Pronoun errors must not survive as named killers');
+assert.deepEqual(c.displayEdges(c.execute('who killed Karna').edges,c.resolve('Karna')).map(i=>K.entities[K.edges[i][2]]), ['Arjuna']);
+assert(K.review.death_accounts?.Karna?.appellations.includes('Kiriti'));
+assert(connection.path.length > 0);
+assert.equal(connection.path[0].from,c.resolve('Karna'));
+assert.equal(connection.path.at(-1).to,c.resolve('Arjuna'));
+assert(connection.path.every(s=>K.edges[s.edge].includes(s.from) && K.edges[s.edge].includes(s.to)));
+assert.equal(c.execute('How is Karna related to Karna?').path.length,0);
+assert.equal(c.execute('who is allied with Duryodhana').kind,'unavailable');
+for (const [child,parent] of [['Sanjaya','Vasava'],['Keshava','Vasava'],['Karna','Dhritarashtra'],['Karna','Duryodhana'],['Karna','Shantanu']])
+  assert(!K.edges.some(e=>K.entities[e[0]]===child&&K.entities[e[2]]===parent&&/Parent|Progenitor/.test(K.relations[e[1]])), child+' must not be asserted as the child of '+parent);
+assert(c.execute("Who is Karna's mother?").parentage.some(r=>r.object==='Radha'&&r.parentage_unspecified));
+assert(K.review.notes.Vasava.text.includes('Indra'));
+assert.equal(typeof K.review.stats.model_graph_matches_review,'boolean');
+assert.equal(c.canPredict('hasDivineProgenitor'),window.KG.relations.includes('hasDivineProgenitor'));
+assert(K.edges.some(e=>K.relations[e[1]]==='hasDivineProgenitor'));
+const graphOnly = create({entities:['A','B'], relations:['rotation'], dim:2,
+  emb:[1,0,0,1], rel_emb:[0,1], edges:[]}, [],
+  {base_entities:['A','B'],base_relations:['rotation'],relations:['rotation','hasDivineProgenitor'],
+   edges:[[0,1,1]],withheld:[],stats:{}});
+assert(!graphOnly.canPredict('hasDivineProgenitor'));
+assert(!graphOnly.data.review.stats.model_graph_matches_review);
+assert.throws(()=>graphOnly.predict(0,'hasDivineProgenitor'));
+assert.throws(()=>create(window.KG,[],{...window.KGReview,base_entities:['wrong index']}));
+const named = c.resolve('Karna');
+const forward = c.predict(named,'foughtWith');
+assert.equal(forward.length,K.entities.length,'Score every candidate');
+assert(forward.every((r,i)=>Number.isFinite(r[1])&&(i===0||r[1]<=forward[i-1][1])));
+const reversed = c.predict(named,'speaksTo','o');
+assert.equal(reversed.length,K.entities.length);
+assert.equal(reversed[0][1],c.score(reversed[0][0],K.relations.indexOf('speaksTo'),named));
+L.push('', '## Analogy ranks', '', '| Expression | Duryodhana rank |', '|---|---|');
+for (const q of ['Arjuna - Kunti + Gandhari','Arjuna - Pandu + Dhritarashtra','Yudhishthira - Kunti + Gandhari']) {
+  const r=c.execute(q);assert.equal(r.kind,'analogy');assert.equal(r.ranking.length,K.entities.length-3);
+  L.push('| '+q+' | '+(r.ranking.findIndex(x=>K.entities[x[0]]==='Duryodhana')+1)+' |');
+}
+L.push('', 'The analogy target is not forced into the results. Its scientific acceptance gate remains unmet.', '',
+  '## Graph integrity recheck', '',
+  K.edges.length+' displayed links; '+K.review.stats.withheld_instances+' withheld source records.',
+  'Displayed links '+(K.review.stats.model_graph_matches_review?'match':'differ from')+' the bundled model graph.',
+  'Generic parentage remains a source statement with unspecified kind, not a biological assertion.', '',
+  '## Browser verification', '',
+  'Run `.venv/bin/python src/test_viewer_browser.py` for offline Chrome rendering,',
+  'canvas pixels, point selection, orbit, dimension switching, queries, evidence,',
+  'export, and mobile/tablet/desktop layout. Screenshots and its report go to',
+  '`build/viewer_checks/`. This Node check does not substitute for a browser test.', '');
+fs.writeFileSync(path.join(__dirname,'../out/phase7_check.md'),L.join('\n'));
+console.log('Explorer core checks passed: complex rotation, both prediction directions, 12 language cases, 3 analogies.');

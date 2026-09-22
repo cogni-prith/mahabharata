@@ -32,9 +32,13 @@ __pycache__/
 *.out
 *.bbl
 *.blg
+*.toc
 *.synctex.gz
 *.bak
 *.bak2
 .claude/
 .serena/
 node_modules/
+
+# Editor
+.vscode/

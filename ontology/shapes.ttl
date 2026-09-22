@@ -1,0 +1,26 @@
+@prefix mbh: <http://example.org/mbh/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+mbh:SemanticEntityShape a sh:NodeShape ; sh:targetClass mbh:Entity ;
+  sh:property [ sh:path rdfs:label ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path mbh:sourcePassage ; sh:minCount 1 ; sh:class mbh:Passage ] ;
+  sh:property [ sh:path mbh:status ; sh:hasValue "candidate" ] .
+mbh:SemanticPassageShape a sh:NodeShape ; sh:targetClass mbh:Passage ;
+  sh:property [ sh:path mbh:sourceText ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path mbh:citedAtChapterLevel ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:boolean ] ;
+  sh:or (
+    [ sh:property [ sh:path mbh:citedAtChapterLevel ; sh:hasValue true ] ; sh:property [ sh:path mbh:chapterOrdinal ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ; sh:minInclusive 1 ] ]
+    [ sh:property [ sh:path mbh:citedAtChapterLevel ; sh:hasValue false ] ; sh:property [ sh:path mbh:chapterOrdinal ; sh:maxCount 0 ] ]
+  ) .
+mbh:EventProposalShape a sh:NodeShape ; sh:targetClass mbh:Proposal ;
+  sh:property [ sh:path mbh:status ; sh:hasValue "proposed" ] ;
+  sh:property [ sh:path mbh:score ; sh:minCount 1 ; sh:maxCount 1 ; sh:minInclusive 0 ; sh:maxInclusive 1 ] ;
+  sh:property [ sh:path mbh:subject ; sh:minCount 1 ; sh:maxCount 1 ; sh:class mbh:Event ] ;
+  sh:property [ sh:path mbh:sourcePassage ; sh:minCount 1 ; sh:class mbh:Passage ] ;
+  sh:or (
+    [ sh:property [ sh:path mbh:predicate ; sh:hasValue mbh:occurredAt ] ; sh:property [ sh:path mbh:object ; sh:minCount 1 ; sh:maxCount 1 ; sh:class mbh:Place ] ]
+    [ sh:property [ sh:path mbh:predicate ; sh:hasValue mbh:hasParticipant ] ; sh:property [ sh:path mbh:object ; sh:minCount 1 ; sh:maxCount 1 ; sh:class mbh:Agent ] ]
+    [ sh:property [ sh:path mbh:predicate ; sh:hasValue mbh:hasTopic ] ; sh:property [ sh:path mbh:object ; sh:minCount 1 ; sh:maxCount 1 ; sh:class mbh:Concept ] ]
+  ) .

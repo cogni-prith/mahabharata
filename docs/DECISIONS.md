@@ -1208,3 +1208,495 @@ It does not judge anything. The three gates are still blocked on a human, and
 the instrument only makes the judging possible without contaminating it. No
 number in this repo moved because of this entry, except the removed-row counts
 in `build/phase4_precision.md`, which were wrong and are now right.
+
+## D23. Parentage types and argument attachment (2026-09-15)
+
+The viewer exposed both a naming misunderstanding and real extraction errors.
+Vasava is used for Indra: Anushasana 12 explicitly introduces a reply to Indra
+with the address "O Vasava". Arjuna's divine parentage is not an error simply
+because this name appears. The biological-parent predicate and the automatically
+attached bearers need separate scrutiny. The UI now exposes the local passage
+and distinguishes divine from biological, foster and legal parentage. No alias
+merge, extra predicate, or hand-authored replacement edge was introduced.
+
+Reading the supporting prose identified three shared failures. An enclosing
+coreference span supplied an entity for a token that was not its root. First-
+person speech inherited a narrator through a cluster labelled third person.
+Kinship apposition in lists chose a nearby name that was not the child. Examples
+include Sanjaya/Vasava in Drona 167, Keshava/Vasava in Karna 37, and Karna/Shantanu
+in Shalya 63. Karna/Dhritarashtra in Aranyaka 241 and Karna/Duryodhana in Bhishma
+93 similarly confuse an interlocutor with the son being described.
+
+The shared extractor now requires exact coreference-span roots, rejects first-
+and second-person tokens, and abstains on conflicting cluster names. Kinship
+and ruler roles require a single directly named bearer and a directly read
+holder. Competing apposition bearers are not resolved by proximity. Copular
+negation and questions do not assert a role. These guards apply across the
+corpus, not just to the reported names.
+
+Generic English "son of" does not distinguish biological, legal and foster
+parentage. Such records now receive candidate status with an explicit reason,
+and are excluded from assertions and from the noun-phrase linking table. The
+existing divine-name inventory supports hasDivineProgenitor; explicit foster
+and biological modifiers retain their respective types. Names remain surface
+forms, with the existing homonymy limitations. Synthetic grammar regression
+checks are not evaluation data or independent annotation.
+
+The initial viewer recheck withheld 769 of 2,935 old extraction records: 204
+failed stricter attachment checks and 565 stated parentage without its kind.
+Nine records were retyped as divine parentage. Subsequently, the concurrent
+pipeline rebuild picked up the corrected extractor. Its current snapshot has
+2,172 extraction records, 1,444 distinct links and 579 unresolved parentage
+records outside assertions. Neither withheld count is a count of false facts.
+
+The main generator preserves unresolved evidence in
+`build/relation_candidates.parquet`. The viewer exports a separately rechecked
+`out/reviewed_relations.ttl` and retains withheld evidence across repeated
+exports. Source statements remain available for questions such as Karna's
+parentage without being relabelled as biological facts. The report explicitly
+excludes an independent precision claim; vocative telling records are unchanged.
+
+The viewer compares its displayed graph with the bundled model graph at load
+time. It no longer assumes that all vectors predate the correction, since a
+concurrent retrain can incorporate it. Graph-only predicates never receive a
+fabricated relation vector. Exporting evidence does not retrain, alter reported
+embedding metrics, overwrite annotation work, or publish anything.
+
+## D24. Conflict evidence and the family-first viewer (2026-09-15)
+
+Karna's displayed slayers exposed another shared extraction failure. In Karna
+Parva, "Vrisha now destroyed it" describes an object, not Karna's death. In
+Shalya, "He was slain by ... Nakula" supplies no named victim in that sentence.
+Coreference guessed Karna in both cases. The death extractor now requires
+directly named arguments and literal death verbs; `destroy` is not one of them.
+Combat and defeat also abstain when either argument depends on unverified
+coreference or noun-phrase linking. This removes guessed opponents such as
+Adhiratha from "him" and Pandu from "the Pandava", across all names rather
+than a blacklist of reported examples. Rejected records retain their evidence.
+
+The inspected Karna death accounts name Arjuna and Kiriti directly. Virata 39,
+sentence 1881, has Arjuna identify Kiriti among his names. The viewer therefore
+groups Kiriti under Arjuna for these accounts, with that passage beside the
+answer. This does not globally merge aliases, alter vectors, or resolve names
+such as Krishna elsewhere in the epic. Other model-resolved slayers are withheld.
+
+Parentage is visible in the ordinary profile and fan again. The concurrent
+extractor now emits the existing `bornTo` predicate for generic parentage; this
+supersedes D23's candidate-only treatment of the unspecified kind. Earlier
+candidate passages remain source matches, not biological-parent assertions.
+Karna/Arjuna queries show their shared Kunti passages before the other graph
+path. Six neighbours per predicate appear initially, with explicit totals and
+Show all; the fan starts at the top so family headings are not hidden.
+
+The eight colour swatches identify K-means groups of the learned vectors, seed
+20260917, not factions or confidence. Tooltips show group sizes and prominent
+names. UMAP independently supplies the coordinates. This update does not train
+the model; the viewer warns when its rechecked graph differs from the bundled
+training graph. Regression and browser checks are not independent evaluation.
+
+## D25. Apposition across clause boundaries (2026-09-16)
+
+Bhishma/Krishna parentage came from Bhishma Parva, sentence 2999:
+"Releasing arrows towards Bhishma, Krishna's son roared loudly."
+The parser made `son` an apposition of the prepositional object `Bhishma`.
+The new clause's subject was consequently read as an epithet of the old object.
+The same pattern produced Bhishma/rules/Chedi in Sabha 1670 and
+Bhishma/rules/Madra in Bhishma 8529. The shared role-bearer guard now abstains
+when an object-attached role is immediately followed by a finite verb. Ordinary
+subject apposition and sentence-final apposition remain covered by positive
+regression checks. No name blacklist or replacement seed fact was added.
+
+Archived parentage candidates are also re-parsed with the current guards.
+Their old "kind unspecified" status is not proof of valid argument attachment.
+Otherwise an excluded graph link could return through the source-parentage
+display. This run withheld 18 further extraction records and reclassified 12
+archived candidates as not reproduced. Their text and original anchors remain
+available in the withheld records. Bhishma's retained parentage is Shantanu;
+Krishna, Chedi and Madra fail their respective graph regression checks.
+
+These are extraction repairs, not a complete factual audit of the epic. Literal
+slaying accounts in the prose can still use different appellations and speakers;
+their existence does not establish multiple distinct historical slayers. No
+embedding was retrained, and no annotation answers were read or written.
+
+When several slayer names remain unresolved, the fan, profile and answer now
+label them "slaying accounts", not a settled list of distinct killers. This
+applies across entities; the scoped Karna/Kiriti identification still displays
+Arjuna once. The underlying textual records and citations are preserved.
+
+## D26. Cited semantic retrieval beside the graph model (2026-09-16)
+
+The user explicitly approved the proposed richer ontology, text embeddings and
+localhost service. This supersedes the static-only restriction for the semantic
+mode, not the original graph mode. No publication, external inference, annotation
+judging, identity merge or new RotatE training is authorized by this change.
+The entry point remains `out/index.html`. No annotation interface is introduced.
+
+RotatE learns relation structure; it does not turn arbitrary words into grounded
+encyclopedic knowledge. A separate pretrained text encoder now indexes all 18
+parvas. `sentence-transformers/multi-qa-MiniLM-L6-cos-v1` produces normalized
+384-dimensional vectors. Its exact downloaded revision, file hashes, input index
+hash and UMAP seed 20260916 are recorded in `build/semantic/manifest.json`.
+The model runs locally. Downloading public weights does not upload the corpus.
+There is no corpus fine-tuning and no claim to reproduce an LLM's internal space.
+
+Passage vectors represent source text, not triples. Node vectors combine equal
+weights of the typed-label vector and the mean of up to twelve source-passage
+vectors, followed by normalization. Passages are sampled evenly in cited-first
+source order, so the first two mentions cannot exclusively define a character.
+Sentence chunks stay within one parva/chapter context and target 120 words;
+individual longer sentences remain intact in evidence but the encoder truncates
+at 256 wordpieces. Dense ranking and SQLite FTS5 use reciprocal-rank fusion,
+k=60. Similarity scores are not probabilities or factual confidence.
+
+The ontology is now explicit in `ontology/mahabharata.ttl`, with structural
+constraints in `ontology/shapes.ttl`. Person, Deity and Group are Agent types;
+Place, Event, Concept, Artifact, TextWork and CelestialBody are Entity types.
+Passage, Mention, Telling, Appellation, Parvan, Assertion and Proposal preserve
+the distinction between text, names, narration and claims. Identity is never
+`owl:sameAs`. A same-name profile is not a resolved person.
+
+Corpus labels nominate candidate types. Named classes require a capitalized
+surface, stopwords and titles are excluded, and conflicting Place/Group/Artifact/
+TextWork labels lose to the surface's dominant corpus type. Event phrases do not
+become textual works merely because the NER layer says SACRED_TEXT. Concept and
+Person readings of Dharma remain separate. CELESTIAL produces CelestialBody,
+not Deity: the actual labels include stars and lunar mansions. Deity is available
+in the schema but is not assigned by name familiarity. These guards remove
+obvious errors; they do not make the remaining types human-verified.
+
+Three approved relations, `occurredAt`, `hasParticipant` and `hasTopic`, extend
+the event-retrieval layer only. This does not change the human calibration
+inventory. Event nodes are source-scoped accounts keyed by sentence, never a
+single merged event for every occurrence of "war". Location phrases produce
+scored proposals, with modal/negative contexts withheld. Participants require
+directly named conflict arguments in that same source sentence. All three
+relations remain reified proposals in a separate named graph in
+`out/semantic.trig`; none enters the asserted graph or the embedding split.
+
+The word war retrieves a Concept profile and source passages. Kurukshetra appears
+under places in event accounts through candidate locations attached to those
+accounts. That list is explicitly distinct from vector-nearest places. Its
+position is never forced beside war, and a low-dimensional projection does not
+prove a relation. Semantic colours denote candidate ontology classes; the
+original graph model retains its eight arbitrary K-means cluster colours.
+
+Descriptions are exact excerpts. Existing chapter anchors are reused only when
+the master sentence matches; missing anchors stay null and uncited. Citation
+locates text, not the truth of its interpretation. This run indexes 16,339
+passages, 11,599 chapter-cited, and 6,921 typed profiles. Run reports include
+rejection reasons. The blind calibration key and annotation answers stay closed.
+
+The read-only stdlib HTTP service binds 127.0.0.1, validates Host/Origin, bounds
+requests, permits only viewer files, and exposes no mutation or shell endpoint.
+SQLite query parameters, escaped UI text and a no-eval CSP protect the boundary.
+Offline file mode still supports the existing graph. Semantic search requires
+the local service. SHACL and browser checks establish structural and software
+properties only, not independent factual accuracy.
+
+## D27. A grounded chat layer, and the first call that leaves the machine (2026-09-21)
+
+The user asked for a chatbot over this corpus and approved building it before
+supplying a key. D26 authorized local inference and explicitly did not
+authorize external inference. This record authorizes it, for one surface only,
+and states exactly what crosses the boundary.
+
+`src/chat.py` sends the user's question and a retrieved context block to
+Groq's chat completions endpoint. The context is at most forty asserted triples
+with their citations and evidence sentences, and at most eight retrieved
+passages. Nothing else goes: not the corpus in bulk, not `build/`, not
+`annotations/`, not the calibration key, not the embedding artefacts. The call
+is opt-in behind `GROQ_API_KEY`; unset, the module prints the context and
+stops, which is also how the retrieval is inspected. The key is read from the
+environment in a process the user runs and never reaches client JavaScript.
+
+The explorer is untouched. `out/index.html` still makes no external request and
+still runs from `file://`, and `src/serve_explorer.py` gains no endpoint. The
+claim in `docs/FRONTEND.md` that nothing is sent remotely is narrowed to the
+explorer rather than deleted, because for the explorer it remains true.
+
+This is not a publication. No repository, dataset or interface is released and
+the sign-off rule is unaffected.
+
+Retrieval is hybrid because neither half is sufficient. The graph half is exact
+and silent about anything it never extracted. The passage half answers loosely
+phrased questions and is not precise. Both are handed over as context the model
+must answer from, with an instruction not to fall back on its own knowledge of
+the epic. Answers are generated text over retrieved evidence; the retrieval is
+cited and the generation is not independently verified.
+
+No grammar-correction model is installed. Gramformer and HappyTransformer were
+considered and rejected: a dedicated multi-hundred-megabyte model to repair
+input that the answering model already tolerates. One line of the system prompt
+covers it. No vendor SDK either. The call is a single POST through stdlib
+`urllib.request`, so the only new dependency is `rapidfuzz`, in
+`requirements-chat.txt`.
+
+Name resolution runs three signals and labels each one. Exact match, edit
+distance at a WRatio cutoff of 85, and lookup in `build/appellations.csv`. It
+reuses `norm_surface` from `src/phase2_entities.py` rather than defining a
+second normalizer.
+
+An appellation is retrieval, never resolution. All 121 appellations are
+`mbh:referentUnresolved` and none is merged, because the evidence does not
+settle them: Achyuta has five candidates and the best scores 0.25. A query
+naming an epithet retrieves its candidates' records, and every one arrives
+flagged `resolved: false` with its confidence, its evidence count and how many
+rivals it has. The context prints that block before the facts it qualifies, and
+the prompt forbids stating a candidate as an identity. Facts reached only
+through an appellation are marked as such on their own line.
+
+Two properties of the corpus forced choices that are not obvious.
+
+A mention floor of ten is applied to the name pool. The declared entity set
+contains annotation artifacts. `Tell` is a `mbh:Person` on two mentions and
+would otherwise swallow the verb in "tell me about Arjuna"; `Yudhishtira` is a
+single misspelling of a name occurring 2,063 times. Ten is the threshold
+`phase2_entities` already applies to its own name list. Genuine names below the
+floor stay reachable through passage retrieval, which needs no name.
+
+Spelling variants are reported, never merged. `Yudhisthira` at 29 mentions and
+`Yudhishthira` at 2,063 are separate entities and nothing in this project
+asserts they are one person. A misspelling landing near both returns both, and
+the context says the graph holds them separately and does not claim they are
+the same. Choosing one would be an identity claim made by a query parser.
+
+The fact budget is spent per predicate, not by rank. `speaksTo` is 1,247 of the
+2,800 assertions and carries the highest confidence in the set, so ranking by
+confidence filled the whole block with people addressing Karna while
+`(Karna, slainBy, Arjuna)` sat below the cut. The opposite fix, filtering by a
+predicate guessed from the question, fails the other way and is why a
+graph-backed bot answers "I do not know" to a fact it holds. Every predicate
+present for the entity gets a turn.
+
+There is no predicate filter anywhere in the retrieval path.
+
+Nothing this module produces enters the asserted graph, the proposal graph, the
+training split or any `out/` artefact. It writes no files. `validate_outputs.py`
+is unaffected and still passes 25 of 25.
+
+The interface is a CLI. A `POST /api/chat` on the explorer service is a possible
+follow-up and is deliberately not built yet, because retrieval quality should be
+settled before a UI depends on it. `src/test_chat.py` carries 14 checks, all
+offline and none needing a key.
+
+### The Ask panel, and the claim it made false (2026-09-21)
+
+D27 above described a CLI and said the explorer gained no endpoint. That is
+superseded. `/api/chat` exists on `src/serve_explorer.py` and **Ask** is a third
+mode on `out/index.html`, beside Text & concepts and Graph model.
+
+The claim in `docs/FRONTEND.md` that the service sends nothing remotely is now
+narrowed to the two local modes rather than to the service, and the claim in
+the page that the interface makes no external request is narrowed to graph
+mode. Offline `file://` use is unchanged and still makes no request at all.
+The key stays in the service process and is never served to the browser.
+
+Without a key the endpoint still answers. It returns the resolutions, the
+facts, the passages and the context, generates nothing and sends nothing, and
+the banner and the per-answer markers say which state it is in. That is also
+how the retrieval is inspected.
+
+The panel draws the evidence beside the answer because prose rounds off a
+caveat. Every fact carries its chapter or the word uncited. Unresolved names
+get their own tab, their own marker, and a marker on every fact reached through
+them. Spelling variants are shown as the separate entities they are. None of
+that depends on what the model wrote.
+
+Browser input reaching a prompt is validated, not repaired: history must be
+user or assistant turns of bounded length, and anything else is a 400. Answer
+text is escaped before a small Markdown subset runs over it, so the only tags
+in a rendered answer are the ones the renderer writes. `src/test_chat_browser.py`
+asserts that with a hostile string.
+
+Four faults the work surfaced, all fixed:
+
+`vocative` rows carry the same string in their evidence column for all 459 of
+them, a description of how the row was derived rather than a quotation. Printed
+as evidence it read like a source quote and cost tokens on every request. It is
+no longer printed as evidence and the panel does not draw it as one.
+
+An uncited relation has no chapter, which pandas spells NaN. NaN is not JSON,
+and `send` serializes with `allow_nan=False`, so every question touching an
+uncited relation returned 400. The absence is now a null before it reaches a
+serializer, and `src/test_chat.py` asserts the facts are JSON.
+
+`llama-3.3-70b-versatile`, named in D27, is not served on this account. The
+model id is now read off `/v1/models` rather than assumed, and `--model`
+overrides it.
+
+Cloudflare rejects urllib's default user agent with error 1010 before the
+request reaches the API, which reads like an auth failure and is not one. The
+call sets a user agent and names that case in its error.
+
+The free tier allows 8,000 tokens a minute and one grounded question costs a
+few thousand, so consecutive questions hit the limit as a matter of course.
+The call retries on 429 after the delay the API names, and the browser check
+paces itself rather than pretending the limit is not there.
+
+### Rival answers were being shown as equals (2026-09-22)
+
+Asked who killed Karna, the panel returned Arjuna, Kiriti, Nakula, Savyasachi
+and Vijaya as five candidates in a flat list. Four of those names carry
+apposition evidence pointing at Arjuna, and that evidence was in
+`build/appellations.csv` all along, read by no query path. The answer looked
+like a contradiction the corpus does not contain.
+
+The fix is not a merge. Three things were missing and are now supplied.
+
+Repeated triples were collapsing to one row, so the corpus stating
+`(Karna, slainBy, Arjuna)` in two places looked identical to stating
+`(Karna, slainBy, Nakula)` in one. Each fact now carries `support`, the number
+of separate places that state it, and the list of those chapters. Support is
+the only weight this graph offers for choosing between rival statements and it
+is now the first thing the prompt is told to rank on.
+
+Co-reference evidence is reported. `coreference_notes` finds pairs where one
+name in the returned facts is an appellation with another of them among its
+candidates, and emits the confidence, the sighting count and the number of
+rivals. The hint is also attached to the individual fact line, because a model
+reading `slainBy Kiriti` does not go back to a section it has already passed,
+and that is exactly the row where missing it turns one killer into five.
+
+Nothing is asserted. The confidences are mostly low and correctly so: Kounteya
+is any son of Kunti, and Partha is used of Yudhishthira nearly as often as of
+Arjuna. Vijaya to Arjuna scores 1.00 on one sighting; Savyasachi to Arjuna
+scores 0.17. The panel prints those numbers and calls the section "may be the
+same person". No appellation is merged and `out/entities.ttl` is unchanged.
+
+A refusal now has to say what the corpus does hold. "The context does not
+contain that" was technically true and useless for Arjuna's father, where the
+graph holds `bornTo Kunti` with four citations and no paternal edge at all,
+because `bornTo` does not distinguish a mother from a father. The answer now
+states the parent it has before stating the gap.
+
+This does not make every answer certain and it is not meant to. `slainBy
+Nakula` at confidence 0.68 is a real extraction error, not an epithet, and it
+still appears, ranked below Arjuna with its single citation visible. The
+remedy for that is the Phase 4 extractor, not the answer layer.
+
+### The NaN fault again, in the place the first fix did not reach (2026-09-22)
+
+"who was dhritarastra" returned `Out of range float values are not JSON
+compliant: nan`. The earlier fix covered `adhyaya` on the fact rows. This was a
+second source: eleven rows in `build/appellations.csv` have status
+`prior_only`, meaning the corpus prior proposes the link and not one apposition
+sighting supports it, so `confidence` is NaN. Both `_expand` and
+`coreference_notes` cast it with `float()`.
+
+A null confidence now stays null and is described rather than printed as a
+number: "NO apposition evidence, proposed only by the corpus prior, which this
+project treats as weak and often wrong."
+
+Those rows are also excluded from the co-reference notes entirely. The prior is
+what CLAUDE.md calls a weak prior and never truth, and
+`build/canonical_id_audit.md` traces the 295-row Bharadvaja to Drona collapse
+to it. `Bharadvaja -> Drona` is one of the eleven. Reporting it as evidence
+that two names may be one person would launder a known failure into an answer.
+`src/test_chat.py` asserts it cannot.
+
+The regression test sweeps all 121 appellations through resolve, graph_facts
+and coreference_notes and serializes each with `allow_nan=False`, rather than
+testing the one name that happened to break.
+
+Aggregating support had a side effect worth naming. `speaksTo` reaches support
+92 for Dhritarashtra, and the answer to "who was dhritarastra" became a recital
+of every triple retrieved. The context is everything about the names in the
+question, not a list to read out. The prompt now caps an answer at 150 words
+and six bullets, tells the model to select rather than enumerate, and says that
+a high support count on `speaksTo` means the corpus records a lot of dialogue,
+not that the dialogue characterises the person.
+
+### The false slayers were a stale file, not a missing guard (2026-09-22)
+
+`(Karna, slainBy, Nakula)` at confidence 0.68 came from "O king! He was slain by
+the great-souled Nakula and fell down". The subject is the pronoun "He", which
+coreference attached to Karna. `(Karna, slainBy, Vrisha)` came from "using the
+serpent, Vrisha now destroyed it", where "it" is a weapon and "destroy" is not
+a death verb. Savyasachi and Vijaya are the same shape.
+
+The guard for this already exists. `emit` in `src/phase4_relations.py` refuses
+any `slainBy`, `foughtWith` or `defeatedBy` whose argument was recovered by
+coreference, and `src/review_viewer_graph.py` re-runs every record through the
+current guards. `build/reviewed_relations.parquet` withholds all four rows.
+
+`src/chat.py` was reading `build/relations.parquet`, the raw extractor output,
+which predates those guards. Every guard the project has written on this exact
+failure was being bypassed at the last step. It now reads the reviewed file and
+takes only `status == "asserted"`, and `src/test_chat.py` asserts both.
+
+"Who killed Karna?" now answers Arjuna, with Kiriti as the single weaker rival.
+
+**This costs a true fact and that is the honest trade.**
+`(Duryodhana, slainBy, Bhimasena)` is withheld too, from "He has been slain by
+Bhimasena, with an upraised club" — the same pronoun-subject shape as the Nakula
+row. Coreference happened to be right about Duryodhana and wrong about Karna,
+and no guard can tell those apart from the sentence alone. Keeping the rule
+consistent means losing the one it got right. Recall on `slainBy` drops from 125
+rows to 53 and on `foughtWith` from 680 to 229. Withheld is not disproved, and
+`build/withheld_relations.parquet` keeps every one of them.
+
+Recovering the true ones needs a better antecedent, which is Phase 4 work on the
+coreference layer, not something the answer layer can decide.
+
+### Arjuna's father: the answer was right
+
+Reported as an error. It is not one. The corpus, as annotated, never states
+Arjuna's paternity in any extractable form. `Pandu's sons` appears in 125
+sentences and is always collective, never an apposition naming Arjuna, and no
+sentence links Arjuna to Indra as a father. The graph holds `bornTo Kunti` and
+nothing else, because `bornTo` does not distinguish a mother from a father.
+
+Deriving Arjuna from "Pandu's sons" means choosing which sons, which is the
+guess the hard rules forbid. The gap stays, and the answer now names the parent
+it does hold before naming the gap.
+
+### Arjuna's father was in the graph all along (2026-09-22, correcting the entry above)
+
+The previous entry says the answer "no father is recorded" was right. It was
+wrong, and so was the check behind it, which searched only for the literal
+string "Arjuna" beside a paternity phrase.
+
+The corpus records it under his epithets. `(Dhananjaya, bornTo, Pandu)` is
+stated in six places, `(Savyasachi, bornTo, Pandu)` and
+`(Phalguna, bornTo, Pandu)` in one each, and
+`(Dhananjaya, hasDivineProgenitor, Indra)` and `Shakra` besides. Filed under
+`Arjuna` there is only Kunti. Retrieval resolved the literal name typed and
+never asked which other names the corpus files that person under, so none of it
+was reachable. The graph was not missing the fact; the query path was.
+
+Retrieval now expands in both directions. A resolved entity pulls the records
+filed under its epithets, every one of them arriving `resolved: false` and
+marked with the name it was recorded under.
+
+Two bases, kept apart. Apposition evidence is the primary one. The corpus prior
+is the second and is fenced hard: it only ever widens retrieval, never asserts,
+carries no confidence because it has none, is labelled `basis: prior`, and is
+gated on the appellation having real apposition evidence for something. That
+gate is what keeps the known failure out, because Bharadvaja is `prior_only`
+and `src/test_chat.py` asserts it never reaches Drona's epithet list.
+
+The prior earns its place here. Apposition alone does not reach Dhananjaya from
+Arjuna: its best apposition candidate is Partha, which is another epithet of
+the same man. In 24 further rows the pattern is identical, the apposition
+candidate being a sibling epithet while the prior names the common form.
+
+Ordering, not prompting, is what made this reach an answer. Told to lead with
+parentage, the model still replied "no father is recorded" with six bornTo rows
+in its context, and once added Pandu from its own knowledge while claiming the
+corpus lacked it. The budget is now question-aware: `PREDICATE_HINTS` maps words
+in the question to predicates, and those predicates take the first half of the
+fact budget among themselves. Nothing is filtered; the second half still rotates
+over every predicate. Rows are also ordered by `support` within a predicate,
+because everything in bornTo carries confidence 0.85 and without that a trim
+drops rows by luck.
+
+`bornTo` still does not distinguish a mother from a father, and the answer says
+so rather than guessing. It now reports Pandu and Kunti as recorded parents and
+Indra as a divine progenitor, each under the name it was recorded under.
+
+The free tier allows 200,000 tokens a day and a question was costing 7,000, so
+28 questions exhausted it. With the answering rows at the top of the block the
+tail was padding the bill: the fact budget drops to 28, passages to 5, evidence
+quotes to the first 12 rows, and the co-reference block is no longer sent twice.
+A question now costs about 2,800 tokens.

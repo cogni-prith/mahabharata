@@ -1,0 +1,796 @@
+% Generated documentation for the Mahabharata knowledge graph and embedding.
+% Build: pdflatex -interaction=nonstopmode KG_SYSTEM.tex  (run twice for the ToC)
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+\usepackage{geometry}
+\geometry{margin=25mm}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\file}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\pred}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\FAIL}{\textcolor{red}{\textbf{FAIL}}}
+\newcommand{\PASS}{\textbf{pass}}
+
+\title{\textbf{The Mahabharata Knowledge Graph and Embedding}\\[2mm]
+\large System documentation: data, algorithms, parameters and limits}
+\author{Prithwish Guha}
+\date{22 September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+This document records what the system is built from and what it does, at the
+level of detail needed to reproduce or to audit it. Every figure quoted here
+was read from the artifacts on disk at the date above, not from memory.
+
+The deliverable is a trained knowledge graph embedding over a
+citation-anchored symbolic graph extracted from an annotated English
+translation of the BORI critical edition. The symbolic graph is training data,
+not the product.
+
+Two statements govern how the rest should be read. The Phase~6 entry gate fails
+on all three of its conditions and the model was trained anyway on explicit
+instruction, so no metric in Section~\ref{sec:embedding} is a finding about the
+Mahabharata. Entity resolution is unfinished: all 121 appellations remain
+unresolved and nothing is merged. Both facts are repeated wherever they bear on
+a number.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Design rules}
+
+Five rules constrain every component. They are not style preferences; each one
+exists because violating it produced a specific wrong output that was found and
+corrected.
+
+\begin{enumerate}
+\item \textbf{Never invent a citation.} A triple with no supporting span is
+marked \pred{uncited} and stays visible as such. Fabricated provenance is worse
+than absent provenance because it cannot be detected downstream.
+
+\item \textbf{Never guess an entity link.} Where a referent is genuinely
+ambiguous the system emits a candidate set with confidences, never a single
+silent choice. ``Achyuta'' has five candidates and the best scores 0.25.
+
+\item \textbf{Leave contested facts unasserted.} Abhimanyu has no single
+recorded slayer, so no edge is emitted and a note records why.
+
+\item \textbf{Predicted triples never enter the asserted graph.} Embedding
+output is a hypothesis. It lives in a separate named graph, always carries a
+score, and is labelled \pred{predicted} in every view.
+
+\item \textbf{Identity is a relation, never \pred{owl:sameAs}.} \pred{isAmshaOf},
+\pred{rebornAs}, \pred{transformedInto} and \pred{disguisedAs} stay strictly
+separate. A shared name is not a resolved person.
+\end{enumerate}
+
+\section{Corpus and data sources}
+
+The input is an annotated English translation. There is no Sanskrit anywhere in
+the corpus or the PDFs, no critical apparatus, and no variant data. Scope is all
+18 parvas; Harivamsha is excluded because it has no token-level annotation.
+
+\begin{table}[h]
+\centering
+\caption{Primary inputs, all read-only}
+\small
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Source} & \textbf{Contents} \\
+\midrule
+\file{mahabharata_ner_by_sentence_master (2).csv} & 66{,}801 sentences with
+punctuation and nested quotes intact. Carries the citation spine and the speech
+frames. \\
+\file{mahabharata_ner_entities_master (2).csv} & Exploded entity rows. \\
+LLM-annotated BIO token CSVs & 18 parvas, machine annotation. \\
+Human-annotated BIO token CSVs & 8 parvas, human revision pass. \\
+\file{parva_pdfs/*.pdf} & 20 PDFs, the only source of chapter boundaries. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Measured properties that govern the design}
+
+\begin{itemize}
+\item \textbf{Eight parvas have a human pass, not twelve.} Two of the eight are
+unrevised machine output: Mahaprasthanika is byte-identical to the LLM file and
+Mausala differs by one token.
+
+\item \textbf{The human pass changed 1.25\% of tokens}, 4{,}780 of 382{,}001.
+The human layer is therefore not independent of the LLM layer, which is why
+Phase~5 cannot verify LLM proposals against it.
+
+\item \textbf{The \pred{gold_hand} tier in the master CSV is mislabelled.} Its
+parvas are Sabha, Virata and Stri, none of which has a human file. It is never
+used for a score.
+
+\item \textbf{No shloka number is printed inline anywhere.} The citation unit is
+therefore \pred{(parvan, adhyaya)} and shloka-level citation is impossible from
+this corpus.
+
+\item \textbf{\file{shanti_parva.csv} is not confined to Shanti Parva.} It
+shares 1{,}635 long sentences with \file{anushasana_tagged.csv} and ends with
+Mahaprasthanika text, so its parva labels are re-derived rather than believed.
+\end{itemize}
+
+\subsection{The substrate join}
+
+The master CSVs carry punctuation and quotes; the BIO CSVs carry token spans.
+Joining them is mandatory and the obvious key is wrong.
+
+\textbf{The join is on normalised sentence text}: strip possessives, replace
+punctuation with whitespace, drop digit-only tokens, collapse whitespace,
+lowercase. Measured coverage is 95.1\% to the LLM files and 95.7\% to the human
+files, with no parva below 89.3\%.
+
+\textbf{The index join must not be used.} Joining on
+\pred{sent_id + 1 == sentence_no} scores roughly 96\% on fourteen parvas and
+\emph{exactly 0\%} on Karna, Shalya, Mahaprasthanika and Svargarohana, dropping
+four entire parvas silently as absent rows rather than as errors. The master CSV
+is a sparse subset that kept its original indices while the BIO files
+re-segmented independently. No fixed offset repairs it, and a five-parva sample
+does not reveal it.
+
+\section{Phase 1: mentions and the citation spine}
+
+Every annotated span becomes a \pred{Mention} anchored to a \pred{Passage}.
+
+\begin{table}[h]
+\centering
+\caption{Phase 1 measured output}
+\small
+\begin{tabular}{lr}
+\toprule
+Mentions emitted & 125{,}262 \\
+Resolving to chapter level \pred{(parvan, adhyaya)} & 124{,}998 (99.79\%) \\
+Resolving to parva level only, \pred{adhyaya} null & 264 (0.21\%) \\
+BORI chapters recovered & 1{,}995 of 1{,}995 \\
+Tier: LLM / human & 101{,}427 / 23{,}835 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Chapter head recovery}
+
+Three head formats occur in the extracted PDF stream and all three are handled:
+\pred{CHAPTER 1162(45)} (1{,}162 heads), a bare \pred{226(1)} with the word
+omitted (608), and in Adi a bare global number on its own line, detected from
+layout at 10.8\,pt against a 14.4\,pt body (224, plus 1 fused).
+
+\subsection{Two anchoring decisions}
+
+\textbf{Mentions anchor on the sentence midpoint, not its start.} Drop caps
+place the decorative initial before the chapter head in the extracted stream, so
+a first-sentence-of-chapter reads \pred{' 'S Chapter 1152(2) anjaya said} and
+begins before the boundary it belongs after. Start-anchoring placed every such
+sentence one chapter early, which was all of Karna and all of Shalya.
+
+\textbf{Anchors are keyed on \pred{(parva, ordinal)}, never on the printed
+number.} Printed global chapter numbers contain typos in the source, confirmed
+in Shalya, which prints \pred{Chapter 1126(7)} where the sequence requires 1226.
+The printed number is retained as an observed attribute only.
+
+\section{Phase 2: entity resolution}
+\label{sec:phase2}
+
+\textbf{This phase is construction, not validation, and it is not finished.}
+
+\subsection{Why the supplied prior cannot be used as truth}
+
+\file{build/canonical_id_audit.md} measures the corpus \pred{canonical_id}
+prior. It is a context-free dictionary: every surface form has exactly one
+value, applied regardless of context. Of 3{,}958 distinct values, only 16 carry
+more than one surface form, and 88.0\% of assignments are verbatim echoes of the
+surface. It performs 43 distinct rewrites covering 11{,}624 mentions.
+
+The failure mode is automated canonicalisation collapsing a patronymic epithet
+onto its bearer. The Bharadvaja to Drona collapse covers 295 rows and the
+Krishna Dvaipayana to Krishna collapse 72 rows. These are not one-off bugs and
+the quantification of this failure is itself a reportable result.
+
+\subsection{The appellation algorithm}
+
+\begin{enumerate}
+\item \textbf{Candidate names}: single-token PERSON surfaces with at least 10
+mentions, minus a title stoplist, matching
+\begin{center}\small\verb|[A-Z][a-z]{2,}|\end{center}
+
+\item \textbf{Apposition mining}: adjacent capitalised pairs such as
+``Vaikartana Karna'' are found by
+\begin{center}\small\verb|\b([A-Z][a-z]{2,})\s+([A-Z][a-z]{2,})\b|\end{center}
+
+\item \textbf{Direction}: the member with the lower bare-mention count is taken
+as the epithet, the other as the bearer.
+
+\item \textbf{Homonym risk}: heads that would absorb epithets promiscuously are
+blocked.
+
+\item \textbf{Resolution thresholds}: a merge requires at least 3 sightings, a
+share of at least 0.90, and a runner-up below 0.10, \emph{and} agreement with
+the corpus prior.
+\end{enumerate}
+
+\begin{table}[h]
+\centering
+\caption{Phase 2 output. Note the final row.}
+\small
+\begin{tabular}{lr}
+\toprule
+Persons declared & 2{,}995 \\
+Places declared & 872 \\
+Appellations with candidates & 121 (246 candidate links) \\
+Status \pred{ambiguous} / \pred{apposition_only} / \pred{prior_only} & 223 / 12 / 11 \\
+\textbf{Appellations merged} & \textbf{0} \\
+\pred{skos:altLabel} triples in \file{out/entities.ttl} & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Nothing reached the merge threshold. Every appellation is emitted as an
+\pred{mbh:Appellation} node carrying \pred{mbh:referentUnresolved true} and a
+set of \pred{mbh:designatesCandidate} blank nodes with confidences. The gate for
+this phase is a human census of all 246 candidate links, which remains unjudged.
+
+\textbf{Consequence for every downstream component.} Spelling variants are
+separate entities: \pred{Bhima} and \pred{Bhimasena}, \pred{Bhishma} and
+\pred{Bhisma}, \pred{Yudhisthira} (29 mentions) and \pred{Yudhishthira} (2{,}063)
+are distinct nodes and nothing in this project asserts they are the same person.
+
+\section{Phase 3: speech frames and diegetic depth}
+
+The epic is narration inside narration. The master CSVs preserve nested quotes,
+which the BIO CSVs do not, so this layer is only possible on that substrate.
+
+\begin{table}[h]
+\centering
+\caption{Phase 3 measured output}
+\small
+\begin{tabular}{lr}
+\toprule
+Sentences scanned & 55{,}519 \\
+Tellings extracted & 5{,}465 \\
+Maximum diegetic depth & 6 \\
+Openers rejected as not a name & 372 \\
+Openers naming a title, narrator left unresolved & 373 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Each telling records narrator, narratee and nesting depth, and becomes one named
+graph. This is what keeps the graph epistemically honest: it separates what the
+text asserts from what a character claims.
+
+\section{Phase 4: relation extraction}
+\label{sec:phase4}
+
+\subsection{Method}
+
+English dependency parsing over the translated prose. Each sentence is parsed,
+and hand-written patterns read subject, verb and object off the dependency tree.
+That the corpus is pure English is an advantage here rather than a loss:
+Sanskrit dependency parsing is thin and would have been the hardest part of the
+project.
+
+The caveat this incurs is recorded and belongs in any write-up: \emph{every
+relation in this graph is mediated by one translator's word choices.}
+
+\subsection{Patterns}
+
+\begin{table}[h]
+\centering
+\caption{Extraction patterns and their base confidences}
+\small
+\begin{tabular}{llr}
+\toprule
+\textbf{Pattern} & \textbf{Shape} & \textbf{Base conf.} \\
+\midrule
+\pred{passive_agent} & ``Bhishma was slain \emph{by} Arjuna'' & 0.80 \\
+\pred{active_dobj} & ``Arjuna killed Bhishma'' & 0.75 \\
+\pred{poss_kinship} & ``Karna's son, Vrishasena'' & 0.85 \\
+\pred{vocative} & narratee of a telling & 0.90 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+An argument recovered by coreference rather than read directly is discounted by
+a per-person penalty, and one recovered by noun-phrase linking by a separate
+penalty. The provenance is retained in \pred{coref_subject},
+\pred{coref_object}, \pred{nplink_subject} and \pred{nplink_object} so a
+consumer can filter to directly-read triples.
+
+\subsection{The predicate inventory}
+
+Ten predicates, deliberately. The inventory is capped because entity agreement
+on this corpus reached 0.831 while relation agreement typically lands between
+0.5 and 0.65, and ``is this an alliance'' would be worse.
+
+\begin{table}[h]
+\centering
+\caption{Asserted predicates, reviewed set, 1{,}774 rows}
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Predicate} & \textbf{Rows} & \textbf{Share} \\
+\midrule
+\pred{speaksTo} & 788 & 44.4\% \\
+\pred{bornTo} & 567 & 32.0\% \\
+\pred{foughtWith} & 229 & 12.9\% \\
+\pred{slainBy} & 53 & 3.0\% \\
+\pred{rules} & 53 & 3.0\% \\
+\pred{hasSpouse} & 23 & 1.3\% \\
+\pred{cursedBy} & 21 & 1.2\% \\
+\pred{instructedBy} & 18 & 1.0\% \\
+\pred{defeatedBy} & 12 & 0.7\% \\
+\pred{hasDivineProgenitor} & 10 & 0.6\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Precision}
+
+\begin{table}[h]
+\centering
+\caption{Phase 4 precision on a judged sample, by argument provenance}
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Source} & \textbf{Judged} & \textbf{Precision} \\
+\midrule
+direct & 75 & 0.960 \\
+noun-phrase linked & 18 & 0.944 \\
+coreference & 113 & 0.761 \\
+\midrule
+\textbf{all} & \textbf{206} & \textbf{0.850} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The gap between 0.960 for directly-read arguments and 0.761 for
+coreference-recovered ones is the single most informative number in this
+section, and it motivates the guards below.
+
+\subsection{Guards, and why each exists}
+
+Each guard was written after a specific wrong triple was traced to its evidence.
+
+\begin{itemize}
+\item \textbf{Possessed kinship nouns.} When a clause argument is ``X's son'' or
+``his brother'' the referent is a description, not a name. Resolving it to a
+single antecedent is the silent choice the rules forbid. This guard emptied
+\pred{(Abhimanyu, slainBy, *)}, which was the one fact the project names as
+contested. The extractor dropped from 3{,}060 rows to 2{,}935.
+
+\item \textbf{Coreference arguments on conflict predicates.} \pred{slainBy},
+\pred{foughtWith} and \pred{defeatedBy} refuse any argument recovered by
+coreference. Unverified antecedents had turned ``him'' into Adhiratha and ``the
+Pandava'' into Pandu.
+
+\item \textbf{Death verbs must be literal.} ``Destroy'' does not establish a
+death.
+
+\item \textbf{Apposition across clause boundaries.} A role phrase at a new
+clause boundary cannot inherit the previous clause's object as its bearer.
+\end{itemize}
+
+\subsection{The review pass}
+
+\file{src/review_viewer_graph.py} re-runs every record through the current
+guards, because the raw extractor output predates several of them. It writes
+\file{build/reviewed_relations.parquet} (1{,}774 asserted) and
+\file{build/withheld_relations.parquet} (1{,}145 withheld).
+
+\textbf{Withheld is not disproved.} The withheld set contains true statements.
+\pred{(Duryodhana, slainBy, Bhimasena)} is withheld from ``He has been slain by
+Bhimasena, with an upraised club'', because the subject is a pronoun resolved by
+coreference. \pred{(Karna, slainBy, Nakula)} is withheld from the identical
+shape and is false. No guard can distinguish them from the sentence alone, so
+applying the rule consistently costs the true one. Recall on \pred{slainBy}
+falls from 125 rows to 53 and on \pred{foughtWith} from 680 to 229.
+
+\section{Phase 5: propose and verify}
+
+An LLM proposes candidate triples freely. Verification is redesigned because the
+annotation layer is contaminated.
+
+\textbf{The annotation is an index, not evidence.} It changed 1.25\% of tokens
+against the LLM output, so verifying LLM proposals against it would measure a
+model against a lightly edited copy of its own output. The annotation is used
+only to retrieve candidate sentences; verification is against the prose.
+
+\textbf{Calibration is on a blind set}, re-annotated from scratch, blind to the
+LLM output. The sampling procedure was written before sampling: three strata
+over 11{,}550 eligible sentences, seed 20260914, sheet id \pred{59a1d3129190},
+419 rows, all 18 parvas represented. Stratum A is 200 allocated by predicate,
+stratum B is 200 by parva over sentences the pipeline produced nothing from,
+stratum C is a census of all 19 proposal-bearing sentences.
+
+\textbf{Status: blocked.} 26 proposals exist in \file{out/proposed.ttl}, none
+asserted. The blind set is unjudged, so no groundedness rate can be reported. A
+number computed against the existing human files would be silver-versus-silver
+and is never reported as an independent evaluation.
+
+\section{Phase 6: the embedding}
+\label{sec:embedding}
+
+\subsection{The entry gate}
+
+\begin{table}[h]
+\centering
+\caption{Phase 6 entry gate, checked before training}
+\small
+\begin{tabular}{lrrl}
+\toprule
+\textbf{Condition} & \textbf{Required} & \textbf{Measured} & \textbf{Result} \\
+\midrule
+Distinct asserted triples & $\geq$ 10{,}000 & 1{,}444 & \FAIL \\
+Entities of degree $\geq$ 5 & $\geq$ 500 & 137 & \FAIL \\
+Largest relation share & $\leq$ 40\% & 50.6\% (\pred{speaksTo}) & \FAIL \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{All three conditions fail, and the model was trained anyway on explicit
+instruction.} The degree distribution is the reason: 256 entities have exactly
+one edge, 93 have two, 45 have three. The stated floor for meaningful vectors is
+roughly 5{,}000 triples.
+
+Consequently every metric in this section describes how well a model fits
+1{,}369 triples. \textbf{None of them is a result about the Mahabharata}, and
+the artifacts carry a \pred{below_gate} flag that the interface displays.
+
+\subsection{Why RotatE and not TransE}
+
+The predicate set contains relations of three algebraic shapes, and the choice
+of model is forced by them.
+
+TransE embeds a relation as a translation, $\mathbf{h} + \mathbf{r} \approx
+\mathbf{t}$. For a symmetric relation this requires
+$\mathbf{h}+\mathbf{r}\approx\mathbf{t}$ and
+$\mathbf{t}+\mathbf{r}\approx\mathbf{h}$ simultaneously, which forces
+$\mathbf{r}\approx\mathbf{0}$ and therefore $\mathbf{h}\approx\mathbf{t}$. Every
+ally collapses onto their ally. TransE cannot represent symmetry at all.
+
+RotatE embeds entities in complex space and each relation as an element-wise
+rotation:
+\[
+\mathbf{t} \approx \mathbf{h} \circ \mathbf{r}, \qquad
+|r_i| = 1, \qquad
+r_i = e^{\mathrm{i}\theta_i}
+\]
+with score $f(h,r,t) = -\lVert \mathbf{h}\circ\mathbf{r}-\mathbf{t}\rVert$.
+Symmetry is a rotation by $\pi$, since applying it twice returns the original.
+Antisymmetry, inversion and composition all follow from the group structure.
+
+\begin{table}[h]
+\centering
+\caption{Relation shapes present in this predicate set}
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Shape} & \textbf{Example} & \textbf{TransE} \\
+\midrule
+Symmetric & \pred{isAlliedWith}, \pred{hasSpouse} & cannot represent \\
+Antisymmetric & \pred{slainBy}, \pred{hasBiologicalParent} & representable \\
+Composition & parent twice is grandparent & weak \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Training configuration}
+
+\begin{table}[h]
+\centering
+\caption{Training run. Implementation: PyKEEN 1.11.1.}
+\small
+\begin{tabular}{ll}
+\toprule
+Model & RotatE \\
+Embedding dimension & 200 complex, stored as 400 float32 \\
+Epochs & 400 \\
+Optimiser & Adam, lr $10^{-3}$, batch 512 \\
+Negative sampling & basic, uniform corruption of head or tail \\
+Negatives per positive & 32 \\
+Split & 80/10/10 by triple \\
+Train / valid / test & 1{,}095 / 137 / 137 \\
+Entities / relations & 561 / 9 \\
+Random seed & 20260917 \\
+Device & cuda:0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{The negative sampling strategy and ratio are stated because KGE numbers
+are not comparable across sampling regimes.} Omitting them makes an evaluation
+unreadable.
+
+\subsection{Determinism}
+
+A seeded run reproduced only to $4\times10^{-7}$, because the gradient scatter
+into the embedding reduces in block-completion order. That was enough to move
+638 of 683 entities in the UMAP layout and drop the projection's top-10
+neighbour overlap against its own rerun to 0.32. The trainer now sets
+\begin{center}\small
+\pred{CUBLAS_WORKSPACE_CONFIG=:4096:8}\quad and \quad
+\pred{torch.use_deterministic_algorithms(True)}
+\end{center}
+before importing torch. Two full train-then-project cycles at seed 20260917 are
+now bit-identical.
+
+\subsection{Leakage controls}
+
+Two standard leaks were blocked, and the check was measured rather than assumed.
+
+\textbf{Symmetric leakage.} If \pred{foughtWith(a,b)} is in train and
+\pred{foughtWith(b,a)} in test, the model has seen the answer. Pairs are ordered
+canonically and deduplicated \emph{before} the split, not after. 75 of 1{,}444
+distinct triples were removed as the same fact written both ways.
+
+\textbf{Inverse leakage.} No inverse relation is materialised and PyKEEN's
+\pred{create_inverse_triples} is off. Predicate pairs sharing an entity pair in
+opposite order were counted: \pred{speaksTo}/\pred{speaksTo} 198,
+\pred{foughtWith}/\pred{speaksTo} 28, \pred{foughtWith}/\pred{slainBy} 19, and a
+tail of smaller counts.
+
+\subsection{Results}
+
+\begin{table}[h]
+\centering
+\caption{Filtered ranking on the test set, realistic rank definition.
+\textbf{These describe a below-gate fit, not the epic.}}
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Metric} & \textbf{Head} & \textbf{Tail} & \textbf{Both} \\
+\midrule
+MRR & 0.1953 & 0.1546 & 0.1750 \\
+Hits@1 & 0.0876 & 0.0730 & 0.0803 \\
+Hits@3 & 0.2263 & 0.1533 & 0.1898 \\
+Hits@10 & 0.4161 & 0.2993 & 0.3577 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Phase 7: projection and interface}
+
+\subsection{UMAP}
+
+UMAP reduces the 400-dimensional entity vectors to 2D and 3D coordinates,
+\pred{n_neighbors} 15, \pred{min_dist} 0.1, seed 20260917 recorded in
+\file{out/projection.json}. A projection whose seed is not recorded is a
+screenshot, not a result.
+
+\subsection{Clustering}
+
+Eight k-means groups over the learned entity vectors, seed 20260917. The eight
+colours denote those groups and nothing else. \textbf{They do not identify
+factions, families, confidence or UMAP regions.} The independent UMAP projection
+determines point positions; k-means determines only colour.
+
+\subsection{Interface}
+
+One static HTML page, no framework and no backend. Scoring runs client side: a
+few thousand entities at 400 dimensions ships as roughly 4\,MB of float32
+alongside the page and scores with a small matrix multiply in JavaScript. The
+graph-model view runs from \pred{file://} with no server and makes no external
+request.
+
+\subsection{The three query modes}
+
+\begin{enumerate}
+\item \textbf{Nearest neighbours in vector space.} Similarity, not adjacency.
+The two differ and the difference is the point. \PASS
+\item \textbf{Link prediction.} Scores every candidate tail for an incomplete
+triple. Rows are labelled \pred{predicted} and \pred{uncited}. \PASS
+\item \textbf{Analogy by vector arithmetic.} $\text{Arjuna}-\text{Kunti}+
+\text{Gandhari}$ should land near Duryodhana. \textbf{This does not currently
+land.}
+\end{enumerate}
+
+\section{Phase 8: divergence analysis}
+
+This is the generalised form of the Karna observation, and the one place the
+project tests a claim rather than displaying one.
+
+For every entity, compute the overlap between its top-$k$ graph neighbours and
+its top-$k$ embedding neighbours by cosine, then rank entities by lowest
+overlap. Graph neighbours are ranked by the number of asserted triples joining
+the pair; $k=10$; overlap is the intersection over $k$, or over the degree where
+the degree is below $k$.
+
+\textbf{The result is negative and is reported as such.} 683 of 683 entities
+scored. Mean overlap 0.028, and 0.081 among the 64 entities of degree $\geq$ 10.
+616 of 683 entities tie at exactly zero overlap, so the ranked list orders a
+tie. At this graph density the measure does not discriminate.
+
+\section{The question-answering layer}
+
+A retrieval and generation layer over the same artifacts. It asserts nothing and
+writes no files.
+
+\subsection{Name correction}
+
+Approximate string matching with \pred{rapidfuzz}, scorer \pred{WRatio},
+acceptance threshold 85. ``Arjun'' scores 90 against Arjuna and ``Yudhistira''
+91 against Yudhishthira, while unrelated names sit in the fifties.
+
+Two constraints, each from an observed failure:
+
+\begin{itemize}
+\item \textbf{Mention floor of 10.} The declared entity set contains annotation
+artifacts. \pred{Tell} is a declared PERSON on two mentions and was capturing
+the verb in ``tell me about Arjuna''. Ten is the threshold Phase~2 already
+applies to its own name list. Names below the floor remain reachable through
+passage retrieval, which needs no name.
+
+\item \textbf{Spelling variants are returned, not merged.} A misspelling close
+to two spellings returns both, because per Section~\ref{sec:phase2} they are
+separate entities and nothing asserts they are one person.
+\end{itemize}
+
+\subsection{Grammar}
+
+\textbf{No grammar model is installed.} Gramformer and HappyTransformer were
+considered and rejected: a multi-hundred-megabyte model to repair input the
+answering model already tolerates. One instruction in the prompt covers it.
+
+\subsection{Hybrid retrieval}
+
+Neither half is sufficient alone, so both run and are merged.
+
+\textbf{Graph half.} 1{,}774 reviewed triples joined on bare label strings, with
+no predicate filter. Filtering by a predicate guessed from the question is
+precisely why a graph-backed system answers ``I do not know'' to a fact it
+holds.
+
+\textbf{Passage half.} \pred{sentence-transformers/multi-qa-MiniLM-L6-cos-v1},
+384 dimensions, over 16{,}339 passages of which 11{,}599 carry a chapter anchor,
+and 6{,}921 typed nodes. Dense cosine is fused with SQLite FTS5 \pred{bm25}
+lexical ranking by reciprocal rank fusion:
+\[
+\mathrm{RRF}(d) = \sum_{r \in R} \frac{1}{k + \mathrm{rank}_r(d)}, \qquad k = 60
+\]
+so a document ranked moderately by both signals outranks one ranked first by
+only one. The encoder runs locally; the model revision, file hashes, input index
+hash and UMAP seed 20260916 are recorded in
+\file{build/semantic/manifest.json}, and the index refuses to serve if any hash
+mismatches.
+
+\subsection{Evidence weighting and budget}
+
+\begin{itemize}
+\item \textbf{Support.} Duplicate triples are collapsed and the count of
+distinct places stating them is retained. The corpus states
+\pred{(Karna, slainBy, Arjuna)} in two chapters and a rival in one; before
+support existed the two rendered as equals.
+
+\item \textbf{Per-predicate rotation.} \pred{speaksTo} is 70\% of the reviewed
+rows. Ranking by confidence filled the entire context with dialogue while
+\pred{slainBy} fell below the cut, so each predicate takes a turn.
+
+\item \textbf{Question-aware ordering.} Words in the question map to predicates,
+which take the first half of the fact budget. This orders and never filters.
+Instructing the model alone was insufficient: told to lead with parentage it
+still answered ``no father is recorded'' with six \pred{bornTo} rows further
+down its context.
+
+\item \textbf{Epithet expansion.} A resolved entity also retrieves records filed
+under its appellations. This is necessary because the corpus files
+\pred{(Dhananjaya, bornTo, Pandu)} six times and
+\pred{(Arjuna, bornTo, Pandu)} zero times. Every such record arrives
+\pred{resolved: false} and tagged with the name it was recorded under.
+\end{itemize}
+
+\subsection{Generation}
+
+\pred{openai/gpt-oss-120b} via the Groq API, selected by reading
+\pred{/v1/models} rather than assuming. \pred{groq/compound} is deliberately
+avoided because it carries its own web search, and a grounded answer must not
+have a route back to the open internet.
+
+The call is opt-in behind \pred{GROQ_API_KEY}. Without a key the layer returns
+the retrieved evidence and generates nothing. Only the question and the
+retrieved context are transmitted, never the corpus in bulk. Browser-supplied
+conversation history is validated rather than repaired, and answer text is
+escaped before a small Markdown subset renders it, so the only tags in a
+rendered answer are those the renderer writes.
+
+\section{Artifacts}
+
+\small
+\begin{longtable}{p{0.40\textwidth}p{0.52\textwidth}}
+\caption{Files and what they contain}\\
+\toprule
+\textbf{Path} & \textbf{Contents} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Path} & \textbf{Contents} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\file{out/passages.ttl} & Passage nodes and chapter anchors \\
+\file{out/entities.ttl} & 2{,}995 persons, 872 places, 121 unresolved appellations \\
+\file{out/tellings.ttl} & 5{,}465 tellings to depth 6 \\
+\file{out/relations.ttl} & Reified assertions with confidence and citation \\
+\file{out/reviewed_relations.ttl} & Guard-rechecked assertions \\
+\file{out/proposed.ttl} & 26 proposals, none asserted \\
+\file{out/entity_emb.bin} & 561 $\times$ 400 float32 \\
+\file{out/relation_emb.bin} & 9 $\times$ 400 float32 \\
+\file{out/embedding_index.json} & Index, seeds, \pred{below_gate} flag \\
+\file{out/projection.json} & UMAP 2D and 3D coordinates, seed \\
+\file{out/eval.md} & Gate, leakage checks, metrics \\
+\file{build/mentions.parquet} & 125{,}262 mentions, 15 columns, carries \pred{tier} \\
+\file{build/reviewed_relations.parquet} & 1{,}774 asserted rows \\
+\file{build/withheld_relations.parquet} & 1{,}145 withheld rows \\
+\file{build/appellations.csv} & 246 candidate links over 121 appellations \\
+\file{build/semantic/index.sqlite} & Passages, nodes, FTS5 index \\
+\file{build/divergence.md} & Phase 8 ranked list \\
+\end{longtable}
+
+\subsection{Validation}
+
+\file{src/validate_outputs.py} runs 25 checks and exits non-zero on any failure:
+every Turtle file parses, no proposal appears in the asserted graph, every
+chapter-cited assertion names a passage and every uncited one names none, no
+dangling entity or passage reference, every telling either names a narrator or
+declares it unresolved, no \pred{owl:sameAs}, the predicate set stays inside the
+recorded inventory, and the embedding artifacts agree with the graph and carry
+their seeds and their below-gate flag.
+
+\section{Known limits}
+
+\begin{enumerate}
+\item \textbf{The Phase 6 gate fails on all three conditions.} Every metric in
+Section~\ref{sec:embedding} describes a below-gate fit.
+
+\item \textbf{Entity resolution is unfinished.} 121 appellations unresolved, 0
+merged. The gate is a human census that remains unjudged.
+
+\item \textbf{Phase 5 groundedness cannot be reported.} The 419-row blind
+calibration set is drawn and frozen but unjudged.
+
+\item \textbf{Phase 8 produced a negative result.} 616 of 683 entities tie at
+zero overlap.
+
+\item \textbf{The analogy query mode does not land.}
+
+\item \textbf{Recall was traded for precision in the review pass.} 1{,}145
+withheld rows include true statements; withheld is not disproved.
+
+\item \textbf{Every relation is mediated by one translator's word choices.}
+
+\item \textbf{Two training runs are present on disk.} \file{out/eval.md} and
+\file{out/embedding_index.json} report 561 entities, 1{,}444 triples and MRR
+0.1750, while \file{build/divergence.md} and \file{docs/STATUS.md} report 683
+entities, 1{,}771 triples and MRR 0.1453. This document quotes the former. The
+two should be reconciled by rerunning the chain end to end, and until then
+neither set should be published as final.
+
+\item \textbf{One validation check currently fails.}
+\pred{(Ghatotkacha, bornTo, Hidimba)} appears in both the asserted and proposed
+graphs, so \file{src/validate_outputs.py} reports 24 of 25.
+\end{enumerate}
+
+\vspace{4mm}
+\noindent\rule{\textwidth}{0.4pt}\\[1mm]
+{\small All figures read from the artifacts on 22 September 2026. Where a
+statement could not be verified against a file it is not made.}
+
+\end{document}

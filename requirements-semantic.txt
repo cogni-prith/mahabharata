@@ -1,0 +1,5 @@
+# Optional local semantic explorer, alongside the existing corpus toolchain.
+sentence-transformers==5.7.0
+pyshacl==0.31.0
+umap-learn==0.5.12
+rdflib==7.6.0

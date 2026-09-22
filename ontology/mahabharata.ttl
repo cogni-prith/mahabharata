@@ -1,0 +1,46 @@
+@prefix mbh: <http://example.org/mbh/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+mbh:ontology a owl:Ontology ; rdfs:comment "Local working ontology. Type assignments and event links from extraction remain candidates, not verified facts. No owl:sameAs identity merging." .
+mbh:Entity a owl:Class ; rdfs:label "Entity" ; rdfs:comment "A typed retrieval referent, distinct from a surface mention and from the text that describes it." .
+mbh:Agent a owl:Class ; rdfs:subClassOf mbh:Entity ; rdfs:comment "An individual or collective narrative actor." .
+mbh:Person a owl:Class ; rdfs:subClassOf mbh:Agent ; rdfs:label "Person" ; rdfs:comment "An individual narrative actor identified in context. A name alone does not resolve homonyms." .
+mbh:Deity a owl:Class ; rdfs:subClassOf mbh:Agent ; rdfs:label "Deity" ; rdfs:comment "An actor explicitly described as divine. Not inferred merely from a familiar spelling." .
+mbh:Group a owl:Class ; rdfs:subClassOf mbh:Agent ; rdfs:label "Group" ; rdfs:comment "A clan, people, army, occupation group or other collective, not one of its members." .
+mbh:Place a owl:Class ; rdfs:subClassOf mbh:Entity ; rdfs:label "Place" ; rdfs:comment "A location, distinct from events occurring there." .
+mbh:Event a owl:Class ; rdfs:subClassOf mbh:Entity ; rdfs:label "Event" ; rdfs:comment "A source-scoped event account. Separate mentions are not automatically identified as the same historical event." .
+mbh:Concept a owl:Class ; rdfs:subClassOf mbh:Entity ; rdfs:label "Concept" ; rdfs:comment "A general idea or retrieval topic, such as war or duty, not a particular occurrence." .
+mbh:Artifact a owl:Class ; rdfs:subClassOf mbh:Entity ; rdfs:label "Artifact" ; rdfs:comment "A material object such as a weapon or chariot." .
+mbh:TextWork a owl:Class ; rdfs:subClassOf mbh:Entity ; rdfs:label "Text work" ; rdfs:comment "A named textual work, distinct from an excerpt or edition." .
+mbh:Appellation a owl:Class ; rdfs:comment "A name or epithet whose bearer must be resolved in context." .
+mbh:Mention a owl:Class ; rdfs:comment "A surface occurrence in a source sentence; annotation is a retrieval index, not proof." .
+mbh:Parvan a owl:Class ; rdfs:comment "A book in the eighteen-parva scope." .
+mbh:Passage a owl:Class ; rdfs:comment "An exact source excerpt with chapter anchor if recovered; an absent anchor stays absent." .
+mbh:Telling a owl:Class ; rdfs:comment "A narration or speech frame with speaker, audience and diegetic context where recoverable." .
+mbh:Assertion a owl:Class ; rdfs:comment "A recorded extraction claim. This class alone does not mean independently verified." .
+mbh:Proposal a owl:Class ; rdfs:comment "An unverified, scored candidate kept outside the asserted graph." .
+
+mbh:occurredAt a owl:ObjectProperty ; rdfs:domain mbh:Event ; rdfs:range mbh:Place ; rdfs:comment "The location of the particular event account, when the source supports that binding." .
+mbh:hasParticipant a owl:ObjectProperty ; rdfs:domain mbh:Event ; rdfs:range mbh:Agent ; rdfs:comment "An actor explicitly involved in the described event, not merely mentioned nearby." .
+mbh:hasTopic a owl:ObjectProperty ; rdfs:domain mbh:Event ; rdfs:range mbh:Concept ; rdfs:comment "A concept indexing the event account; this does not identify separate events with each other." .
+mbh:sourcePassage a owl:ObjectProperty ; rdfs:range mbh:Passage .
+mbh:CelestialBody a owl:Class ; rdfs:subClassOf mbh:Entity ; rdfs:label "Celestial body" ; rdfs:comment "A star, planet, lunar mansion or other celestial referent. A celestial label does not by itself establish deity identity." .
+mbh:hasBiologicalParent a owl:ObjectProperty ; rdfs:domain mbh:Agent ; rdfs:range mbh:Agent .
+mbh:hasLegalParent a owl:ObjectProperty ; rdfs:domain mbh:Agent ; rdfs:range mbh:Agent .
+mbh:hasFosterParent a owl:ObjectProperty ; rdfs:domain mbh:Agent ; rdfs:range mbh:Agent .
+mbh:hasDivineProgenitor a owl:ObjectProperty ; rdfs:domain mbh:Agent ; rdfs:range mbh:Agent .
+mbh:bornTo a owl:ObjectProperty ; rdfs:domain mbh:Agent ; rdfs:range mbh:Agent ; rdfs:comment "Generic parentage; biological, legal or foster kind is unspecified." .
+mbh:hasSpouse a owl:ObjectProperty, owl:SymmetricProperty ; rdfs:domain mbh:Agent ; rdfs:range mbh:Agent .
+mbh:foughtWith a owl:ObjectProperty, owl:SymmetricProperty ; rdfs:domain mbh:Agent ; rdfs:range mbh:Agent .
+mbh:slainBy a owl:ObjectProperty ; rdfs:comment "Victim to attributed slayer in the source account; preserve speaker and unresolved appellations." .
+mbh:defeatedBy a owl:ObjectProperty .
+mbh:cursedBy a owl:ObjectProperty .
+mbh:instructedBy a owl:ObjectProperty .
+mbh:speaksTo a owl:ObjectProperty .
+mbh:rules a owl:ObjectProperty ; rdfs:range mbh:Place .
+mbh:isAlliedWith a owl:ObjectProperty, owl:SymmetricProperty .
+mbh:isEnemyOf a owl:ObjectProperty, owl:SymmetricProperty .
+mbh:isAmshaOf a owl:ObjectProperty ; rdfs:comment "A portion/incarnation relationship, never owl:sameAs." .
+mbh:rebornAs a owl:ObjectProperty .

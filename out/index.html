@@ -1,378 +1,45 @@
 <!doctype html>
-<meta charset="utf-8">
-<title>Mahabharata knowledge graph embedding</title>
-<script src="projection.js"></script>
-<style>
- :root{--ink:#20201d;--dim:#6b6660;--rule:#ddd8cf;--bg:#fbfaf7;--card:#fff}
- *{box-sizing:border-box}
- body{font:14px/1.55 Georgia,serif;margin:0;color:var(--ink);background:var(--bg)}
- header{padding:12px 18px 10px;border-bottom:1px solid var(--rule)}
- h1{font-size:19px;margin:0;display:inline}
- .stats{color:var(--dim);font-size:12px;margin-left:10px;letter-spacing:.03em}
- .warn{background:#fff4d6;border:1px solid #e0c98a;padding:7px 10px;margin:8px 0;font-size:12.5px}
- .bar{display:flex;gap:8px;margin-top:8px}
- #q{flex:1;padding:9px 11px;font:14px Georgia,serif;border:1px solid #bbb5ab;background:#fff}
- button{padding:9px 16px;font:14px Georgia,serif;border:1px solid #444;background:#20201d;color:#fff;cursor:pointer}
- .chips{margin-top:7px;display:flex;flex-wrap:wrap;gap:5px}
- .chip{font-size:12px;border:1px solid var(--rule);background:#fff;padding:2px 8px;cursor:pointer;color:#3a3a36}
- .chip:hover{background:#f1eee7}
- #msg{color:#a33;font-size:13px;min-height:18px;margin-top:5px}
- main{display:flex;gap:12px;padding:12px 18px;align-items:stretch}
- .pane{border:1px solid var(--rule);background:var(--card);min-width:0;display:flex;flex-direction:column}
- .pane h2{font-size:11.5px;margin:0;padding:6px 10px;background:#f2f0ea;border-bottom:1px solid var(--rule);
-   font-weight:normal;letter-spacing:.09em;text-transform:uppercase;color:#54504a}
- #left{flex:1.55}
- #right{flex:1;max-width:460px}
- #gwrap{overflow:auto;flex:1}
- .body{padding:10px 12px;overflow:auto;flex:1;font-size:13px}
- .ent{font:17px "Courier New",monospace;letter-spacing:.02em}
- .kind{color:var(--dim);font-size:12px}
- .grp{margin-top:11px;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#54504a;
-   border-top:1px solid #eee;padding-top:7px}
- .grp i{display:inline-block;width:8px;height:8px;margin-right:5px;font-style:normal}
- .row{margin:3px 0}
- .row b{font-weight:normal;color:var(--dim)}
- section{padding:0 18px 26px;display:flex;gap:12px;align-items:flex-start}
- #sc{flex:1;max-width:520px}
- #tab{flex:1.3;min-width:0}
- canvas{display:block;background:#fff;cursor:grab}
- table{border-collapse:collapse;width:100%;font-size:12.5px;background:#fff}
- th,td{border:1px solid var(--rule);padding:3px 7px;text-align:left;vertical-align:top}
- th{background:#f2f0ea;font-weight:normal;letter-spacing:.03em}
- .tag{font-size:10px;background:#eee;border:1px solid #ccc;padding:0 4px;margin-right:3px;white-space:nowrap}
- .tag.p{background:#e7eefc;border-color:#a9bfe8}
- .tag.u{background:#f6e7e7;border-color:#e0b3b3}
- .tag.a{background:#e6f3e6;border-color:#a8ccA8}
- .ev{color:var(--dim);font-size:11.5px}
- a{color:#0645ad;cursor:pointer;text-decoration:none}
- a:hover{text-decoration:underline}
- .foot{color:var(--dim);font-size:11.5px;padding:0 18px 22px}
-</style>
-<header>
- <h1>Mahabharata knowledge graph embedding</h1><span class="stats" id="stats"></span>
- <div class="warn"><b>Below the Phase 6 entry gate.</b> Trained on <span id="ntrip"></span>
-  against a stated floor of 10,000, on explicit instruction. Nothing here is a result about
-  the Mahabharata. Rows marked <span class="tag a">asserted</span> come from the text and
-  carry a passage. Rows marked <span class="tag p">predicted</span> are model hypotheses.</div>
- <div class="bar"><input id="q" placeholder="Ask a question, or type a name" autofocus><button onclick="run(document.getElementById('q').value)">Answer</button></div>
- <div class="chips" id="chips"></div>
- <div id="msg"></div>
-</header>
-<main>
- <div class="pane" id="left"><h2>Graph neighbourhood, asserted edges only</h2><div id="gwrap"><svg id="g"></svg></div></div>
- <div class="pane" id="right"><h2 id="ph">Entity</h2><div class="body" id="panel"></div></div>
-</main>
-<section>
- <div class="pane" id="sc"><h2>Embedding, UMAP 3D. Drag to rotate</h2><canvas id="c" width="520" height="420"></canvas></div>
- <div class="pane" id="tab"><h2 id="rh">Results</h2><div class="body" style="padding:0"><table id="res"></table></div></div>
-</section>
-<p class="foot" id="foot"></p>
-<script>
-const K=window.KG, N=K.entities.length, D=K.dim, H=D/2;
-const E=Float32Array.from(K.emb), R=Float32Array.from(K.rel_emb);
-const id={}; K.entities.forEach((n,i)=>id[n.toLowerCase()]=i);
-const rid={}; K.relations.forEach((n,i)=>rid[n.toLowerCase()]=i);
-// edge: [s, rel, o, citation, support, cited, evidence, confidence, depth]
-const adj={}; K.edges.forEach(e=>{(adj[e[0]]=adj[e[0]]||[]).push([e,1]);(adj[e[2]]=adj[e[2]]||[]).push([e,-1]);});
-const COL=['#c0392b','#2980b9','#27ae60','#8e44ad','#d35400','#16a085','#7f8c8d','#b7950b'];
-
-// Predicate groups, purely for reading order in the panel. Names as written.
-const GROUP=[['kinship','#2f6b3a',['hasBiologicalParent','hasSpouse']],
-             ['conflict','#a03232',['foughtWith','slainBy','defeatedBy']],
-             ['rule and tutelage','#1f5d86',['rules','instructedBy']],
-             ['divine and fated','#6b3f8e',['cursedBy']],
-             ['the telling','#8a6d1f',['speaksTo']]];
-const WORDS={hasBiologicalParent:['parent','child'],hasSpouse:['spouse','spouse'],
- foughtWith:['fought','fought'],slainBy:['slain by','slew'],defeatedBy:['defeated by','defeated'],
- rules:['rules','ruled by'],instructedBy:['instructed by','instructed'],cursedBy:['cursed by','cursed'],
- speaksTo:['speaks to','spoken to by']};
-const SYM={foughtWith:1,hasSpouse:1};
-
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-function vec(i){return E.subarray(i*D,(i+1)*D);}
-function cos(a,b){let d=0,x=0,y=0;for(let i=0;i<D;i++){d+=a[i]*b[i];x+=a[i]*a[i];y+=b[i]*b[i];}return d/(Math.sqrt(x*y)+1e-9);}
-// RotatE: score = -|| h o r - t ||, complex product, stored [re,im,re,im,...]
-function rotate(h,r){const o=new Float32Array(D);
- for(let k=0;k<H;k++){const a=h[2*k],b=h[2*k+1],c=r[2*k],d=r[2*k+1];o[2*k]=a*c-b*d;o[2*k+1]=a*d+b*c;}return o;}
-function dist(a,b){let s=0;for(let i=0;i<D;i++){const d=a[i]-b[i];s+=d*d;}return Math.sqrt(s);}
-function score(h,ri,t){return -dist(rotate(vec(h),R.subarray(ri*D,(ri+1)*D)),vec(t));}
-function nearest(v,skip,n){const out=[];for(let i=0;i<N;i++){if(i===skip)continue;out.push([i,cos(v,vec(i))]);}
- return out.sort((a,b)=>b[1]-a[1]).slice(0,n);}
-function link(i){return '<a onclick="run(K.entities['+i+'])">'+esc(K.entities[i])+'</a>';}
-function resolve(t){const i=id[String(t).trim().toLowerCase()];return i===undefined?null:i;}
-function table(head,rows){document.getElementById('res').innerHTML=
- '<tr>'+head.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+(rows.join('')||'<tr><td colspan=9>Nothing to show.</td></tr>');}
-function msg(t){document.getElementById('msg').innerHTML=t;}
-
-/* ---------- natural language ---------- */
-// Pattern list. Each entry: regex, which capture group holds the name, the
-// predicate, and whether the name sits in the subject slot ('s') or the
-// object slot ('o'). No model does this parsing, it is a lookup table, and an
-// unmatched question says so rather than guessing.
-const NL=[
- [/^who (?:killed|slew|slayed|slays|kills) (.+)$/,1,'slainBy','s'],
- [/^who (?:did|does) (.+?) (?:kill|slay)\??$/,1,'slainBy','o'],
- [/^who (?:is|was) (.+?)(?:'s|s')? (?:killer|slayer)$/,1,'slainBy','s'],
- [/^who (?:fought|battled|fights|fought against|fought with) (?:with )?(.+)$/,1,'foughtWith','s'],
- [/^who (?:are|were) (.+?)(?:'s|s')? (?:enemies|opponents|foes)$/,1,'foughtWith','s'],
- [/^who defeated (.+)$/,1,'defeatedBy','s'],
- [/^who(?:m)? did (.+?) defeat\??$/,1,'defeatedBy','o'],
- [/^who (?:is|are|was|were) (?:the )?(?:father|mother|parents?) of (.+)$/,1,'hasBiologicalParent','s'],
- [/^who (?:is|are|was|were) (.+?)(?:'s|s')? (?:father|mother|parents?)$/,1,'hasBiologicalParent','s'],
- [/^who (?:are|is|were) (?:the )?(?:children|sons?|daughters?) of (.+)$/,1,'hasBiologicalParent','o'],
- [/^who (?:are|is|were) (.+?)(?:'s|s')? (?:children|sons?|daughters?)$/,1,'hasBiologicalParent','o'],
- [/^who (?:is|was) (.+?) married to\??$/,1,'hasSpouse','s'],
- [/^who (?:is|are|was|were) (?:the )?(?:wife|husband|spouse|wives|spouses) of (.+)$/,1,'hasSpouse','s'],
- [/^who (?:is|are|was|were) (.+?)(?:'s|s')? (?:wife|husband|spouse|wives)$/,1,'hasSpouse','s'],
- [/^who (?:does|did) (.+?) (?:speak|talk) to\??$/,1,'speaksTo','s'],
- [/^who speaks to (.+)$/,1,'speaksTo','o'],
- [/^who(?:m)? (?:does|did) (.+?) address\??$/,1,'speaksTo','s'],
- [/^who rules (.+)$/,1,'rules','o'],
- [/^what (?:does|did) (.+?) rule\??$/,1,'rules','s'],
- [/^who (?:taught|instructed|trained) (.+)$/,1,'instructedBy','s'],
- [/^who (?:did|does) (.+?) (?:study|train) under\??$/,1,'instructedBy','s'],
- [/^who studied under (.+)$/,1,'instructedBy','o'],
- [/^who cursed (.+)$/,1,'cursedBy','s'],
- [/^who(?:m)? did (.+?) curse\??$/,1,'cursedBy','o'],
- [/^who (?:is|are) (?:like|similar to|closest to|near) (.+)$/,1,'~',''],
- [/^(?:who|what) (?:is|was) (.+)$/,1,'',''],
- [/^tell me about (.+)$/,1,'',''],
-];
-const CHIPS=['who killed Karna','who are Bhishma\'s enemies','who is Arjuna\'s father',
- 'who are Dhritarashtra\'s children','who does Krishna speak to','who studied under Drona',
- 'who rules Madra','who is like Karna','who is Droupadi','Arjuna - Kunti + Gandhari','Duryodhana foughtWith ?'];
-
-function parse(q){
- const s=q.trim().replace(/[’‘]/g,"'").replace(/\s+/g,' ').replace(/[?.!]+$/,'').toLowerCase();
- for(const [re,g,p,slot] of NL){const m=s.match(re); if(!m)continue;
-  const i=resolve(m[g]); if(i===null)continue;      // try a later pattern first
-  return {e:i,p:p,slot:slot};}
- return null;
-}
-
-/* ---------- the three modes ---------- */
-function run(qs){
- const q=(qs||'').trim(); if(!q)return;
- document.getElementById('q').value=q; msg('');
- if(/[+\-]/.test(q)&&!q.includes('?')) return analogy(q);
- if(q.includes('?')&&/\s/.test(q.replace(/\?/g,' ').trim())&&q.split(/\s+/).length===3) return triple(q);
- const direct=resolve(q); if(direct!==null) return profile(direct);
- const p=parse(q);
- if(!p) return fail(q);
- if(p.p==='') return profile(p.e);
- if(p.p==='~') return neighbours(p.e);
- return question(p.e,p.p,p.slot,q);
-}
-
-function question(e,pred,slot,q){
- const r=rid[pred.toLowerCase()], sym=SYM[pred];
- // slot 's' means the named entity is the subject and we rank tails.
- const tailQ=(slot==='s');
- const asserted=[];
- (adj[e]||[]).forEach(([ed,dir])=>{
-  if(ed[1]!==r)return;
-  const outgoing=dir>0;
-  if(!sym&&outgoing!==tailQ)return;
-  asserted.push([outgoing?ed[2]:ed[0],ed]);});
- const seen=new Set(asserted.map(a=>a[0]));
- const pred_rows=[];
- for(let i=0;i<N;i++){if(i===e||seen.has(i))continue;
-  pred_rows.push([i,tailQ?score(e,r,i):score(i,r,e)]);}
- pred_rows.sort((a,b)=>b[1]-a[1]);
- const w=WORDS[pred][tailQ?0:1];
- document.getElementById('rh').textContent=
-  esc(K.entities[e])+' '+w+' : '+asserted.length+' asserted, then the model’s ranking';
- const rows=asserted.map(([j,ed])=>'<tr><td>&mdash;</td><td>'+link(j)+'</td><td>'+
-   (ed[5]?esc(ed[3]):'<span class="tag u">uncited</span>')+'</td><td><span class="tag a">asserted</span> '+
-   ed[4]+' sentence'+(ed[4]>1?'s':'')+', conf '+ed[7]+
-   '<div class="ev">'+esc(ed[6])+'</div></td></tr>')
-  .concat(pred_rows.slice(0,12).map(([j,s],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+
-   '</td><td>'+s.toFixed(3)+'</td><td><span class="tag p">predicted</span><span class="tag u">uncited</span></td></tr>'));
- table(['rank','entity','citation / score','status'],rows);
- focusOn(e,asserted.map(a=>a[0]).concat(pred_rows.slice(0,8).map(r=>r[0])));
-}
-
-function neighbours(i){
- const nn=nearest(vec(i),i,15), gn=new Set((adj[i]||[]).map(([e,d])=>d>0?e[2]:e[0]));
- document.getElementById('rh').textContent='Nearest neighbours of '+K.entities[i]+' in vector space, cosine';
- table(['rank','entity','cosine','also a graph neighbour'],
-  nn.map(([j,c],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+'</td><td>'+c.toFixed(4)+'</td><td>'+
-   (gn.has(j)?'yes':'no')+'</td></tr>'));
- focusOn(i,nn.map(r=>r[0]));
-}
-function profile(i){neighbours(i);}
-
-function triple(q){
- const p=q.replace(/[(),]/g,' ').split(/\s+/).filter(Boolean);
- const r=rid[p[1].toLowerCase()];
- if(r===undefined) return msg('Unknown relation "'+esc(p[1])+'". Known: '+K.relations.join(', '));
- const tailQ=p[2]==='?', e=tailQ?resolve(p[0]):resolve(p[2]);
- if(e===null) return fail(tailQ?p[0]:p[2]);
- return question(e,K.relations[r],tailQ?'s':'o',q);
-}
-
-function analogy(q){
- const terms=q.replace(/\s*([+\-])\s*/g,' $1 ').split(/\s+/).filter(Boolean);
- const v=new Float32Array(D); let sign=1, used=[], ok=true;
- terms.forEach(t=>{if(t==='+'){sign=1;return;} if(t==='-'){sign=-1;return;}
-  const i=resolve(t); if(i===null){fail(t);ok=false;return;}
-  used.push(i); const e=vec(i); for(let k=0;k<D;k++)v[k]+=sign*e[k]; sign=1;});
- if(!ok)return;
- const nn=nearest(v,-1,25).filter(([j])=>!used.includes(j)).slice(0,15);
- document.getElementById('rh').textContent='Analogy by vector arithmetic, cosine to the result vector';
- table(['rank','entity','cosine','status'],
-  nn.map(([j,c],n)=>'<tr><td>'+(n+1)+'</td><td>'+link(j)+'</td><td>'+c.toFixed(4)+
-   '</td><td><span class="tag p">predicted</span><span class="tag u">uncited</span></td></tr>'));
- focusOn(used[0],used.concat(nn.slice(0,8).map(r=>r[0])));
-}
-
-function fail(t){const l=String(t).toLowerCase().replace(/^(who|what|where) /,'');
- const key=l.split(/\s+/).filter(w=>w.length>2).pop()||l;
- const near=K.entities.filter(n=>n.toLowerCase().startsWith(key.slice(0,3))).slice(0,8);
- msg('Not understood, or not in the graph: "'+esc(t)+'". The parser is a fixed pattern list over nine predicates, not a language model.'+
-  (near.length?'<br>Did you mean: '+near.map(n=>'<a onclick="run(\''+n+'\')">'+n+'</a>').join(', ')+'?':''));}
-
-/* ---------- panels ---------- */
-function focusOn(i,hi){focus=i;drawGraph(i);drawPanel(i);hilite=hi||[];draw3d();}
-let focus=0, hilite=[];
-
-function edgesOf(i){const seen={},out=[];
- (adj[i]||[]).forEach(([e,dir])=>{const other=dir>0?e[2]:e[0], k=e[1]+':'+other+':'+(SYM[K.relations[e[1]]]?0:dir);
-  if(seen[k])return; seen[k]=1; out.push([e,dir,other]);});
- return out;}
-
-// Fan layout: incoming edges left, outgoing right, grouped by predicate, the
-// focus in a box in the middle. Curves rather than straight lines only because
-// thirty labels on straight spokes overlap.
-function drawGraph(f){
- const svg=document.getElementById('g'), W=Math.max(560,document.getElementById('gwrap').clientWidth-4);
- const es=edgesOf(f), CAP=17;
- const side={'-1':[], '1':[]};
- es.forEach(t=>side[SYM[K.relations[t[0][1]]]?1:t[1]].push(t));
- const order=t=>K.relations[t[0][1]];
- side[1].sort((a,b)=>order(a).localeCompare(order(b)));
- side[-1].sort((a,b)=>order(a).localeCompare(order(b)));
- const L=side[-1].slice(0,CAP), Rt=side[1].slice(0,CAP);
- const rows=Math.max(L.length,Rt.length,1), Hh=Math.max(300,rows*26+40), mid=Hh/2;
- const cx=W/2, boxw=170;
- let s='', lab='';
- function column(list,dirLeft){
-  const x=dirLeft?150:W-150, n=list.length, top=mid-(n-1)*13;
-  let prev='';
-  list.forEach(([e,dir,other],k)=>{
-   const y=top+k*26, c=COL[K.cluster[other]%8];
-   const ax=dirLeft?x+34:x-34, bx=dirLeft?cx-boxw/2:cx+boxw/2;
-   s+='<path d="M'+ax+' '+y+' C'+((ax+bx)/2)+' '+y+' '+((ax+bx)/2)+' '+mid+' '+bx+' '+mid+
-      '" fill="none" stroke="'+c+'" stroke-opacity=".55"/>';
-   const name=K.entities[other], tw=Math.max(52,name.length*7.4+12);
-   s+='<rect x="'+(dirLeft?x+34-tw:x-34)+'" y="'+(y-11)+'" width="'+tw+'" height="21" fill="#fff" stroke="#ccc"/>';
-   s+='<text x="'+(dirLeft?x+28-tw+6:x-28)+'" y="'+(y+4)+'" font-family="Courier New" font-size="12">'+
-      '<tspan onclick="run(K.entities['+other+'])" style="cursor:pointer;fill:#0645ad">'+esc(name)+'</tspan></text>';
-   const w=WORDS[K.relations[e[1]]][dir>0?0:1];
-   if(w!==prev){prev=w;
-    lab+='<text x="'+(dirLeft?14:W-14)+'" y="'+(y+4)+'" font-size="10.5" fill="#54504a" letter-spacing="1" '+
-         'text-anchor="'+(dirLeft?'start':'end')+'">'+w.toUpperCase()+'</text>';}
-   // An edge with no chapter anchor says so on the drawing. It used to emit an
-   // empty label, so parva-level edges looked exactly like cited ones.
-   if(!e[5])s+='<text x="'+(dirLeft?x+38:x-40)+'" y="'+(y+4)+'" font-size="9" fill="#b06" '+
-      'text-anchor="'+(dirLeft?'start':'end')+'">uncited</text>';
-  });
- }
- column(L,true); column(Rt,false);
- s+='<rect x="'+(cx-boxw/2)+'" y="'+(mid-21)+'" width="'+boxw+'" height="42" fill="#20201d"/>';
- s+='<text x="'+cx+'" y="'+(mid-2)+'" text-anchor="middle" fill="#fff" font-family="Courier New" font-size="15">'+esc(K.entities[f])+'</text>';
- s+='<text x="'+cx+'" y="'+(mid+13)+'" text-anchor="middle" fill="#9a958d" font-size="10">'+
-    es.length+' asserted edge'+(es.length===1?'':'s')+'</text>';
- svg.setAttribute('width',W); svg.setAttribute('height',Hh);
- svg.innerHTML=s+lab;
- const cited=es.filter(t=>t[0][5]).length;
- document.getElementById('foot').textContent=
-  'Focus '+K.entities[f]+'. '+es.length+' distinct asserted edges, '+cited+' carry a chapter citation, '+
-  (es.length-cited)+' anchor at parva level only. '+(es.length>CAP?'Each side of the fan shows at most '+CAP+'. ':'')+
-  'RotatE, dim '+H+' complex, training seed '+K.train_seed+', UMAP seed '+K.umap_seed+'.';
-}
-
-function drawPanel(f){
- const name=K.entities[f], m=K.meta[name]||{}, es=edgesOf(f);
- document.getElementById('ph').textContent='Entity';
- let h='<div class="ent">'+esc(name)+'</div><div class="kind">'+
-  (m.mentions?m.mentions.toLocaleString()+' mentions in the corpus':'no counted mentions')+
-  (m.tells?' · narrates '+m.tells+' tellings':'')+
-  ' · degree '+es.length+' · cluster '+K.cluster[f]+'</div>';
- const al=K.alias[name];
- if(al&&al.length){h+='<div class="grp"><i style="background:#8a6d1f"></i>appellation candidates, unresolved</div>';
-  h+='<div class="row">'+al.slice(0,8).map(a=>esc(a[0])+' <b>'+a[1].toFixed(2)+', '+a[2]+
-   ' sighting'+(a[2]===1?'':'s')+', '+esc(a[3])+'</b>').join('<br>')+'</div>';
-  h+='<div class="ev">Candidate set from apposition in Phase 2. Not merged, not asserted. '+
-     'A genuinely ambiguous referent keeps its set.</div>';}
- GROUP.forEach(([label,colour,preds])=>{
-  const rows=[];
-  preds.forEach(p=>{const r=rid[p.toLowerCase()]; if(r===undefined)return;
-   [1,-1].forEach(dirWanted=>{
-    const hits=es.filter(([e,dir])=>e[1]===r&&(SYM[p]?dirWanted===1:dir===dirWanted));
-    if(!hits.length)return;
-    const w=WORDS[p][dirWanted>0?0:1];
-    const cited=hits.filter(t=>t[0][5]);
-    rows.push('<div class="row">'+w+' '+hits.slice(0,14).map(t=>link(t[2])).join(', ')+
-     (hits.length>14?' <b>and '+(hits.length-14)+' more</b>':'')+
-     ' <span class="tag'+(cited.length?'':' u')+'">'+(cited.length?cited.length+' cited':'uncited')+'</span></div>');});});
-  if(rows.length)h+='<div class="grp"><i style="background:'+colour+'"></i>'+label+'</div>'+rows.join('');});
- const c=es.filter(t=>t[0][5]).slice(0,2);
- if(c.length)h+='<div class="grp">first passages</div>'+c.map(t=>
-  '<div class="row"><b>'+esc(t[0][3])+'</b><div class="ev">'+esc(t[0][6])+'</div></div>').join('');
- document.getElementById('panel').innerHTML=h;
-}
-
-/* ---------- 3D scatter ---------- */
-// Hand-rolled projection. A 3D library would be a dependency for one scatter
-// plot; this is a rotation matrix and a painter's-algorithm sort.
-let ry=0.6, rx=-0.35, drag=null;
-const cv=document.getElementById('c');
-cv.addEventListener('mousedown',e=>{drag=[e.clientX,e.clientY,ry,rx];cv.style.cursor='grabbing';});
-addEventListener('mouseup',()=>{drag=null;cv.style.cursor='grab';});
-addEventListener('mousemove',e=>{if(!drag)return;
- ry=drag[2]+(e.clientX-drag[0])*.008; rx=drag[3]+(e.clientY-drag[1])*.008; draw3d();});
-cv.addEventListener('click',e=>{const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
- let best=null,bd=14;
- pts().forEach(p=>{const d=Math.hypot(p.x-mx,p.y-my); if(d<bd){bd=d;best=p.i;}});
- if(best!==null)run(K.entities[best]);});
-
-function pts(){const W=cv.width,Hh=cv.height,cs=Math.cos(ry),sn=Math.sin(ry),cp=Math.cos(rx),sp=Math.sin(rx);
- const out=[];
- for(let i=0;i<N;i++){const p=K.xyz[i],X=p[0]-.5,Y=p[1]-.5,Z=p[2]-.5;
-  const x1=X*cs-Z*sn, z1=X*sn+Z*cs, y1=Y*cp-z1*sp, z2=Y*sp+z1*cp;
-  const k=1/(2.0-z2)*Hh*1.5;
-  out.push({i:i,x:W/2+x1*k,y:Hh/2+y1*k,z:z2});}
- return out;}
-
-function draw3d(){
- const x=cv.getContext('2d'),W=cv.width,Hh=cv.height;
- x.clearRect(0,0,W,Hh);
- const hs=new Set(hilite), P=pts().sort((a,b)=>a.z-b.z);
- P.forEach(p=>{const on=hs.has(p.i)||p.i===focus;
-  x.globalAlpha=on?1:.2+.35*(p.z+.5);
-  x.fillStyle=p.i===focus?'#c0392b':(on?'#20201d':COL[K.cluster[p.i]%8]);
-  x.beginPath(); x.arc(p.x,p.y,p.i===focus?6:(on?3.4:1.6+1.4*(p.z+.5)),0,7); x.fill();});
- x.globalAlpha=1; x.fillStyle='#20201d'; x.font='11px Georgia';
- P.filter(p=>hs.has(p.i)).slice(-14).forEach(p=>x.fillText(K.entities[p.i],p.x+5,p.y-4));
- const f=P.find(p=>p.i===focus);
- if(f){x.fillStyle='#c0392b';x.font='bold 13px Georgia';x.fillText(K.entities[focus],f.x+8,f.y-6);}
- x.fillStyle='#6b6660';x.font='10px Georgia';
- x.fillText('UMAP 3D, cosine, seed '+K.umap_seed+'. Colour is k-means k=8 on the vectors, not a faction label.',8,Hh-8);
-}
-
-/* ---------- boot ---------- */
-// The banner names what the model saw, which is not the asserted count: symmetric
-// pairs are deduplicated before the split, so K.edges.length is larger than n_trained.
-document.getElementById('ntrip').textContent=
- K.n_trained.toLocaleString()+' of '+K.n_asserted.toLocaleString()+' asserted triples ('+
- K.sym_removed+' removed as symmetric duplicates)';
-document.getElementById('stats').textContent=
- N.toLocaleString()+' entities · '+K.edges.length.toLocaleString()+' asserted relations · '+
- K.relations.length+' predicates · RotatE '+H+'d complex';
-document.getElementById('chips').innerHTML=
- CHIPS.map(c=>'<span class="chip" onclick="run(this.textContent)">'+esc(c)+'</span>').join('');
-document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')run(e.target.value);});
-addEventListener('resize',()=>drawGraph(focus));
-run('Karna');
-</script>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mahabharata | Graph & vector explorer</title>
+<link rel="stylesheet" href="explorer.css">
+<link rel="stylesheet" href="semantic.css">
+<link rel="stylesheet" href="chat.css">
+<script defer src="projection.js"></script><script defer src="evidence.js"></script>
+<script defer src="vendor/viewer-lib.js"></script><script defer src="kg-core.js"></script><script defer src="explorer.js"></script>
+<script defer src="semantic.js"></script>
+<script defer src="chat.js"></script>
+</head><body>
+<header class="topbar"><a class="wordmark" href="index.html">Mahabharata<span>KNOWLEDGE EXPLORER</span></a><div class="top-stats" id="stats"></div><button class="model-button" id="model-info" aria-label="Model details: below entry gate"><span class="status-dot"></span>Below-gate model<i data-lucide="info"></i></button></header>
+<section class="query-band" aria-label="Query the knowledge graph">
+<div class="search-modes segmented" role="group" aria-label="Knowledge space"><button id="mode-semantic" type="button" aria-pressed="false"><i data-lucide="book-open"></i>Text &amp; concepts</button><button id="mode-graph" type="button" aria-pressed="true"><i data-lucide="network"></i>Graph model</button><button id="mode-chat" type="button" aria-pressed="false" hidden><i data-lucide="message-circle"></i>Ask</button></div>
+<form id="query-form" class="query-form"><i data-lucide="search"></i><input id="q" autocomplete="off" spellcheck="false" aria-label="Ask about the Mahabharata" placeholder="Who fought Bhishma? Ask a question or explore a character..."><button class="primary" type="submit">Explore<i data-lucide="arrow-right"></i></button></form>
+<div class="examples"><span>Explore</span><button data-query="Who taught Karna?">Who taught Karna?</button><button data-query="How is Karna related to Arjuna?">Karna &amp; Arjuna</button><button data-query="Who fought Bhishma?">Who fought Bhishma?</button><button data-query="Who is like Karna?">Similar to Karna</button><button data-query="Arjuna - Kunti + Gandhari">Arjuna &minus; Kunti + Gandhari</button></div><div id="message" role="status" aria-live="polite"></div></section>
+<main id="semantic-workspace" hidden aria-label="Cited semantic explorer">
+<div class="semantic-status"><span id="semantic-status" role="status" aria-live="polite">Local semantic service unavailable.</span><details id="semantic-about"><summary>Index details</summary><div id="semantic-provenance"></div></details></div>
+<div class="semantic-toolbar"><div id="semantic-classes" role="group" aria-label="Ontology class filter"></div><button id="semantic-ontology" class="quiet-button"><i data-lucide="layers"></i>Ontology</button></div>
+<div class="semantic-layout">
+<section class="semantic-results" aria-label="Semantic search results"><div class="surface-head"><h2 id="semantic-result-heading">Search results</h2></div><div class="semantic-tabs" role="tablist" aria-label="Retrieved material"><button data-sem-tab="nodes" role="tab" aria-selected="true">Nodes</button><button data-sem-tab="passages" role="tab" aria-selected="false">Passages</button></div><div id="semantic-results" aria-live="polite"></div></section>
+<section class="semantic-space" aria-label="Text embedding space"><div class="surface-head"><h2><i data-lucide="box"></i>Semantic space</h2><div class="segmented" role="group" aria-label="Semantic projection dimensions"><button id="semantic-3d" aria-pressed="true">3D</button><button id="semantic-2d" aria-pressed="false">2D</button></div></div><div id="semantic-stage" tabindex="0" aria-label="Semantic UMAP scatter"><div class="scene-caption"><span id="semantic-projection-label">TEXT UMAP / 3D</span><span id="semantic-point-count"></span></div><div class="scene-tools"><button class="icon-button" id="semantic-fit" title="Fit all points" aria-label="Fit all points"><i data-lucide="maximize"></i></button><button class="icon-button" id="semantic-centre" title="Centre on selected node" aria-label="Centre on selected node"><i data-lucide="focus"></i></button><button class="icon-button" id="semantic-rotate" title="Auto-rotate" aria-label="Auto-rotate semantic map" aria-pressed="false"><i data-lucide="play"></i></button><button class="icon-button" id="semantic-plus" title="Zoom in" aria-label="Zoom in semantic map"><i data-lucide="plus"></i></button><button class="icon-button" id="semantic-minus" title="Zoom out" aria-label="Zoom out semantic map"><i data-lucide="minus"></i></button></div><div id="semantic-labels"></div><div id="semantic-tooltip" hidden></div></div><div class="semantic-map-footer"><span>Colour: candidate ontology class</span><span id="semantic-visible"></span></div></section>
+<aside class="semantic-inspector" aria-label="Node description and citations"><div id="semantic-inspector"><p class="muted">No node selected.</p></div></aside>
+</div></main>
+<main id="chat-workspace" hidden aria-label="Grounded question answering">
+<div class="chat-status"><span id="chat-status" role="status" aria-live="polite">Ask service unavailable.</span><span id="chat-remote" class="chat-remote" hidden></span></div>
+<div class="chat-layout">
+<section class="chat-thread" aria-label="Conversation"><div id="chat-log" aria-live="polite"></div></section>
+<aside class="chat-evidence" aria-label="Evidence behind the latest answer"><div class="surface-head"><h2><i data-lucide="file-text"></i>Evidence</h2></div><div class="chat-tabs" role="tablist" aria-label="Evidence type"><button data-chat-tab="facts" role="tab" aria-selected="true">Facts</button><button data-chat-tab="passages" role="tab" aria-selected="false">Passages</button><button data-chat-tab="names" role="tab" aria-selected="false">Names</button><button data-chat-tab="context" role="tab" aria-selected="false">Sent</button></div><div id="chat-evidence"><p class="chat-empty">Ask a question to see what an answer rests on.</p></div></aside>
+</div></main>
+<main class="workspace"><div class="exploration">
+<section id="answer" class="answer-band" aria-label="Answer and supporting passages" aria-live="polite" hidden></section>
+<div class="view-toolbar"><div id="families" class="families" role="group" aria-label="Filter relationship categories"></div><div class="segmented layout-modes" role="group" aria-label="Explorer layout"><button data-layout="both" aria-pressed="true" title="Graph and embedding space">Both</button><button data-layout="graph" aria-pressed="false"><i data-lucide="network"></i>Graph</button><button data-layout="space" aria-pressed="false"><i data-lucide="box"></i>Space</button></div></div>
+<div class="views" data-layout="both">
+<section class="graph-view" aria-label="Graph connections and source parentage"><div class="surface-head"><h2><i data-lucide="network"></i>Graph connections</h2><span class="small muted" id="graph-count"></span></div><div id="graph-container"><svg id="graph" role="img" aria-label="Graph neighbourhood of the selected entity"></svg></div><div class="graph-footer"><span><i class="legend-dot text-dot"></i>Extracted relation <span class="source-legend">&ndash; &ndash; Source parentage</span></span><button id="all-connections">View all<i data-lucide="arrow-up-right"></i></button></div></section>
+<section class="space-view" aria-label="Learned entity embedding"><div class="surface-head"><h2><i data-lucide="box"></i>Embedding space</h2><div class="segmented" role="group" aria-label="Projection dimensions"><button id="dim3" aria-pressed="true">3D</button><button id="dim2" aria-pressed="false">2D</button></div></div>
+<div id="stage" tabindex="0" aria-label="3D UMAP scatter. Drag to orbit, scroll to zoom, select a point to inspect."><div class="scene-caption"><span class="scene-tag" id="projection-label">UMAP / 3D</span><span id="point-count"></span></div><div class="scene-tools"><button id="reset-camera" class="icon-button" title="Fit all points" aria-label="Fit all points"><i data-lucide="maximize"></i></button><button id="focus-camera" class="icon-button" title="Centre on selected entity" aria-label="Centre on selected entity"><i data-lucide="focus"></i></button><button id="rotate" class="icon-button" title="Auto-rotate" aria-label="Auto-rotate" aria-pressed="false"><i data-lucide="play"></i></button><button id="zoom-in" class="icon-button" title="Zoom in" aria-label="Zoom in"><i data-lucide="plus"></i></button><button id="zoom-out" class="icon-button" title="Zoom out" aria-label="Zoom out"><i data-lucide="minus"></i></button><button id="scene-download" class="icon-button" title="Download projection image" aria-label="Download projection image"><i data-lucide="download"></i></button></div><div id="point-labels"></div><div id="point-tooltip" hidden></div><div class="scene-bottom"><label class="toggle"><input type="checkbox" id="show-labels" checked>Names</label><label class="toggle"><input type="checkbox" id="show-edges">Graph edges</label></div></div>
+<div class="cluster-bar"><span title="Eight K-means groups of the learned entity vectors">Vector clusters</span><div id="clusters" role="group" aria-label="Filter embedding clusters"></div><button id="all-clusters">All</button></div></section></div>
+<section class="results-view" aria-label="Query results"><div class="results-title"><div><p class="eyebrow" id="result-kind">VECTOR SIMILARITY</p><h2 id="result-title">Near Karna</h2></div><button id="export-results" class="quiet-button"><i data-lucide="download"></i>Export results</button></div><div class="result-toolbar"><div class="result-tabs" role="tablist" aria-label="Result mode"><button id="tab-similar" role="tab" aria-selected="true">Similar entities</button><button id="tab-connections" role="tab" aria-selected="false">Text relations</button><button id="tab-predictions" role="tab" aria-selected="false">Link predictions</button></div><div id="prediction-options" hidden><select id="prediction-relation" aria-label="Prediction relation"></select><label class="toggle"><input type="checkbox" id="novel-only" checked>New links only</label></div></div><p id="result-note" class="result-note"></p><div id="result-table-wrap"><table><thead id="result-head"></thead><tbody id="results"></tbody></table></div><div class="results-footer"><span id="results-count"></span><button id="more-results" class="quiet-button">Show more<i data-lucide="chevron-down"></i></button></div></section></div>
+<aside class="inspector" aria-label="Entity information"><div class="inspector-heading"><p class="eyebrow">ENTITY PROFILE</p><span class="cluster-key" id="entity-cluster"></span><h1 id="entity-name">Karna</h1><p id="entity-description"></p><div class="entity-metrics" id="entity-metrics"></div></div><div class="inspector-tabs" role="tablist" aria-label="Entity details"><button data-detail="relations" role="tab" aria-selected="true">Relations</button><button data-detail="evidence" role="tab" aria-selected="false">Evidence</button><button data-detail="aliases" role="tab" aria-selected="false">Names</button></div><div id="detail-panel"></div></aside>
+</main><footer class="page-footer"><span>Debroy translation &middot; BORI critical edition</span><span id="run-info"></span><span class="muted">Predicted links are uncited hypotheses.</span></footer>
+<dialog id="model-dialog"><div class="dialog-head"><h2>Model &amp; provenance</h2><button id="close-model" class="icon-button" aria-label="Close model details"><i data-lucide="x"></i></button></div><div id="model-details"></div><p class="muted small">The embedding is below the project's entry gate. Predictions and similarities are exploratory. A model score is not a probability.</p><a href="eval.md">Full evaluation report<i data-lucide="external-link"></i></a></dialog>
+<noscript>JavaScript is required to load the local graph and score its vectors.</noscript>
+</body></html>

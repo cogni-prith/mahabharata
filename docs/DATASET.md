@@ -273,7 +273,7 @@ Searched for Devanagari (U+0900 to U+097F) and IAST diacritics across every CSV,
 `TheMahabharata.pdf`, `parva_pdfs/06_Bhishma.pdf` and
 `parva_pdfs/frontmatter.pdf`. Zero Devanagari and zero IAST in any corpus or
 source file. The only hits are inside `.venv` (spaCy's own language data) and
-two incidental diacritics in `2.py` and `7.py`.
+two incidental diacritics in `ner/compare_four_models.py` and `ner/pipeline_zero_training.py`.
 
 No normalization pass is needed, because there is no Sanskrit to normalize.
 This answers open question 2 and forces a change to Phase 4: the verb-triggered

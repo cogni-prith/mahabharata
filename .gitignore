@@ -42,3 +42,7 @@ node_modules/
 
 # Editor
 .vscode/
+
+# IDE and agent tooling
+.idea/
+.codex/

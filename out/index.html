@@ -5,14 +5,16 @@
 <link rel="stylesheet" href="explorer.css">
 <link rel="stylesheet" href="semantic.css">
 <link rel="stylesheet" href="chat.css">
+<link rel="stylesheet" href="lineage.css">
 <script defer src="projection.js"></script><script defer src="evidence.js"></script>
 <script defer src="vendor/viewer-lib.js"></script><script defer src="kg-core.js"></script><script defer src="explorer.js"></script>
 <script defer src="semantic.js"></script>
 <script defer src="chat.js"></script>
+<script defer src="lineage-data.js"></script><script defer src="lineage.js"></script>
 </head><body>
 <header class="topbar"><a class="wordmark" href="index.html">Mahabharata<span>KNOWLEDGE EXPLORER</span></a><div class="top-stats" id="stats"></div><button class="model-button" id="model-info" aria-label="Model details: below entry gate"><span class="status-dot"></span>Below-gate model<i data-lucide="info"></i></button></header>
 <section class="query-band" aria-label="Query the knowledge graph">
-<div class="search-modes segmented" role="group" aria-label="Knowledge space"><button id="mode-semantic" type="button" aria-pressed="false"><i data-lucide="book-open"></i>Text &amp; concepts</button><button id="mode-graph" type="button" aria-pressed="true"><i data-lucide="network"></i>Graph model</button><button id="mode-chat" type="button" aria-pressed="false" hidden><i data-lucide="message-circle"></i>Ask</button></div>
+<div class="search-modes segmented" role="group" aria-label="Knowledge space"><button id="mode-semantic" type="button" aria-pressed="false"><i data-lucide="book-open"></i>Text &amp; concepts</button><button id="mode-graph" type="button" aria-pressed="true"><i data-lucide="network"></i>Graph model</button><button id="mode-chat" type="button" aria-pressed="false" hidden><i data-lucide="message-circle"></i>Ask</button><button id="mode-lineage" type="button" aria-pressed="false"><i data-lucide="users"></i>Lineage</button></div>
 <form id="query-form" class="query-form"><i data-lucide="search"></i><input id="q" autocomplete="off" spellcheck="false" aria-label="Ask about the Mahabharata" placeholder="Who fought Bhishma? Ask a question or explore a character..."><button class="primary" type="submit">Explore<i data-lucide="arrow-right"></i></button></form>
 <div class="examples"><span>Explore</span><button data-query="Who taught Karna?">Who taught Karna?</button><button data-query="How is Karna related to Arjuna?">Karna &amp; Arjuna</button><button data-query="Who fought Bhishma?">Who fought Bhishma?</button><button data-query="Who is like Karna?">Similar to Karna</button><button data-query="Arjuna - Kunti + Gandhari">Arjuna &minus; Kunti + Gandhari</button></div><div id="message" role="status" aria-live="polite"></div></section>
 <main id="semantic-workspace" hidden aria-label="Cited semantic explorer">
@@ -28,6 +30,14 @@
 <div class="chat-layout">
 <section class="chat-thread" aria-label="Conversation"><div id="chat-log" aria-live="polite"></div></section>
 <aside class="chat-evidence" aria-label="Evidence behind the latest answer"><div class="surface-head"><h2><i data-lucide="file-text"></i>Evidence</h2></div><div class="chat-tabs" role="tablist" aria-label="Evidence type"><button data-chat-tab="facts" role="tab" aria-selected="true">Facts</button><button data-chat-tab="passages" role="tab" aria-selected="false">Passages</button><button data-chat-tab="names" role="tab" aria-selected="false">Names</button><button data-chat-tab="context" role="tab" aria-selected="false">Sent</button></div><div id="chat-evidence"><p class="chat-empty">Ask a question to see what an answer rests on.</p></div></aside>
+</div></main>
+<main id="lineage-workspace" hidden aria-label="Family lineage">
+<div class="chat-status"><span>Curated lineage table, hand-authored and uncited. <span id="lineage-source"></span> Solid edges are also stated in the text; dashed edges are the table alone.</span></div>
+<div class="lineage-layout">
+<section class="lineage-qa" aria-label="Lineage answer"><div id="lineage-answer" aria-live="polite"></div></section>
+<section class="lineage-view" aria-label="Lineage drawing"><div class="surface-head"><h2><i data-lucide="users"></i><span id="lineage-focus"></span></h2><div class="segmented" role="group" aria-label="Lineage view"><button data-lineage-view="tree" aria-pressed="true">Tree</button><button data-lineage-view="graph" aria-pressed="false">Graph</button></div></div>
+<div class="lineage-stage"><svg id="lineage-svg" role="img" aria-label="Lineage drawing. Select a person to focus them."></svg><div class="scene-tools"><button class="icon-button" data-lineage-zoom="fit" title="Fit" aria-label="Fit drawing"><i data-lucide="maximize"></i></button><button class="icon-button" data-lineage-zoom="in" title="Zoom in" aria-label="Zoom in"><i data-lucide="plus"></i></button><button class="icon-button" data-lineage-zoom="out" title="Zoom out" aria-label="Zoom out"><i data-lucide="minus"></i></button></div></div>
+<div class="semantic-map-footer"><span id="lineage-caption"></span><span><i class="lineage-key is-cited"></i>in the text <i class="lineage-key"></i>curated only</span></div></section>
 </div></main>
 <main class="workspace"><div class="exploration">
 <section id="answer" class="answer-band" aria-label="Answer and supporting passages" aria-live="polite" hidden></section>

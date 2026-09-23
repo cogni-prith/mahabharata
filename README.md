@@ -63,7 +63,7 @@ out/          deliverables: Turtle graphs, embeddings, projection, the interface
 docs/         written decisions, dataset findings, status, system documentation
 ontology/     the OWL 2 RL ontology and its SHACL shapes
 tools/        run_all.sh and the viewer bundle source
-annotations/  human judgement only, tracked because a judgement is not regenerable
+annotations/  human judgement and the curated lineage table, tracked because neither is regenerable
 ner/          the earlier NER phase that produced the paper, kept for reference
 paper/        NER.tex and its figures
 build/        intermediates, gitignored, regenerable by definition
@@ -91,7 +91,7 @@ the asserted and the proposed graph, so it reports 24 of 25.
 .venv/bin/python src/serve_explorer.py --port 8765
 ```
 
-Three modes at `http://127.0.0.1:8765/index.html`.
+Four modes at `http://127.0.0.1:8765/index.html`.
 
 **Graph model** shows the extracted graph, the UMAP projection and an entity
 inspector. It runs from `file://` with no server and makes no network request.
@@ -106,6 +106,13 @@ right. This is the only component that sends anything off the machine, it is
 opt-in behind `GROQ_API_KEY`, and without a key it returns the retrieved
 evidence and generates nothing. The decision record is D27 in
 `docs/DECISIONS.md`.
+
+**Lineage** draws a family tree and a generation-by-generation graph from the
+curated table in `annotations/lineage/`, and answers kinship questions such as
+parents, siblings, descendants, or how two people are related. The table is
+hand-authored and uncited. Only 36 of its 254 edges are also stated in the
+text, and those carry the chapter. The rest are marked curated. Nothing is
+generated and it runs from `file://`. The decision record is D28.
 
 ## The rules the code keeps
 

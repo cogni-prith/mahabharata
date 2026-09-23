@@ -43,6 +43,8 @@ node_modules/
 # Editor
 .vscode/
 
-# IDE and agent tooling
+# IDE and agent tooling. Instructions to an assistant, not project source.
 .idea/
 .codex/
+CLAUDE.md
+AGENTS.md

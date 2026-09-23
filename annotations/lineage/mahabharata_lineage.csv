@@ -1,0 +1,257 @@
+Parent,Child
+Brahma,Daksha
+Brahma,Marichi
+Brahma,Pulastya
+Brahma,Vasishtha
+Brahma,Narada
+Marichi,Kashyapa
+Kashyapa,Aditi
+Aditi,Indra
+Aditi,Vivasvan
+Vivasvan,Manu
+Manu,Ila
+Ila,Pururavas
+Pururavas,Ayus
+Ayus,Nahusha
+Nahusha,Yayati
+Yayati,Yadu
+Yayati,Puru
+Yayati,Turvasu
+Yayati,Druhyu
+Yayati,Anu
+Puru,Janamejaya (son of Puru)
+Janamejaya (son of Puru),Prachinvat
+Prachinvat,Pravira
+Pravira,Manasyu
+Manasyu,Abhayada
+Abhayada,Sudhanvan
+Sudhanvan,Bahugava
+Bahugava,Samyati
+Samyati,Rahovadi
+Rahovadi,Raudrasva
+Raudrasva,Matinara
+Matinara,Tansu
+Tansu,Ilina
+Ilina,Dushyanta
+Dushyanta,Bharata
+Bharata,Bhumanyu
+Bhumanyu,Suhotra
+Suhotra,Hastin
+Hastin,Vikunthana
+Vikunthana,Ajamidha
+Ajamidha,Riksha
+Riksha,Samvarana
+Samvarana,Kuru
+Kuru,Viduratha
+Viduratha,Anaswan
+Anaswan,Parikshit (ancestor)
+Parikshit (ancestor),Bhimasena (ancestor)
+Bhimasena (ancestor),Pratisravas
+Pratisravas,Pratipa
+Pratipa,Shantanu
+Pratipa,Devapi
+Pratipa,Bahlika
+Shantanu,Bhishma
+Shantanu,Chitrangada
+Shantanu,Vichitravirya
+Ganga,Bhishma
+Satyavati,Chitrangada
+Satyavati,Vichitravirya
+Satyavati,Vyasa
+Parashara,Vyasa
+Vyasa,Dhritarashtra
+Vyasa,Pandu
+Vyasa,Vidura
+Ambika,Dhritarashtra
+Ambalika,Pandu
+Dasi,Vidura
+Dhritarashtra,Duryodhana
+Dhritarashtra,Dushasana
+Dhritarashtra,Vikarna
+Dhritarashtra,Chitrasena (Kaurava)
+Dhritarashtra,Jalasandha
+Dhritarashtra,Sama
+Dhritarashtra,Saha
+Dhritarashtra,Dushkarna
+Dhritarashtra,Karna (Kaurava)
+Dhritarashtra,Vivinsati
+Dhritarashtra,Yuyutsu
+Dhritarashtra,Durmukha
+Dhritarashtra,Dussaha
+Dhritarashtra,Durmarshana
+Dhritarashtra,Dushpradharsha
+Dhritarashtra,Durjaya
+Dhritarashtra,Jaya (Kaurava)
+Dhritarashtra,Srutava
+Dhritarashtra,Srutarvan
+Dhritarashtra,Durdharsha
+Dhritarashtra,Durvishaha
+Dhritarashtra,Durvimochana
+Dhritarashtra,Dushparajaya
+Dhritarashtra,Aparajita (Kaurava)
+Dhritarashtra,Kundabhedi
+Dhritarashtra,Visalaksha
+Dhritarashtra,Duradhara
+Dhritarashtra,Dridhahasta
+Dhritarashtra,Suhasta
+Dhritarashtra,Vatavega
+Dhritarashtra,Suvarchas
+Dhritarashtra,Adityaketu
+Dhritarashtra,Bahvasi
+Dhritarashtra,Nagadata
+Dhritarashtra,Anuyada
+Dhritarashtra,Nishangi
+Dhritarashtra,Kuvashi
+Dhritarashtra,Danda
+Dhritarashtra,Dandadhara
+Dhritarashtra,Dhanugraha
+Dhritarashtra,Ugra
+Dhritarashtra,Bhimaratha
+Dhritarashtra,Vira (Kaurava)
+Dhritarashtra,Virabahu
+Dhritarashtra,Alolupa
+Dhritarashtra,Abhaya (Kaurava)
+Dhritarashtra,Raudrakarman
+Dhritarashtra,Dridhavarman
+Dhritarashtra,Dridhasandha
+Dhritarashtra,Jarasandha (Kaurava)
+Dhritarashtra,Satyasandha
+Dhritarashtra,Sada
+Dhritarashtra,Ugrasravas
+Dhritarashtra,Ugrasena (Kaurava)
+Dhritarashtra,Senaní
+Dhritarashtra,Dushparajaya (2)
+Dhritarashtra,Aparajita (2)
+Dhritarashtra,Durpradharsha
+Dhritarashtra,Dussaha (2)
+Duryodhana,Lakshmana (son)
+Gandhari,Duryodhana
+Gandhari,Dushasana
+Gandhari,Vikarna
+Gandhari,Duhsala
+Pandu,Yudhishthira
+Pandu,Bhima
+Pandu,Arjuna
+Pandu,Nakula
+Pandu,Sahadeva
+Kunti,Yudhishthira
+Kunti,Bhima
+Kunti,Arjuna
+Kunti,Karna
+Madri,Nakula
+Madri,Sahadeva
+Surya,Karna
+Dharma,Yudhishthira
+Vayu,Bhima
+Indra,Arjuna
+Ashwins,Nakula
+Ashwins,Sahadeva
+Karna,Vrishasena
+Karna,Chitrasena (son of Karna)
+Karna,Satyasena
+Karna,Sushena
+Karna,Shatrunjaya
+Karna,Dvipata
+Karna,Banasena
+Arjuna,Abhimanyu
+Arjuna,Shrutakarma
+Arjuna,Iravat
+Arjuna,Babhruvahana
+Subhadra,Abhimanyu
+Draupadi,Shrutakarma
+Draupadi,Shatanika
+Draupadi,Shrutasena
+Draupadi,Srutakirti
+Draupadi,Prativindhya
+Yudhishthira,Prativindhya
+Bhima,Ghatotkacha
+Bhima,Sarvaga
+Bhima,Sutasoma
+Hidimba,Ghatotkacha
+Draupadi,Sutasoma
+Nakula,Niramitra
+Draupadi,Srutakirti
+Sahadeva,Shrutasena
+Abhimanyu,Parikshit
+Uttara,Parikshit
+Parikshit,Janamejaya
+Janamejaya,Shatanika (son of Janamejaya)
+Shatanika (son of Janamejaya),Sahasranika
+Sahasranika,Ashwamedhadatta
+Yadu,Kroshtri
+Yadu,Nala (Yadu line)
+Kroshtri,Vrijnivat
+Vrijnivat,Swahi
+Swahi,Rushadgu
+Rushadgu,Chitraratha (Yadu)
+Chitraratha (Yadu),Shashabindu
+Shashabindu,Prithusravas
+Prithusravas,Dharma (Yadu)
+Dharma (Yadu),Ushanas
+Ushanas,Ruchaka
+Ruchaka,Jyamagha
+Jyamagha,Vidarbha
+Vidarbha,Kratha
+Vidarbha,Kaishika
+Vidarbha,Romapada
+Kratha,Kunti (ancestor)
+Kaishika,Chedi
+Chedi,Damaghosa
+Damaghosa,Shishupala
+Vasudeva,Krishna
+Vasudeva,Balarama
+Vasudeva,Subhadra
+Devaki,Krishna
+Devaki,Balarama
+Rohini,Balarama
+Krishna,Pradyumna
+Rukmini,Pradyumna
+Pradyumna,Aniruddha
+Aniruddha,Vajra
+Ugrasena,Kamsa
+Ugrasena,Devaki
+Devaka,Devaki
+Shura,Vasudeva
+Shura,Pritha (Kunti)
+Pritha (Kunti),Yudhishthira
+Pritha (Kunti),Bhima
+Pritha (Kunti),Arjuna
+Pritha (Kunti),Karna
+Subhadra,Abhimanyu
+Drupada,Draupadi
+Drupada,Dhrishtadyumna
+Drupada,Shikhandi
+Drona,Ashwatthama
+Kripi,Ashwatthama
+Bharadwaja,Drona
+Sharadvata,Kripa
+Sharadvata,Kripi
+Shalya,Madri
+Somadatta,Bhurishravas
+Somadatta,Sala
+Somadatta,Bhuri
+Bahlika,Somadatta
+Virata,Uttara
+Virata,Uttaraa (daughter)
+Virata,Sweta
+Virata,Sankha
+Jarasandha,Sahadeva (Magadha)
+Bhagadatta,Vajradatta
+Ghatotkacha,Barbarika
+Shakuni,Uluka
+Shakuni,Vrikodara (son of Shakuni)
+Subala,Gandhari
+Subala,Shakuni
+Dhrishtadyumna,Kshatradharman
+Shikhandi,Kshatradeva
+Satyaki,Yuyudhana
+Kritavarma,Matrikavata
+Vidura,Kashyapa (son of Vidura)
+Vidura,Ani
+Vidura,Mandavya
+Vichitravirya,Dhritarashtra
+Vichitravirya,Pandu
+Chitrangada,Babhruvahana
+Ulupi,Iravat
+Ulupi,Babhruvahana
+Chitrangada (princess),Babhruvahana

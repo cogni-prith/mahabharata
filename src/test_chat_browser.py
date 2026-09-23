@@ -53,10 +53,12 @@ def check_endpoint():
 
     code, radheya = call('/api/chat', {'query': 'who is Radheya'})
     assert code == 200
-    candidates = [r for r in radheya['resolutions'] if not r['resolved']]
+    # Epithet widening adds Karna's other epithets as unresolved too; the
+    # appellation candidates are the ones this checks.
+    candidates = [r for r in radheya['resolutions'] if not r['resolved'] and r['via'] == 'appellation']
     assert candidates and all(c['appellation'] == 'Radheya' for c in candidates)
     assert 'Karna' in {c['name'] for c in candidates}
-    assert 'candidate referents, not identities' in radheya['context']
+    assert 'candidate referents, not identities' in radheya['context'].lower()
     assert not any(r['resolved'] and r['name'] == 'Karna' for r in radheya['resolutions'])
 
     # Untrusted input reaching a prompt is rejected, not repaired.

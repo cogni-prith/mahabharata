@@ -1,0 +1,23 @@
+{
+  "initial_nodes": [
+    "Brahma", "Yayati", "Shantanu", "Vyasa", "Dhritarashtra", "Pandu",
+    "Kunti", "Arjuna", "Bhima", "Yudhishthira", "Nakula", "Sahadeva",
+    "Duryodhana", "Karna", "Krishna", "Vasudeva", "Draupadi", "Abhimanyu",
+    "Drupada", "Gandhari", "Bhishma", "Vidura", "Drona", "Satyavati"
+  ],
+  "clans": {
+    "cosmic":  ["brahma","kashyapa","aditi","indra","surya","vayu","dharma","ashwins","ganga","narada","marichi","vasishtha","daksha","pulastya","parashara","vivasvan","manu","ila","pururavas","ayus","nahusha"],
+    "kuru":    ["yayati","puru","dushyanta","bharata","kuru","hastin","ajamidha","samvarana","pratipa","shantanu","bhishma","vichitravirya","chitrangada","vyasa","satyavati","vidura","ambika","ambalika","bahlika","devapi"],
+    "pandava": ["yudhishthira","bhima","arjuna","nakula","sahadeva","kunti","madri","draupadi","abhimanyu","parikshit","ghatotkacha","hidimba","iravat","babhruvahana","subhadra","uttara","prativindhya","sutasoma","shrutakarma","niramitra","janamejaya","sarvaga"],
+    "kaurava": ["dhritarashtra","gandhari","duryodhana","dushasana","vikarna","karna","yuyutsu","duhsala","shakuni","subala","pandu"],
+    "yadava":  ["yadu","vasudeva","devaki","krishna","balarama","pradyumna","aniruddha","rukmini","ugrasena","kamsa","rohini","shura","vajra","subhadra"]
+  },
+  "colors": {
+    "cosmic":  "#9b72cf",
+    "kuru":    "#e07070",
+    "pandava": "#5aad7a",
+    "kaurava": "#e08c50",
+    "yadava":  "#5a9fd4",
+    "other":   "#a0a0c0"
+  }
+}

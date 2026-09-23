@@ -35,6 +35,7 @@ $PY src/phase6_gate.py                 # entry gate. FAILS on all three conditio
 $PY src/phase6_train.py                # RotatE. Below the gate, on instruction. D19
 $PY src/phase7_project.py              # UMAP, projection.json, projection.js
 $PY src/export_viewer_evidence.py     # full source passages for the offline inspector
+$PY src/lineage_export.py        # curated lineage table + text check -> out/lineage-data.js. D28
 node src/phase7_check.js               # the three query modes end to end
 $PY src/phase8_divergence.py           # graph vs embedding neighbourhoods
 $PY src/phase8b_alias.py               # cosine as an alias candidate generator

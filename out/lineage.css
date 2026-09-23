@@ -1,0 +1,33 @@
+.lineage-layout{display:grid;grid-template-columns:400px minmax(0,1fr);align-items:start}
+.lineage-qa{border-right:1px solid #d9e3df;min-width:0}
+#lineage-answer{height:760px;overflow:auto;scrollbar-width:thin;padding:20px 0}
+#lineage-answer>.eyebrow,#lineage-answer>h2{padding:0 18px}
+#lineage-answer>h2{font-size:19px;margin-bottom:8px}
+.lineage-caveat{padding:4px 18px 8px}
+.lineage-verdict{padding:10px 18px 12px;font-size:15px;line-height:1.6;font-family:Georgia,serif}
+.lineage-list,.lineage-chain{list-style:none;margin:0;padding:0}
+.lineage-list li,.lineage-chain li{padding:9px 18px;border-bottom:1px solid #e5ebe8;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lineage-list .chat-meta,.lineage-chain .chat-meta{margin:0;flex-basis:100%}
+.lineage-list li:has(.chat-meta:empty) .chat-meta{display:none}
+.lineage-chain small{color:#7f7564;font-size:11px}
+.lineage-name{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:#214f3d;padding:0}
+.lineage-name i{width:9px;height:9px;border-radius:50%;flex:none}
+.lineage-view{min-width:0}
+.lineage-view .surface-head h2{display:flex;gap:8px;align-items:center}
+.lineage-stage{position:relative;height:715px;background:#fbfcfa;overflow:hidden}
+#lineage-svg{width:100%;height:100%;cursor:grab;touch-action:none;user-select:none}
+#lineage-svg:active{cursor:grabbing}
+.lnode{cursor:pointer}
+.lnode rect{fill-opacity:.2;stroke:#7a8c80;stroke-width:1}
+.lnode text{font-size:12px;fill:#233a31;pointer-events:none}
+.lnode:hover rect{fill-opacity:.4}
+.lnode.is-focus rect{fill-opacity:.55;stroke:#1d4b38;stroke-width:2.5}
+.lnode.is-focus text{font-weight:700}
+.lnode.is-sibling rect{stroke-dasharray:3 2}
+.lnode.is-far{opacity:.45}
+.ledge{fill:none;stroke:#b3a58a;stroke-width:1.2;stroke-dasharray:5 4}
+.ledge.is-cited{stroke:#2f6b4f;stroke-width:1.8;stroke-dasharray:none}
+.ledge.is-focus{stroke-width:3}
+.lineage-key{display:inline-block;width:22px;height:0;border-top:2px dashed #b3a58a;vertical-align:middle;margin:0 4px 0 10px}
+.lineage-key.is-cited{border-top:2px solid #2f6b4f}
+@media(max-width:1150px){.lineage-layout{grid-template-columns:1fr}.lineage-qa{border-right:0;border-bottom:1px solid #d9e3df}#lineage-answer{height:420px}.lineage-stage{height:560px}}

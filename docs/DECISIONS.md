@@ -1700,3 +1700,37 @@ The free tier allows 200,000 tokens a day and a question was costing 7,000, so
 tail was padding the bill: the fact budget drops to 28, passages to 5, evidence
 quotes to the first 12 rows, and the co-reference block is no longer sent twice.
 A question now costs about 2,800 tokens.
+
+## D28. The curated lineage table is shown beside the graph, never merged into it (2026-09-23)
+
+The user supplied `mahabharata_lineage.csv` (256 Parent,Child rows), a clan
+colour config and a standalone D3 page, and asked for a lineage tree, a lineage
+graph and lineage question answering in the explorer. The two data files now
+live in `annotations/lineage/` because they are human-authored and not
+regenerable.
+
+The table is hand-authored and carries no citation. It therefore never enters
+the asserted graph, the training split or any evaluation. It is a display layer.
+`src/lineage_export.py` checks each edge against the asserted `bornTo` and
+`hasDivineProgenitor` triples under the exact same names: 36 of 254 edges are
+also stated in the text and carry that citation, the other 218 are labelled
+curated and uncited in every view. No appellation or spelling variant is
+followed for the check, so `(Pandu, Arjuna)` is not corroborated although the
+graph records Dhananjaya bornTo Pandu.
+
+Lineage answers are computed in the page from the table, with no model and no
+request. An ambiguous name ("Chitrasena", or "Bhimasena" reaching only
+"Bhimasena (ancestor)") comes back as a choice, never a pick.
+
+What the table cannot say, and the answers say it cannot: it has one Parent
+column, so father and mother, and biological, legal and divine parents, are
+not told apart. That conflicts with the kinship primitives this project stores
+(`hasBiologicalParent`, `hasLegalParent`, `hasDivineProgenitor`). Splitting the
+column is a human job and is listed in `build/lineage_report.md`, along with
+duplicate rows, children with more than two parents, and a clan conflict.
+
+The standalone page loaded D3 and fonts from CDNs. The explorer makes no
+external request, so the views were rewritten without D3. The graph view is a
+layered drawing with one row per generation, not a force layout, and it is not
+the embedding.
+

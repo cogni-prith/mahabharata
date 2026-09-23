@@ -106,6 +106,25 @@ unresolved and variant markers, the citation on every fact, that the page makes
 no request off this machine other than the one the service makes for it, and
 that the answer renderer cannot be made to emit a tag from model output.
 
+## Lineage mode (2026-09-23)
+
+A fourth mode, drawn from the curated lineage table in `annotations/lineage/`.
+It works from `file://` with no server and sends nothing. D28 records why the
+table is shown beside the graph and not merged into it.
+
+- **Question box.** The main query bar answers parents, children, siblings,
+  grandparents, grandchildren, ancestors, descendants, co-parents, and how two
+  people are related. Answers are computed from the table in the page. Each
+  edge shows a chapter badge when the asserted graph states it, and
+  `curated, uncited` when it does not. Kin triples the text holds and the
+  table lacks are listed as `in the text, not in the table`.
+- **Tree.** Three generations up and two down from the focus, with everyone
+  who shares a parent on the focus row.
+- **Graph.** All 240 people, one row per generation. Drag to pan, scroll to
+  zoom, select anyone to refocus.
+
+Solid edges are stated in the text. Dashed edges are the table alone.
+
 ## Original graph mode
 
 Updated 2026-09-15 in response to the request to change `out/index.html`.
@@ -239,6 +258,8 @@ details are accessible in the header. UI correctness is not model validation.
 - `.venv/bin/python src/test_relation_integrity.py`
 - `node src/phase7_check.js`
 - `.venv/bin/python src/test_viewer_browser.py`
+- `.venv/bin/python src/lineage_export.py`
+- `.venv/bin/python src/test_lineage_browser.py`
 
 Only when changing the vendor bundle:
 

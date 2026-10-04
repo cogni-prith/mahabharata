@@ -208,7 +208,9 @@ def test_epithet_records_are_reachable(r):
     facts = r.graph_facts(r.resolve("who was father of arjuna"))
     parents = {(f["subject"], f["object"]) for f in facts
                if f["predicate"] in ("bornTo", "hasDivineProgenitor")}
-    assert ("Dhananjaya", "Pandu") in parents, parents
+    # On a graph folded by Phase 4f the Dhananjaya rows sit under Arjuna, so
+    # either form shows Pandu is reachable; neither means it is not.
+    assert {("Dhananjaya", "Pandu"), ("Arjuna", "Pandu")} & parents, parents
     assert any(o in {"Indra", "Shakra"} for _, o in parents), parents
     # And every one of them is marked with the name it was recorded under.
     for f in facts:

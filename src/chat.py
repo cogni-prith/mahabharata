@@ -121,6 +121,38 @@ HISTORY_TURNS = 6
 # citation, which is what provenance actually requires.
 QUOTED_FACTS = 12
 MAX_NOTES = 8
+MAX_SIBLINGS = 12
+# Plain-language mode, the default for the explorer and the CLI. An appellation
+# resolves to its single best-supported candidate (Partha to Arjuna), and the
+# answer is written for a general reader. This is a deliberate exception to the
+# rule against guessing an entity link, taken on instruction for readability.
+# MBH_STRICT_NAMES=1 restores strict mode. The Retriever default stays strict,
+# so src/test_chat.py keeps testing the rule it was written for.
+SIMPLE = os.environ.get("MBH_STRICT_NAMES") != "1"
+SIBLING_HINTS = ("brother", "sister", "sibling")
+# Popular spellings the corpus does not use. Most popular forms only drop the
+# final a (Arjun, Karn, Bhishm) and resolve() handles those by rule; these are
+# the ones a rule cannot reach. Values are corpus spellings, lower case.
+SPELLINGS = {
+    "bheem": "bhima", "bhimsen": "bhimasena", "bheemsen": "bhimasena",
+    "draupadi": "droupadi", "dropadi": "droupadi", "sahdev": "sahadeva",
+    "ashwatthama": "ashvatthama", "ashwathama": "ashvatthama", "ashvathama": "ashvatthama",
+    "dronacharya": "drona", "kripacharya": "kripa",
+    "balram": "baladeva", "balaram": "baladeva", "balarama": "baladeva",
+    "kansa": "kamsa", "eklavya": "ekalavya", "parikshita": "parikshit",
+    "dushasana": "duhshasana", "dushasan": "duhshasana",
+    "yudhishtir": "yudhishthira", "yudhishtira": "yudhishthira",
+}
+# Words of the question itself, never names. Loose matching turned "and" into
+# Bandi, Chandra and Dandadhara.
+NOT_NAMES = {
+    "who", "whom", "whose", "what", "which", "when", "where", "why", "how", "was",
+    "were", "are", "the", "and", "did", "does", "his", "her", "their", "same",
+    "person", "people", "brother", "sister", "father", "mother", "son", "sons",
+    "daughter", "wife", "husband", "killed", "kill", "teacher", "about", "tell",
+    "with", "from", "that", "this", "name", "names", "between", "related", "also",
+}
+SHORT = 6       # tokens this long or shorter are matched on plain ratio, not WRatio
 
 SYSTEM = """You answer questions about the Mahabharata from the context below and from nothing else.
 
@@ -154,6 +186,34 @@ Write short prose with short bullet lists where a list helps. Use "- " for bulle
 Context:
 {context}"""
 
+SYSTEM_SIMPLE = """You answer questions about the Mahabharata for a general reader who knows nothing about it. Use only the context below. Never add anything from your own knowledge, even when you are sure of it.
+
+The user may write with spelling or grammar errors. Correct them silently and answer the intended question.
+
+How to write:
+- Plain, everyday English. Put the direct answer in the first sentence, then at most two more short sentences.
+- If a list helps, use at most five short "- " bullets. No tables, no headings.
+- Never mention confidence, support, scores, sightings, candidates, patterns, "the corpus", "the graph", "the context" or "the records". Never write relation names such as bornTo or slainBy; say "parent", "was killed by", "fought", and so on.
+- At most 80 words, not counting the Source line.
+
+Names:
+- Under NAMES, every name in the question is matched to one person. Treat it as that person. The first time, write it as "Dhananjaya (Arjuna)". Never say a name is unresolved, uncertain or ambiguous.
+- If a NAMES line says the name is also used almost as often for others, you must say so once, as a short clause, the first time you use the name: "Partha (here Yudhishthira; the name is also used for Arjuna and Bhima)". Then answer for the matched person only.
+- A name listed as another name for someone is that person. Treat facts recorded under it as facts about them.
+
+Facts:
+- Give the answer stated most often (highest support). Mention a rival only if it is stated as often.
+- A parent fact tagged [X is the mother] or [X is the father] tells you which. Use it plainly: "Arjuna's mother is Kunti and his father is Pandu". A parent with no tag is only known to be a parent: say "parent" for that one, unless the evidence quote itself says father or mother. Asked for a mother or father that no tag or quote identifies, name the recorded parents and say the text here does not mark which is which. Never decide it from how often a parent is mentioned.
+- SIBLINGS lists people who share a recorded parent. Asked about brothers or sisters, name every person in SIBLINGS, and call them brothers or sisters plainly.
+- Facts marked predicted or proposed are a model's guesses; if you use one, say "possibly".
+- If the context does not answer the question, say so in one sentence and give the closest thing it does say.
+- The facts record only these kinds of relation: parent, divine parent, spouse, ruled, fought, was killed by, was defeated by, was cursed by, was taught by, spoke to, and siblings worked out from parents. Asked about any other kind (ally, friend, enemy, uncle, grandson, charioteer, and so on), say in your first sentence that this kind of relation is not recorded, then give the closest facts under their real meaning. Never present "spoke to" as alliance, friendship or loyalty.
+
+End with one line starting "Source:" listing up to three chapter references exactly as the context gives them, like 08_Karna 69. Write "uncited" for a fact with no chapter. If the answer is that something is not recorded, cite the facts you gave instead; leave the Source line out only if you gave none.
+
+Context:
+{context}"""
+
 
 def entity_labels(path=ENTITIES):
     """Person and Place labels from the asserted graph.
@@ -182,12 +242,20 @@ class Retriever:
     src/test_chat.py, can skip it.
     """
 
-    def __init__(self, root=ROOT, passages=True, index=None):
+    def __init__(self, root=ROOT, passages=True, index=None, top_alias=False):
         root = Path(root)
+        self.top_alias = top_alias
         reviewed = root / "build/reviewed_relations.parquet"
         self.reviewed = reviewed.exists()
-        self.rel = pd.read_parquet(reviewed if self.reviewed
-                                   else root / "build/relations.parquet")
+        raw = root / "build/relations.parquet"
+        if self.reviewed or raw.exists():
+            self.rel = pd.read_parquet(reviewed if self.reviewed else raw)
+        else:
+            # Phase 4 has not run here (coreference needs a GPU). Serve passages
+            # with no graph facts rather than refuse to start; nothing is invented.
+            print("No relations parquet in build/: Ask answers from passages only.", flush=True)
+            self.rel = pd.DataFrame(columns=["subject", "predicate", "object", "status", "confidence",
+                                             "pattern", "parva", "adhyaya_ordinal", "cited", "evidence"])
         if self.reviewed:
             self.rel = self.rel[self.rel.status == "asserted"]
         self.app = pd.read_csv(root / "build/appellations.csv")
@@ -207,6 +275,47 @@ class Retriever:
         self.appellations = {}
         for a in self.app.appellation.unique():
             self.appellations.setdefault(norm_surface(a), a)
+        # Plain-language mode: each name's single best person. Phase 2b's
+        # mention scores decide it, as total confidence over every mention it
+        # won outside the reject band, which weighs how often and how surely.
+        # The appellation table only fills names Phase 2b never scored; its
+        # top candidates include known errors (Kartavirya to Arjuna).
+        ranked = self.app.sort_values(["confidence", "evidence_count"],
+                                      ascending=False, na_position="last")
+        self.top_of = ranked.drop_duplicates("appellation").set_index(
+            "appellation").candidate_entity.to_dict()
+        self.also_of = {}
+        self.alias_cites = {}
+        links = root / "build/er/mention_links.csv"
+        if top_alias and links.exists():
+            ml = pd.read_csv(links, usecols=["surface", "candidate", "confidence", "action",
+                                             "parva", "adhyaya_ordinal"])
+            mass = (ml[ml.action != "reject"].groupby(["surface", "candidate"])
+                    .confidence.sum().sort_values(ascending=False))
+            for surface, group in mass.groupby(level=0, sort=False):
+                cands = group.droplevel(0)
+                self.top_of[surface] = cands.index[0]
+                # A runner-up within 10% is a near tie, and the answer says so.
+                self.also_of[surface] = [c for c, v in cands.iloc[1:].items()
+                                         if v >= 0.9 * cands.iloc[0]]
+            # Where the text itself uses the name for that person: the most
+            # confident accepted mentions, so a "same person?" answer has a
+            # chapter to cite instead of "uncited".
+            acc = ml[ml.action.isin(["auto_accept", "accept_sample_verify"])
+                     & ml.adhyaya_ordinal.notna()].sort_values("confidence", ascending=False)
+            for (surface, cand), g in acc.groupby(["surface", "candidate"], sort=False):
+                if self.top_of.get(surface) == cand and surface != cand:
+                    cites = [citation(p, a, True) for p, a in zip(g.parva, g.adhyaya_ordinal)]
+                    self.alias_cites[surface] = list(dict.fromkeys(cites))[:2]
+        self.alias_by_norm = {norm_surface(s): s for s, c in self.top_of.items() if c != s}
+        # Mother or father for a parent, from Phase 4s GLiREL counts, where
+        # they are lopsided enough to call. Plain-language mode only; strict
+        # mode keeps bornTo as the generic parent it is. Absent file, no roles.
+        roles = root / "build/parent_roles.csv"
+        self.parent_roles = {}
+        if top_alias and roles.exists():
+            pr = pd.read_csv(roles)
+            self.parent_roles = {p: r for p, r in zip(pr.parent, pr.role) if r in ("mother", "father")}
         # The reverse index: given an entity, which appellations name it. Asked
         # for Arjuna's father the graph looked empty, and the father was there
         # the whole time under his epithets. bornTo Pandu is stated seven times
@@ -259,8 +368,19 @@ class Retriever:
         """
         tokens = []
         for t in norm_surface(query).split():
-            if len(t) <= 2:
+            # norm_surface keeps punctuation, so "Vrikodara?" missed the exact
+            # and alias lookups and fell through to a fuzzy match on a node
+            # with no facts. A typed question nearly always ends in one.
+            t = t.strip("?!.,;:\"'()[]")
+            if len(t) <= 2 or t in NOT_NAMES:
                 continue
+            t = SPELLINGS.get(t, t)
+            # The popular form often drops the final a: Arjun, Karn, Bhishm.
+            known = (t in self.by_norm or t in self.appellations
+                     or (self.top_alias and t in self.alias_by_norm))
+            if not known and (t + "a" in self.by_norm or t + "a" in self.appellations
+                              or (self.top_alias and t + "a" in self.alias_by_norm)):
+                t += "a"
             tokens.append(t)
             # norm_surface drops "Arjuna's" but not "arjunas", and a dropped
             # apostrophe is the commonest thing in a typed question. The bare
@@ -268,7 +388,7 @@ class Retriever:
             # just under the cutoff, while "arjuna" is exact.
             if t.endswith("s") and len(t) > 4:
                 tokens.append(t[:-1])
-        found, seen = [], set()
+        found, seen, aliased = [], set(), set()
 
         def add(rec):
             key = (rec["name"], rec["via"])
@@ -277,6 +397,18 @@ class Retriever:
                 found.append(rec)
 
         for tok in tokens:
+            # Plain-language mode: a name whose best person is someone else
+            # ("Partha") answers as that person, not as the leftover graph node.
+            if self.top_alias and tok in self.alias_by_norm:
+                # Consumed even when add() drops it as a repeat: "vrikodara and
+                # bheem" names Bhimasena twice, and the second must not fall
+                # through to the fuzzy pass and land on King Bhima of Vidarbha.
+                aliased.add(tok)
+                s = self.alias_by_norm[tok]
+                add({"name": self.top_of[s], "via": "alias", "resolved": True,
+                     "score": 100.0, "surface": tok, "appellation": s,
+                     "also": self.also_of.get(s, []), "cites": self.alias_cites.get(s, [])})
+                continue
             if tok in self.by_norm:
                 add({"name": self.by_norm[tok], "via": "exact", "resolved": True,
                      "score": 100.0, "surface": tok})
@@ -285,16 +417,20 @@ class Retriever:
 
         matched = {r["surface"] for r in found}
         for tok in tokens:
-            if tok in matched:
+            if tok in matched or tok in aliased:
                 continue
-            hits = process.extract(tok, self.by_norm.keys(), scorer=fuzz.WRatio,
+            # WRatio scores partial overlaps highly, so a short word matched any
+            # longer name containing it: "karn" scored 90 on Kumbhakarna and
+            # "bhim" on Abhimanyu. Short tokens are compared whole.
+            scorer = fuzz.ratio if len(tok) <= SHORT else fuzz.WRatio
+            hits = process.extract(tok, self.by_norm.keys(), scorer=scorer,
                                    score_cutoff=CUTOFF, limit=FUZZY_KEEP)
             if hits:
                 for key, score, _ in hits:
                     add({"name": self.by_norm[key], "via": "fuzzy", "resolved": True,
                          "score": float(score), "surface": tok})
                 continue
-            hit = process.extractOne(tok, self.appellations.keys(), scorer=fuzz.WRatio,
+            hit = process.extractOne(tok, self.appellations.keys(), scorer=scorer,
                                      score_cutoff=CUTOFF)
             if hit:
                 self._expand(add, self.appellations[hit[0]], float(hit[1]))
@@ -304,6 +440,13 @@ class Retriever:
         # are unreachable otherwise. These arrive resolved=False and every
         # fact they bring is marked with the epithet it came through, because
         # the apposition evidence is a lead and not an identity.
+        if self.top_alias:
+            # Plain-language mode reads the graph Phase 4f folded, where every
+            # confidently linked epithet mention already sits under its person.
+            # A leftover epithet node holds exactly the mentions that were not
+            # confident, so pulling it in would attach the doubtful records:
+            # "Kounteya" brings Bhima's divine father to Yudhishthira.
+            return found
         for r in [x for x in found if x["resolved"]]:
             # Budget the two bases separately. Sorted together, the apposition
             # entries fill every slot and the prior-based ones never get in,
@@ -322,6 +465,11 @@ class Retriever:
 
     def _expand(self, add, appellation, match_score):
         rows = self.app[self.app.appellation == appellation]
+        if self.top_alias:
+            add({"name": self.top_of[appellation], "via": "alias", "resolved": True,
+                 "score": match_score, "surface": norm_surface(appellation),
+                 "appellation": appellation, "also": self.also_of.get(appellation, [])})
+            return
         for _, r in rows.sort_values("confidence", ascending=False, na_position="last").iterrows():
             # Eleven rows are prior_only: the corpus prior proposes the link
             # and no apposition sighting supports it, so there is no
@@ -384,8 +532,56 @@ class Retriever:
                 "evidence": row.evidence,
                 "quoted": row.pattern not in UNQUOTED_PATTERNS,
                 "unresolved_via": [v["appellation"] for v in via if not v["resolved"]],
+                "parent_role": (self.parent_roles.get(row.object)
+                                if row.predicate == "bornTo" else None),
             })
         return facts
+
+    def siblings(self, resolutions, query=""):
+        """People who share a recorded parent with a person the question named.
+
+        The graph has no sibling relation, so "who was Partha's brother" finds
+        nothing directly. Two people born to the same recorded parent are
+        siblings; that is derived here and labelled as derived. Only built when
+        the question asks about siblings, and only in plain-language mode.
+        """
+        words = norm_surface(query).split()
+        if not self.top_alias or not any(w.startswith(h) for w in words for h in SIBLING_HINTS):
+            return []
+        people = {}
+        for r in resolutions:
+            if r["resolved"]:
+                people.setdefault(r.get("of") or r["name"], set()).add(r["name"])
+        born = self.rel[self.rel.predicate == "bornTo"]
+        out = []
+        for person, names in people.items():
+            # A parent stated in two or more places, where there is one. A
+            # single stray bornTo row is how an extraction error would make a
+            # stranger into a sibling.
+            counts = born[born.subject.isin(names)].object.value_counts()
+            parents = set(counts[counts >= 2].index) or set(counts.index)
+            # Cited rows first, so a pair stated both with and without a
+            # chapter is cited: Karna to Kunti has one of each.
+            rows = born[born.object.isin(parents) & ~born.subject.isin(names)].sort_values(
+                "cited", ascending=False)
+            stated = rows.subject.value_counts()
+            seen = {}
+            for _, row in rows.iterrows():
+                sib = self.top_of.get(row.subject, row.subject)
+                # A leftover epithet node ("Ajamidha", a descendant of Ajamidha)
+                # is a title, not a person. A name in the appellation table on a
+                # single parent row is taken as one; Bhimasena, also in that
+                # table, has six rows and stays. Nakula has one and is no title.
+                title = sib in self.appellations.values() and stated.get(row.subject, 0) < 2
+                if sib in names or sib == person or title:
+                    continue
+                rec = seen.setdefault(sib, {"person": person, "sibling": sib,
+                                            "parents": [], "citation": citation(
+                                                row.parva, row.adhyaya_ordinal, row.cited)})
+                if row.object not in rec["parents"]:
+                    rec["parents"].append(row.object)
+            out += sorted(seen.values(), key=lambda s: -len(s["parents"]))
+        return out[:MAX_SIBLINGS]
 
     @staticmethod
     def _citations(hit, row):
@@ -496,7 +692,7 @@ def relevant(query):
             if any(h in words or any(w.startswith(h) for w in words) for h in hints)}
 
 
-def build_context(resolutions, facts, retrieval, notes=()):
+def build_context(resolutions, facts, retrieval, notes=(), siblings=()):
     """The context block, and the only thing besides the question that is sent.
 
     Every fact line ends in a citation or the word uncited, so the model cannot
@@ -542,16 +738,33 @@ def build_context(resolutions, facts, retrieval, notes=()):
 
     resolved = [r for r in resolutions if r["resolved"]]
     if resolved:
-        out.append("RESOLVED NAMES.")
+        out.append("NAMES." if any(r["via"] in ("alias", "epithet") for r in resolved)
+                   else "RESOLVED NAMES.")
         variants = {}
         for r in resolved:
             variants.setdefault(r["surface"], []).append(r)
         for surface, group in variants.items():
             for r in group:
+                if r["via"] == "alias":
+                    line = '  "%s" in the question means %s.' % (r["appellation"], r["name"])
+                    if r.get("cites"):
+                        line += " The text calls %s by this name in %s." % (
+                            r["name"], ", ".join(r["cites"]))
+                    if r.get("also"):
+                        line += (' The name is also used, almost as often, for %s. The first '
+                                 'time you use it, write exactly: "%s (here %s; the name is '
+                                 'also used for %s)".' % (
+                                     " and ".join(r["also"]), r["appellation"], r["name"],
+                                     " and ".join(r["also"])))
+                    out.append(line)
+                    continue
+                if r["via"] == "epithet":
+                    out.append("  %s is another name for %s." % (r["name"], r["of"]))
+                    continue
                 note = ("exact match" if r["via"] == "exact"
                         else "spelling match on %r, score %.0f" % (surface, r["score"]))
                 out.append("  %s (%s)" % (r["name"], note))
-            if len(group) > 1:
+            if len([r for r in group if r["via"] in ("exact", "fuzzy")]) > 1:
                 out.append("    %r matched %d spellings. The graph holds them as "
                            "separate entities and does not state they are the same "
                            "person. Report what each one's records say; do not merge them."
@@ -569,6 +782,14 @@ def build_context(resolutions, facts, retrieval, notes=()):
                           n["evidence_count"], n["candidates"]))
         out.append("")
 
+    if siblings:
+        out.append("SIBLINGS, worked out from a shared recorded parent. The graph has no "
+                   "sibling relation of its own.")
+        for s in siblings:
+            out.append("  %s and %s share the parent %s, %s" % (
+                s["person"], s["sibling"], " and ".join(s["parents"]), s["citation"]))
+        out.append("")
+
     out.append("ASSERTED FACTS from the extracted graph. `support` is how many separate "
                "places in the corpus state that triple, and is the main weight for "
                "choosing between rival statements.")
@@ -580,6 +801,8 @@ def build_context(resolutions, facts, retrieval, notes=()):
             f["pattern"], ", ".join(f["citations"][:3]))
         if f["unresolved_via"]:
             line += " [reached only through the unresolved name %s]" % ", ".join(f["unresolved_via"])
+        if f.get("parent_role"):
+            line += " [%s is the %s]" % (f["object"], f["parent_role"])
         # The hint goes on the line, not only in the block above it. A model
         # reading "slainBy Kiriti" will not go back and cross-reference a
         # section it has already passed, and that is exactly the row where
@@ -646,24 +869,46 @@ def retrieve(retriever, query):
     """
     resolutions = retriever.resolve(query)
     facts = retriever.graph_facts(resolutions, query=query)
-    notes = retriever.coreference_notes(facts)
+    # Plain-language mode has already chosen one person per name, so the
+    # may-be-the-same-person evidence would only reintroduce the hedging.
+    notes = [] if retriever.top_alias else retriever.coreference_notes(facts)
     for f in facts:
         f["may_be"] = [n for n in notes if n["appellation"] in (f["subject"], f["object"])][:2]
+    siblings = retriever.siblings(resolutions, query)
     found = retriever.passages(query)
     return {
         "query": query,
         "resolutions": resolutions,
         "facts": facts,
         "coreference": notes,
+        "siblings": siblings,
         "passages": found.get("passages", []),
         "retrieval_status": found.get("status"),
         "notice": found.get("notice", ""),
-        "context": build_context(resolutions, facts, found, notes),
+        "context": build_context(resolutions, facts, found, notes, siblings),
     }
 
 
+def name_note(resolutions):
+    """One plain line for a name that is close to a tie, put above the answer.
+
+    The model drops this caveat about half the time when only asked to, so it
+    is added here, where it cannot be dropped. Only near ties get it.
+    """
+    lines = ['"%s" is taken here to mean %s; the name is also used for %s.'
+             % (r["appellation"], r["name"], " and ".join(r["also"]))
+             for r in resolutions if r.get("via") == "alias" and r.get("also")]
+    return " ".join(lines)
+
+
+def with_note(answer_text, resolutions):
+    note = name_note(resolutions)
+    return "%s\n\n%s" % (note, answer_text) if note and answer_text else answer_text
+
+
 def generate(query, context, history=(), key=None, model=MODEL):
-    messages = [{"role": "system", "content": SYSTEM.format(context=context)}]
+    system = SYSTEM_SIMPLE if SIMPLE else SYSTEM
+    messages = [{"role": "system", "content": system.format(context=context)}]
     messages += list(history)[-HISTORY_TURNS:]
     messages.append({"role": "user", "content": query})
     return call_groq(messages, key, model)
@@ -675,7 +920,7 @@ def answer(retriever, query, history=(), key=None, model=MODEL):
     context = found["context"]
     if not key:
         return context, context
-    return generate(query, context, history, key, model), context
+    return with_note(generate(query, context, history, key, model), found["resolutions"]), context
 
 
 def main(argv=None):
@@ -693,7 +938,7 @@ def main(argv=None):
     if not key and not args.no_llm:
         print("GROQ_API_KEY is not set. Printing retrieved context instead of an answer.\n",
               file=sys.stderr)
-    r = Retriever(passages=not args.no_passages)
+    r = Retriever(passages=not args.no_passages, top_alias=SIMPLE)
 
     if args.once:
         try:

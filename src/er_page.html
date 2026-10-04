@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mahabharata | Entity normalization</title>
+<!-- Built like out/index.html: a fixed page, its data in a .js file that
+     assigns one global, so it opens from file:// with no server and no request.
+     src/phase2b_confidence.py copies this file next to er-data.js. -->
+<link rel="stylesheet" href="explorer.css">
+<script defer src="er-data.js"></script>
+<style>
+:root{--very_high:#216a4e;--high:#5c9a6f;--medium:#b58a3c;--low:#a2503f;--card:#fff}
+body{background:#f5f7f2}
+.topbar .wordmark span{font:600 10px/1.2 system-ui,sans-serif;letter-spacing:.14em;color:#9fb5a6}
+.er-stats{display:flex;gap:26px;margin-left:auto;font-size:12px;color:#aebfb2;flex-wrap:wrap}
+.er-stats b{display:block;font:22px/1.1 Georgia,serif;color:#fff}
+.er-banner{padding:9px 28px;background:#fbf5e9;color:#7c6240;border-bottom:1px solid #e8dbc6;font-size:12px;line-height:1.6}
+.er-tabs{display:flex;gap:4px;padding:12px 28px 0;background:#fff;border-bottom:1px solid var(--border);overflow-x:auto}
+.er-tabs button{border:0;background:none;padding:10px 14px;font:inherit;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.er-tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.er-panel{max-width:1500px;margin:0 auto;padding:22px 28px}
+.er-panel[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:18px 20px;margin-bottom:18px;min-width:0}
+.card h2{font:20px/1.3 Georgia,serif;margin:0 0 12px}
+.card h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.grid2{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;align-items:start}
+.grid-half{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters input,.filters select{font:inherit;padding:7px 10px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--ink);min-width:0}
+.filters input{flex:1 1 220px}
+.ent-list{max-height:70vh;overflow:auto;margin:0;padding:0;list-style:none}
+.ent-list li{display:flex;justify-content:space-between;gap:8px;padding:7px 8px;border-radius:4px;cursor:pointer}
+.ent-list li:hover{background:var(--wash)}
+.ent-list li[aria-selected=true]{background:var(--wash);font-weight:600}
+.ent-list small{color:var(--muted);font-variant-numeric:tabular-nums}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{text-align:left;font-weight:600;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid #eef2ec;vertical-align:top}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.table-wrap{overflow-x:auto}
+.chip{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;color:#fff;white-space:nowrap}
+.chip.very_high{background:var(--very_high)}.chip.high{background:var(--high)}.chip.medium{background:var(--medium)}.chip.low{background:var(--low)}
+.act{font-size:11px;color:var(--muted);white-space:nowrap}
+.act.human_review{color:#8a5d14;font-weight:600}
+.bar{height:6px;border-radius:3px;background:#e8ede6;min-width:60px;position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:3px}
+.feat{display:grid;grid-template-columns:repeat(5,34px);gap:2px;font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.feat span{text-align:center}
+.sent{font-family:Georgia,serif;line-height:1.55;color:#465149;max-width:560px}
+.sent mark{background:#f2e6c4;color:inherit;padding:0 2px;border-radius:2px}
+.cite{color:var(--muted);font-size:11px;white-space:nowrap}
+tr.row{cursor:pointer}
+tr.row:hover td{background:#fafcf8}
+tr.detail td{background:#f8faf7}
+.pager{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:10px;font-size:12px;color:var(--muted)}
+.pager button{font:inherit;padding:5px 10px;border:1px solid var(--border);background:#fff;border-radius:4px;cursor:pointer}
+.pager button:disabled{opacity:.4;cursor:default}
+.hbar{display:grid;grid-template-columns:120px minmax(0,1fr) 70px;gap:10px;align-items:center;margin:6px 0;font-size:12px}
+.hbar .bar{height:14px}
+.note{color:var(--muted);font-size:12px;line-height:1.6}
+.muted{color:var(--muted)}
+.nowrap{white-space:nowrap}
+.big{font:30px/1.2 Georgia,serif;margin:0}
+.delta-up{color:var(--accent)}.delta-down{color:var(--low)}
+@media(max-width:900px){.grid2{grid-template-columns:minmax(0,1fr)}.ent-list{max-height:260px}.er-panel,.er-banner{padding-left:16px;padding-right:16px}.er-tabs{padding:8px 16px 0}.er-stats{display:none}}
+</style>
+</head><body>
+<header class="topbar"><a class="wordmark" href="er.html">Mahabharata<span>ENTITY NORMALIZATION</span></a><div class="er-stats" id="stats"></div></header>
+<div class="er-banner" id="banner"></div>
+<nav class="er-tabs" role="tablist">
+<button role="tab" data-tab="characters" aria-selected="true">Characters</button>
+<button role="tab" data-tab="mentions" aria-selected="false">Mentions</button>
+<button role="tab" data-tab="review" aria-selected="false">Review queue</button>
+<button role="tab" data-tab="overview" aria-selected="false">Bands &amp; gate</button>
+<button role="tab" data-tab="gold" aria-selected="false">Gold standard</button>
+</nav>
+
+<section class="er-panel" id="tab-characters">
+<div class="grid2">
+<div class="card"><div class="filters"><input id="ent-q" placeholder="Find a character or alias" aria-label="Find a character or alias"></div><ul class="ent-list" id="ent-list"></ul></div>
+<div class="card" id="ent-detail"></div>
+</div>
+</section>
+
+<section class="er-panel" id="tab-mentions" hidden>
+<div class="card">
+<div class="filters">
+<input id="m-q" placeholder="Search name, candidate or sentence" aria-label="Search mentions">
+<select id="m-band" aria-label="Band"><option value="">All bands</option></select>
+<select id="m-action" aria-label="Action"><option value="">All actions</option></select>
+<select id="m-parva" aria-label="Parva"><option value="">All parvas</option></select>
+<select id="m-multi" aria-label="Candidates"><option value="">Any candidates</option><option value="1">More than one candidate</option></select>
+</div>
+<div class="table-wrap"><table id="m-table"></table></div>
+<div class="pager" id="m-pager"></div>
+</div>
+</section>
+
+<section class="er-panel" id="tab-review" hidden>
+<div class="grid2">
+<div class="card"><h2>By name</h2><p class="note">Mentions routed to a human: a medium score, or a runner-up too close to call.</p><ul class="ent-list" id="rv-list"></ul></div>
+<div class="card"><div class="table-wrap"><table id="rv-table"></table></div><div class="pager" id="rv-pager"></div></div>
+</div>
+</section>
+
+<section class="er-panel" id="tab-overview" hidden></section>
+<section class="er-panel" id="tab-gold" hidden></section>
+
+<script>
+// Runs after the deferred er-data.js, the way explorer.js runs after projection.js.
+document.addEventListener("DOMContentLoaded", function(){
+"use strict";
+const D = window.KGER;
+if (!D) { document.body.insertAdjacentHTML("beforeend", "<p class='er-panel'>er-data.js did not load. Keep it in the same folder as this page.</p>"); return; }
+const BANDS = D.bands.map(b => b[1]), ACTIONS = D.actions;
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+const fmt = n => Number(n).toLocaleString("en");
+const pct = x => (100 * x).toFixed(1) + "%";
+const bandOf = c => { for (const [lo, name] of D.bands) if (c >= lo) return name; return "low"; };
+const $ = id => document.getElementById(id);
+
+// Mention rows: [id, surface, parva, adhyaya, sentence index, action index, candidates]
+// candidates: [name, confidence, A, C, R, S, E, sources], best first.
+const M = D.mentions.map(r => ({id: r[0], surface: r[1], parva: r[2], adhyaya: r[3], sent: D.sentences[r[4]],
+  action: ACTIONS[r[5]], cands: r[6], top: r[6][0], band: bandOf(r[6][0][1]),
+  margin: r[6].length > 1 ? r[6][0][1] - r[6][1][1] : null}));
+
+// --- header, banner
+$("stats").innerHTML = [["mentions scored", D.summary.scored], ["characters", D.entities.length],
+  ["auto-accepted", D.summary.actions.auto_accept || 0], ["to review", D.summary.actions.human_review || 0]]
+  .map(([k, v]) => "<div><b>" + fmt(v) + "</b>" + k + "</div>").join("");
+$("banner").innerHTML = "<strong>Proposals only.</strong> Nothing on this page is in the asserted graph. " +
+  "Confidence = " + Object.entries(D.weights).map(([k, v]) => v.toFixed(2) + "&middot;" + k).join(" + ") +
+  " (" + (D.gold ? "learned weights are reported under Gold standard" : "the design document's weights, not learned") + "). " +
+  (D.gold ? "Calibration is measured against " + fmt(D.gold.n) + " hand-linked mentions."
+          : "Confidence is not accuracy: no gold standard has been scored yet.");
+
+// --- tabs, linkable as er.html#mentions
+function showTab(name) {
+  const b = document.querySelector(".er-tabs button[data-tab='" + name + "']");
+  if (!b) return;
+  document.querySelectorAll(".er-tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
+  document.querySelectorAll(".er-panel").forEach(p => p.hidden = p.id !== "tab-" + name);
+}
+document.querySelectorAll(".er-tabs button").forEach(b => b.addEventListener("click", () => {
+  showTab(b.dataset.tab);
+  history.replaceState(null, "", "#" + b.dataset.tab);
+}));
+showTab(location.hash.slice(1) || "characters");
+
+// --- shared renderers
+function sentenceHTML(s, surface) {
+  // Whole words only: "Nara" must not light up inside "Narayana".
+  const t = esc(s), m = esc(surface);
+  const re = new RegExp("(^|[^A-Za-z])(" + m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")(?![A-Za-z])");
+  return t.replace(re, "$1<mark>$2</mark>");
+}
+function confCell(c) {
+  const b = bandOf(c);
+  return "<span class='chip " + b + "'>" + c.toFixed(2) + "</span>";
+}
+function featHTML(c) {
+  return "<div class='feat' title='A alias, C context, R relations, S source, E type'>" +
+    ["A", "C", "R", "S", "E"].map((k, i) => "<span title='" + k + "'>" + k + " " + c[2 + i].toFixed(2) + "</span>").join("") + "</div>";
+}
+function candTable(m) {
+  return "<table><tr><th>candidate</th><th class='num'>confidence</th><th>A &middot; C &middot; R &middot; S &middot; E</th><th>proposed by</th></tr>" +
+    m.cands.map(c => "<tr><td>" + esc(c[0]) + "</td><td class='num'>" + confCell(c[1]) + "</td><td>" + featHTML(c) +
+      "</td><td class='muted'>" + esc(c[7]) + "</td></tr>").join("") + "</table>";
+}
+function mentionTable(tableEl, pagerEl, rows, page, onPage) {
+  const per = 50, pages = Math.max(1, Math.ceil(rows.length / per));
+  page = Math.min(page, pages - 1);
+  const slice = rows.slice(page * per, page * per + per);
+  tableEl.innerHTML = "<thead><tr><th>mention</th><th>linked to</th><th class='num'>confidence</th><th>action</th><th>runner-up</th><th>scores</th><th>passage</th></tr></thead><tbody>" +
+    slice.map((m, i) => "<tr class='row' data-i='" + i + "'><td><strong>" + esc(m.surface) + "</strong></td><td>" + esc(m.top[0]) +
+      "</td><td class='num'>" + confCell(m.top[1]) + "</td><td class='act " + m.action + "'>" + m.action.replace(/_/g, " ") +
+      "</td><td class='muted'>" + (m.cands[1] ? esc(m.cands[1][0]) + " <span class='cite'>(&minus;" + m.margin.toFixed(2) + ")</span>" : "&mdash;") +
+      "</td><td>" + featHTML(m.top) + "</td><td><div class='sent'>" + sentenceHTML(m.sent, m.surface) +
+      "</div><div class='cite'>" + esc(m.parva) + (m.adhyaya != null ? " / " + m.adhyaya : "") + "</div></td></tr>").join("") + "</tbody>";
+  tableEl.querySelectorAll("tr.row").forEach(tr => tr.addEventListener("click", () => {
+    const next = tr.nextElementSibling;
+    if (next && next.classList.contains("detail")) { next.remove(); return; }
+    tr.insertAdjacentHTML("afterend", "<tr class='detail'><td colspan='7'>" + candTable(slice[+tr.dataset.i]) + "</td></tr>");
+  }));
+  pagerEl.innerHTML = "<span>" + fmt(rows.length) + " mentions</span><button " + (page ? "" : "disabled") + ">Previous</button><span>page " +
+    (page + 1) + " of " + pages + "</span><button " + (page < pages - 1 ? "" : "disabled") + ">Next</button>";
+  const [prev, next] = pagerEl.querySelectorAll("button");
+  prev.onclick = () => onPage(page - 1); next.onclick = () => onPage(page + 1);
+}
+
+// --- characters
+const byEntity = {};
+M.forEach(m => { if (m.action === "auto_accept" || m.action === "accept_sample_verify") (byEntity[m.top[0]] = byEntity[m.top[0]] || []).push(m); });
+let entSel = D.entities.length ? D.entities[0].name : null;
+function renderEntList() {
+  const q = $("ent-q").value.trim().toLowerCase();
+  const list = D.entities.filter(e => !q || e.name.toLowerCase().includes(q) || e.aliases.some(a => a[0].toLowerCase().includes(q)));
+  $("ent-list").innerHTML = list.slice(0, 600).map(e => "<li role='option' aria-selected='" + (e.name === entSel) + "' data-n='" + esc(e.name) +
+    "'><span>" + esc(e.name) + " <small>" + esc(e.id) + "</small></span><small>" + fmt(e.mentions) + "</small></li>").join("") ||
+    "<li class='muted'>No match</li>";
+  $("ent-list").querySelectorAll("li[data-n]").forEach(li => li.onclick = () => { entSel = li.dataset.n; renderEntList(); renderEntity(); });
+}
+function renderEntity() {
+  const e = D.entities.find(x => x.name === entSel);
+  if (!e) { $("ent-detail").innerHTML = "<p class='muted'>No accepted links yet.</p>"; return; }
+  const ms = byEntity[e.name] || [];
+  $("ent-detail").innerHTML = "<p class='cite'>" + esc(e.id) + " &middot; canonical entity</p><h1 class='big'>" + esc(e.name) + "</h1>" +
+    "<p class='note'>" + fmt(e.mentions) + " accepted mentions under " + e.aliases.length + " surface forms. Aliases are the names these mentions were written with; " +
+    "a name shared with another character appears under each, split by passage.</p>" +
+    "<h3>Aliases</h3><div class='table-wrap'><table><tr><th>written as</th><th class='num'>mentions</th><th class='num'>mean confidence</th><th>proposed by</th></tr>" +
+    e.aliases.map(a => "<tr><td>" + esc(a[0]) + "</td><td class='num'>" + fmt(a[1]) + "</td><td class='num'>" + confCell(a[2]) +
+      "</td><td class='muted'>" + esc(a[3]) + "</td></tr>").join("") + "</table></div>" +
+    "<h3>Accepted mentions</h3><div class='table-wrap'><table id='ent-m'></table></div><div class='pager' id='ent-p'></div>";
+  const go = p => mentionTable($("ent-m"), $("ent-p"), ms, p, go); go(0);
+}
+$("ent-q").addEventListener("input", renderEntList);
+renderEntList(); renderEntity();
+
+// --- mentions
+const parvas = [...new Set(M.map(m => m.parva))].sort();
+BANDS.forEach(b => $("m-band").insertAdjacentHTML("beforeend", "<option>" + b + "</option>"));
+ACTIONS.forEach(a => $("m-action").insertAdjacentHTML("beforeend", "<option value='" + a + "'>" + a.replace(/_/g, " ") + "</option>"));
+parvas.forEach(p => $("m-parva").insertAdjacentHTML("beforeend", "<option>" + esc(p) + "</option>"));
+let mRows = M;
+function filterMentions() {
+  const q = $("m-q").value.trim().toLowerCase(), b = $("m-band").value, a = $("m-action").value,
+        p = $("m-parva").value, multi = $("m-multi").value;
+  mRows = M.filter(m => (!b || m.band === b) && (!a || m.action === a) && (!p || m.parva === p) &&
+    (!multi || m.cands.length > 1) &&
+    (!q || m.surface.toLowerCase().includes(q) || m.top[0].toLowerCase().includes(q) || m.sent.toLowerCase().includes(q)));
+  goM(0);
+}
+const goM = p => mentionTable($("m-table"), $("m-pager"), mRows, p, goM);
+["m-q", "m-band", "m-action", "m-parva", "m-multi"].forEach(id => $(id).addEventListener("input", filterMentions));
+goM(0);
+
+// --- review queue
+const review = M.filter(m => m.action === "human_review");
+const rvCount = {};
+review.forEach(m => rvCount[m.surface] = (rvCount[m.surface] || 0) + 1);
+let rvSel = null;
+function renderReview() {
+  $("rv-list").innerHTML = "<li aria-selected='" + (rvSel === null) + "' data-n=''><span>All names</span><small>" + fmt(review.length) + "</small></li>" +
+    Object.entries(rvCount).sort((a, b) => b[1] - a[1]).map(([s, n]) => "<li aria-selected='" + (s === rvSel) + "' data-n='" + esc(s) +
+      "'><span>" + esc(s) + "</span><small>" + fmt(n) + "</small></li>").join("");
+  $("rv-list").querySelectorAll("li").forEach(li => li.onclick = () => { rvSel = li.dataset.n || null; renderReview(); });
+  const rows = rvSel ? review.filter(m => m.surface === rvSel) : review;
+  const go = p => mentionTable($("rv-table"), $("rv-pager"), rows, p, go); go(0);
+}
+renderReview();
+
+// --- bands and gate
+function hbars(obj, order, total, cls) {
+  return order.filter(k => obj[k] != null).map(k => "<div class='hbar'><span>" + esc(k.replace(/_/g, " ")) + "</span><div class='bar'><i class='" + (cls ? k : "") +
+    "' style='width:" + (100 * obj[k] / total).toFixed(1) + "%;background:" + (cls ? "var(--" + k + ")" : "var(--accent)") + "'></i></div><span class='num'>" +
+    fmt(obj[k]) + "</span></div>").join("");
+}
+const g = D.gate, S = D.summary;
+const gateRow = (label, k, req, kind) => {
+  const b = g.before[k], a = g.after[k];
+  const show = v => kind === "pct" ? pct(v) : kind === "dec" ? v.toFixed(2) : (typeof v === "number" ? fmt(v) : esc(v));
+  const cls = typeof a === "number" && typeof b === "number" && a !== b ? (a > b ? "delta-up" : "delta-down") : "";
+  return "<tr><td class='nowrap'>" + label + "</td><td class='num'>" + show(b) + "</td><td class='num " + cls + "'>" + show(a) + "</td><td class='muted nowrap'>" + req + "</td></tr>";
+};
+$("tab-overview").innerHTML = "<div class='grid-half'>" +
+  "<div class='card'><h2>Confidence bands</h2>" + hbars(S.bands, BANDS, S.scored, true) +
+  "<p class='note'>&ge; " + D.bands[0][0] + " auto-accept, &ge; " + D.bands[1][0] + " accept with sample verification, &ge; " + D.bands[2][0] +
+  " human review, below that reject.</p><h3>Actions</h3>" + hbars(S.actions, ACTIONS, S.scored, false) +
+  "<p class='note'>" + fmt(S.multi) + " mentions had more than one candidate. " + fmt(S.close) + " went to review because the runner-up was within " +
+  D.margin + ", whatever their score.</p></div>" +
+  "<div class='card'><h2>Effect on the Phase 6 entry gate</h2><div class='table-wrap'><table><tr><th>measure</th><th class='num'>before</th><th class='num'>after</th><th>required</th></tr>" +
+  gateRow("distinct triples", "triples", "&ge; 10,000") + gateRow("entities", "entities", "") +
+  gateRow("entities of degree &ge; 5", "degree_ge_5", "&ge; 500") + gateRow("largest relation share", "top_share", "&le; 40%", "pct") +
+  gateRow("mean degree", "mean_degree", "", "dec") + gateRow("highest degree", "max_degree", "") + "</table></div>" +
+  "<p class='note'>Relation endpoints rewritten through accepted links only. Merging turns Shakra, Vasava and Maghavan into Indra: a triple written under two names becomes one, " +
+  "a triple between two names of one person is dropped, and several nodes of degree 5 become one node. Normalization cannot add a triple.</p></div></div>" +
+  "<div class='card'><h2>Ambiguous names, how their mentions split</h2><div class='table-wrap'><table><tr><th>written as</th><th class='num'>mentions</th><th>accepted as</th><th class='num'>to review</th></tr>" +
+  D.ambiguous.map(a => "<tr><td>" + esc(a.surface) + "</td><td class='num'>" + fmt(a.mentions) + "</td><td>" +
+    (Object.entries(a.accepted).map(([k, v]) => esc(k) + " " + fmt(v)).join(", ") || "<span class='muted'>&mdash;</span>") +
+    "</td><td class='num'>" + fmt(a.review) + "</td></tr>").join("") + "</table></div></div>";
+
+// --- gold standard
+function relTable(rows) {
+  return "<table><tr><th>confidence</th><th class='num'>mentions</th><th class='num'>mean confidence</th><th class='num'>share correct</th><th>gap</th></tr>" +
+    rows.map(r => "<tr><td>" + r[0] + "</td><td class='num'>" + fmt(r[1]) + "</td><td class='num'>" + r[2].toFixed(3) + "</td><td class='num'>" +
+      r[3].toFixed(3) + "</td><td><div class='bar'><i style='width:" + Math.min(100, 100 * Math.abs(r[2] - r[3])).toFixed(1) +
+      "%;background:var(--" + (Math.abs(r[2] - r[3]) > .1 ? "low" : "high") + ")'></i></div></td></tr>").join("") + "</table>";
+}
+const G = D.gold;
+$("tab-gold").innerHTML = !G ? "<div class='card'><h2>No gold standard yet</h2><p class='note'>Fill <code>gold_template.csv</code> (the mention is marked in the sentence; " +
+  "write one of the listed candidates, OTHER, NOT_A_PERSON or UNSURE in <code>correct_entity</code>), save it as <code>er_gold.csv</code> and run again. " +
+  "This tab then shows precision, recall and F1 per threshold, calibration, and the weights learned from your links. Do not open <code>gold_key.csv</code> first.</p></div>" :
+  "<div class='card'><h2>Against " + fmt(G.n) + " hand-linked mentions</h2><div class='table-wrap'><table><tr><th>accept at</th><th class='num'>predicted</th><th class='num'>TP</th><th class='num'>FP</th><th class='num'>FN</th><th class='num'>precision</th><th class='num'>recall</th><th class='num'>F1</th></tr>" +
+  G.thresholds.map(t => "<tr><td>" + t[0].toFixed(2) + "</td>" + t.slice(1, 5).map(v => "<td class='num'>" + fmt(v) + "</td>").join("") +
+    t.slice(5).map(v => "<td class='num'>" + v.toFixed(3) + "</td>").join("") + "</tr>").join("") + "</table></div></div>" +
+  "<div class='grid-half'>" + G.calibration.map(c => "<div class='card'><h2>Calibration, " + esc(c.name) + "</h2><p class='note'>ECE " + c.ece.toFixed(3) +
+    ", Brier " + c.brier.toFixed(3) + ". A calibrated score has share correct close to mean confidence in every row.</p><div class='table-wrap'>" + relTable(c.rows) + "</div></div>").join("") + "</div>" +
+  (G.coef ? "<div class='card'><h2>Learned weights</h2><p class='note'>Logistic regression over every (mention, candidate) row, cross-validated by name so no alias is in both train and test.</p><div class='table-wrap'><table><tr><th>feature</th><th class='num'>coefficient</th><th class='num'>share of positive weight</th><th class='num'>design weight</th></tr>" +
+    G.coef.map(r => "<tr><td>" + r[0] + "</td><td class='num'>" + r[1].toFixed(3) + "</td><td class='num'>" + r[2].toFixed(2) + "</td><td class='num'>" + r[3].toFixed(2) + "</td></tr>").join("") +
+    "</table></div></div>" : "");
+});
+</script>
+</body></html>

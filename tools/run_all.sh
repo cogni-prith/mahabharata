@@ -23,6 +23,9 @@ $PY src/phase4_sample.py               # draw the precision sample
 $PY src/phase4e_sample.py              # draw the sample for the expanded patterns
 # HUMAN: judge a new sample into annotations/, keyed on the triple and the pattern as annotations/phase4e_judged.csv is. A row id is a position in relations.parquet and does not survive a re-extraction
 $PY src/phase4_precision.py            # precision from the judgements in annotations/
+# OPTIONAL: entity normalization. Uncomment both to build Phases 5 to 8 on the folded graph.
+# $PY src/phase2b_confidence.py        # confidence per mention, build/er/ and the page build/er/er.html
+# $PY src/phase4f_apply_er.py          # relation endpoints through accepted links; raw kept in build/relations_raw.parquet
 $PY src/phase5_propose.py              # proposals, separate graph, never asserted
 $PY src/phase5_blind_sample.py         # draw the blind set, docs/PHASE5_SAMPLING.md, seed 20260914. Refuses to overwrite
 $PY src/annot_pages.py                 # build/annot_blind.html and build/annot_entities.html from public columns only

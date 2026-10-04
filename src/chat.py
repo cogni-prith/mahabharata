@@ -197,7 +197,7 @@ How to write:
 - At most 80 words, not counting the Source line.
 
 Names:
-- Under NAMES, every name in the question is matched to one person. Treat it as that person. The first time, write it as "Dhananjaya (Arjuna)". Never say a name is unresolved, uncertain or ambiguous.
+- Under NAMES, every name in the question is matched to one person. Treat it as that person. Write the person as the question named them. Only when the question used another name for them, and only the first time, add the common name in brackets: asked about Dhananjaya, write "Dhananjaya (Arjuna)"; asked about Arjuna, write just "Arjuna". Never say a name is unresolved, uncertain or ambiguous.
 - If a NAMES line says the name is also used almost as often for others, you must say so once, as a short clause, the first time you use the name: "Partha (here Yudhishthira; the name is also used for Arjuna and Bhima)". Then answer for the matched person only.
 - A name listed as another name for someone is that person. Treat facts recorded under it as facts about them.
 

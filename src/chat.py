@@ -130,6 +130,17 @@ MAX_SIBLINGS = 12
 # so src/test_chat.py keeps testing the rule it was written for.
 SIMPLE = os.environ.get("MBH_STRICT_NAMES") != "1"
 SIBLING_HINTS = ("brother", "sister", "sibling")
+# A family question: words whose stems mark kinship. Plain-language mode then
+# adds a FAMILY block reaching two steps out from the people named.
+KIN_HINTS = ("father", "mother", "parent", "son", "daughter", "child", "brother", "sister",
+             "sibling", "grand", "uncle", "aunt", "cousin", "nephew", "niece", "wife",
+             "husband", "spouse", "marri", "born", "divine", "relat", "family", "lineage",
+             "descend", "ancestor", "progenitor")
+# Gods of the curated family table's cosmic clan. A row there with one of them
+# as the parent is a divine parent, as Dharma for Yudhishthira and Vayu for Bhima.
+DIVINE = {"indra", "surya", "vayu", "dharma", "ashwins", "ashvins", "agni", "varuna", "yama"}
+MAX_FAMILY = 40
+LINEAGE = "annotations/lineage/mahabharata_lineage.csv"
 # Popular spellings the corpus does not use. Most popular forms only drop the
 # final a (Arjun, Karn, Bhishm) and resolve() handles those by rule; these are
 # the ones a rule cannot reach. Values are corpus spellings, lower case.
@@ -205,6 +216,9 @@ Facts:
 - Give the answer stated most often (highest support). Mention a rival only if it is stated as often.
 - A parent fact tagged [X is the mother] or [X is the father] tells you which. Use it plainly: "Arjuna's mother is Kunti and his father is Pandu". A parent with no tag is only known to be a parent: say "parent" for that one, unless the evidence quote itself says father or mother. Asked for a mother or father that no tag or quote identifies, name the recorded parents and say the text here does not mark which is which. Never decide it from how often a parent is mentioned.
 - SIBLINGS lists people who share a recorded parent. Asked about brothers or sisters, name every person in SIBLINGS, and call them brothers or sisters plainly.
+- For any family question, answer from FAMILY first. It already reaches two steps out: a person's parents and grandparents, and a person's children with each child's other parents, including divine fathers. A maternal grandparent is the mother's parent; a paternal grandparent is the father's parent. If FAMILY does not mark the side, say "grandparent through" that parent. Names in FAMILY are already merged, so never list one person twice under two names.
+- A link from the "curated family table" is from the project's hand-made family table and cites no passage. Use it, and mark it once in plain words, such as "(from the family table)". Put "family table" in the Source line for it.
+- KINSHIP PATH is the shortest chain of family links between two people. Explain it in plain words, step by step, and name the relationship it adds up to only when the chain makes it plain (a parent's sibling's child is a cousin; a spouse's sibling is an in-law).
 - Facts marked predicted or proposed are a model's guesses; if you use one, say "possibly".
 - If the context does not answer the question, say so in one sentence and give the closest thing it does say.
 - The facts record only these kinds of relation: parent, divine parent, spouse, ruled, fought, was killed by, was defeated by, was cursed by, was taught by, spoke to, and siblings worked out from parents. Asked about any other kind (ally, friend, enemy, uncle, grandson, charioteer, and so on), say in your first sentence that this kind of relation is not recorded, then give the closest facts under their real meaning. Never present "spoke to" as alliance, friendship or loyalty.
@@ -289,8 +303,12 @@ class Retriever:
         links = root / "build/er/mention_links.csv"
         if top_alias and links.exists():
             ml = pd.read_csv(links, usecols=["surface", "candidate", "confidence", "action",
-                                             "parva", "adhyaya_ordinal"])
-            mass = (ml[ml.action != "reject"].groupby(["surface", "candidate"])
+                                             "parva", "adhyaya_ordinal", "sources"])
+            # A link proposed by spelling likeness alone is not evidence of
+            # identity: it mapped Shura, Kunti's father, onto the sage Shukra.
+            # Seed, apposition and identity links remain.
+            mass = (ml[(ml.action != "reject") & (ml.sources != "spelling")]
+                    .groupby(["surface", "candidate"])
                     .confidence.sum().sort_values(ascending=False))
             for surface, group in mass.groupby(level=0, sort=False):
                 cands = group.droplevel(0)
@@ -316,6 +334,88 @@ class Retriever:
         if top_alias and roles.exists():
             pr = pd.read_csv(roles)
             self.parent_roles = {p: r for p, r in zip(pr.parent, pr.role) if r in ("mother", "father")}
+        self._moved_init_tail(root, passages, index)
+        self.kin = self._build_kin(root) if top_alias else ({}, {}, {})
+
+    def canon(self, name):
+        """A name as the graph spells the person: Bhima -> Bhimasena, Draupadi -> Droupadi.
+
+        A bracketed name is a different person by the curated table's own
+        convention ("Kunti (ancestor)", "Karna (Kaurava)") and is left as
+        written, unless the bracket names the same person as the name before
+        it: "Pritha (Kunti)" is Kunti.
+        """
+        if "(" in name:
+            base, _, note = name.partition("(")
+            note = note.rstrip(") ").strip()
+            same = self.canon(note) if note and "(" not in note else None
+            if same and same in self.by_norm.values() and self.canon(base) == same:
+                return same
+            return name.strip()
+        n = norm_surface(name).strip()
+        n = SPELLINGS.get(n, n)
+        if n in self.alias_by_norm:
+            return self.top_of[self.alias_by_norm[n]]
+        return self.by_norm.get(n, name.strip())
+
+    def _build_kin(self, root):
+        """Parent, child and spouse links, from the graph and the curated table.
+
+        Graph rows keep their citation. A row whose end is a leftover epithet
+        node ("Kounteya", "Dharmaraja") is skipped: Phase 4f already folded the
+        confident mentions into their person, so what is left under the epithet
+        is exactly the doubtful part, and "Kounteya" would hand Bhima's divine
+        father to Yudhishthira. A bare title on one row ("Ajamidha") is skipped
+        as well. The curated table is hand-made and uncited; its links are
+        labelled so, and never override a link the text states.
+        """
+        up, down, spouse = {}, {}, {}
+        kinds = {"bornTo": "parent", "hasDivineProgenitor": "divine"}
+        titles = set(self.appellations.values())
+        curated = []
+        path = root / LINEAGE
+        if path.exists():
+            for r in pd.read_csv(path).itertuples():
+                par, child = self.canon(str(r.Parent)), self.canon(str(r.Child))
+                if par != child:
+                    curated.append((par, child))
+        curated_parents = {}
+        for par, child in curated:
+            curated_parents.setdefault(child, set()).add(par)
+        rel = self.rel[self.rel.predicate.isin(list(kinds) + ["hasSpouse"])]
+        rel = rel.sort_values("cited", ascending=False)
+        for (s, p, o), g in rel.groupby(["subject", "predicate", "object"], sort=False):
+            if any(norm_surface(n) in self.alias_by_norm for n in (s, o)):
+                continue
+            # A bare title on one row ("Ajamidha"). A real person who also sits in
+            # the appellation table, as Bhimasena does, is kept when the curated
+            # table knows them.
+            known = set(curated_parents) | {q for ps in curated_parents.values() for q in ps}
+            if len(g) < 2 and any(n in titles and n not in known for n in (s, o)):
+                continue
+            # A parent stated once that the curated table contradicts is most
+            # likely a name clash: "Nakula, Drona's son", "Jarasandha's son,
+            # Sahadeva", and Vyasa read as Krishna in "Krishna, Satyavati's son".
+            if (p == "bornTo" and len(g) < 2 and s in curated_parents
+                    and o not in curated_parents[s]):
+                continue
+            r0 = g.iloc[0]
+            link = {"source": "text", "cite": citation(r0.parva, r0.adhyaya_ordinal, r0.cited),
+                    "support": len(g)}
+            if p == "hasSpouse":
+                spouse.setdefault(s, {}).setdefault(o, link)
+                spouse.setdefault(o, {}).setdefault(s, link)
+            else:
+                up.setdefault(s, {}).setdefault(o, dict(link, kind=kinds[p]))
+                down.setdefault(o, {}).setdefault(s, dict(link, kind=kinds[p]))
+        for par, child in curated:
+            link = {"source": "curated", "cite": "family table", "support": 0,
+                    "kind": "divine" if par.lower() in DIVINE else "parent"}
+            up.setdefault(child, {}).setdefault(par, link)
+            down.setdefault(par, {}).setdefault(child, link)
+        return up, down, spouse
+
+    def _moved_init_tail(self, root, passages, index):
         # The reverse index: given an entity, which appellations name it. Asked
         # for Arjuna's father the graph looked empty, and the father was there
         # the whole time under his epithets. bornTo Pandu is stated seven times
@@ -583,6 +683,103 @@ class Retriever:
             out += sorted(seen.values(), key=lambda s: -len(s["parents"]))
         return out[:MAX_SIBLINGS]
 
+    def role_of(self, parent, link):
+        if link["kind"] == "divine":
+            return "divine father"
+        return self.parent_roles.get(parent, "parent")
+
+    @staticmethod
+    def source_of(link):
+        return "text %s" % link["cite"] if link["source"] == "text" else "curated family table"
+
+    def family(self, resolutions, query=""):
+        """Kin two steps out from the people a family question names.
+
+        Retrieval otherwise reaches only facts that touch a named person, so
+        "Dhananjaya's maternal grandfather" stopped at Kunti and "Pandu's sons
+        and their divine fathers" stopped at the sons. This walks one more step:
+        parents and their parents, children and their other parents, spouses.
+        """
+        words = norm_surface(query).split()
+        if not self.top_alias or not any(w.startswith(h) for w in words for h in KIN_HINTS):
+            return {"lines": [], "path": []}
+        people = []
+        for r in resolutions:
+            if r["resolved"] and r["via"] != "epithet":
+                n = self.canon(r["name"])
+                if n not in people:
+                    people.append(n)
+        up, down, spouse = self.kin
+
+        def fmt(name, link, role=None):
+            return "%s (%s%s)" % (name, role + "; " if role else "", self.source_of(link))
+
+        lines = []
+        for p in people[:3]:
+            parents = up.get(p, {})
+            if parents:
+                lines.append("%s's parents: %s" % (p, ", ".join(
+                    fmt(q, l, self.role_of(q, l)) for q, l in parents.items())))
+            for q, l in parents.items():
+                grand = up.get(q, {})
+                if l["kind"] == "divine" or not grand:
+                    continue
+                side = {"mother": "maternal", "father": "paternal"}.get(self.parent_roles.get(q))
+                label = "%s grandparents" % side if side else "grandparents through %s" % q
+                lines.append("%s's %s, the parents of %s: %s" % (p, label, q, ", ".join(
+                    fmt(g, gl, self.role_of(g, gl)) for g, gl in grand.items())))
+            kids = list(down.get(p, {}).items())[:15]
+            if kids:
+                lines.append("%s's children: %s" % (p, ", ".join(
+                    fmt(c, l, "as divine father" if l["kind"] == "divine" else None) for c, l in kids)))
+                for c, _ in kids:
+                    others = [(q, l) for q, l in up.get(c, {}).items() if q != p]
+                    if others:
+                        lines.append("  %s's other parents: %s" % (c, ", ".join(
+                            fmt(q, l, self.role_of(q, l)) for q, l in others)))
+            if spouse.get(p):
+                lines.append("%s's spouses: %s" % (p, ", ".join(
+                    fmt(s, l) for s, l in spouse[p].items())))
+        path = self.kin_path(people[0], people[1]) if len(people) >= 2 else []
+        return {"lines": lines[:MAX_FAMILY], "path": path}
+
+    def kin_path(self, a, b, depth=5):
+        """The shortest chain of parent, child and spouse links from a to b.
+
+        Divine parentage is left out: Indra or Surya alone would connect half
+        the epic, which is a true statement and no answer to "how are they related".
+        """
+        up, down, spouse = self.kin
+
+        def steps(n):
+            for q, l in up.get(n, {}).items():
+                if l["kind"] != "divine":
+                    yield q, "%s is %s's %s" % (q, n, self.role_of(q, l)), l
+            for c, l in down.get(n, {}).items():
+                if l["kind"] != "divine":
+                    yield c, "%s is %s's child" % (c, n), l
+            for s, l in spouse.get(n, {}).items():
+                yield s, "%s is %s's spouse" % (s, n), l
+
+        prev, frontier = {a: None}, [a]
+        for _ in range(depth):
+            nxt = []
+            for n in frontier:
+                for m, text, l in steps(n):
+                    if m not in prev:
+                        prev[m] = (n, "%s (%s)" % (text, self.source_of(l)))
+                        nxt.append(m)
+            if b in prev:
+                break
+            frontier = nxt
+        if b not in prev:
+            return []
+        chain, n = [], b
+        while prev[n]:
+            n, text = prev[n]
+            chain.append(text)
+        return [("%s and %s" % (a, b), list(reversed(chain)))]
+
     @staticmethod
     def _citations(hit, row):
         """Every distinct chapter that states this triple, best first.
@@ -692,7 +889,7 @@ def relevant(query):
             if any(h in words or any(w.startswith(h) for w in words) for h in hints)}
 
 
-def build_context(resolutions, facts, retrieval, notes=(), siblings=()):
+def build_context(resolutions, facts, retrieval, notes=(), siblings=(), family=None):
     """The context block, and the only thing besides the question that is sent.
 
     Every fact line ends in a citation or the word uncited, so the model cannot
@@ -782,6 +979,19 @@ def build_context(resolutions, facts, retrieval, notes=(), siblings=()):
                           n["evidence_count"], n["candidates"]))
         out.append("")
 
+    if family and family["lines"]:
+        out.append("FAMILY, up to two steps from the people in the question. Names are "
+                   "already merged to one person each. A 'text' link cites a passage; a "
+                   "'curated family table' link comes from the project's hand-made family "
+                   "table and cites no passage.")
+        out += ["  " + line for line in family["lines"]]
+        out.append("")
+    if family and family["path"]:
+        for pair, chain in family["path"]:
+            out.append("KINSHIP PATH between %s, shortest chain of family links:" % pair)
+            out += ["  %d. %s" % (i + 1, step) for i, step in enumerate(chain)]
+        out.append("")
+
     if siblings:
         out.append("SIBLINGS, worked out from a shared recorded parent. The graph has no "
                    "sibling relation of its own.")
@@ -832,7 +1042,7 @@ def retry_after(detail, default=6.0):
     return min(float(match.group(1)) + 0.5, 30.0) if match else default
 
 
-def call_groq(messages, key, model=MODEL, endpoint=ENDPOINT, timeout=60, retries=2):
+def call_groq(messages, key, model=MODEL, endpoint=ENDPOINT, timeout=90, retries=2):
     body = json.dumps({"model": model, "messages": messages}).encode()
     req = urllib.request.Request(endpoint, data=body, method="POST", headers={
         "Authorization": "Bearer " + key, "Content-Type": "application/json",
@@ -853,6 +1063,12 @@ def call_groq(messages, key, model=MODEL, endpoint=ENDPOINT, timeout=60, retries
         raise RuntimeError("Groq returned %d: %s" % (e.code, detail))
     except urllib.error.URLError as e:
         raise RuntimeError("Could not reach Groq: %s" % e.reason)
+    except TimeoutError:
+        # A slow reply raises TimeoutError from the read, not URLError, and it
+        # reached the service as a bare 500 "Local request failed". Said plainly
+        # instead. Not retried: a second wait would hold the page for minutes.
+        raise RuntimeError("Groq took longer than %d s to answer. Try asking again in a "
+                           "moment." % timeout)
     message = payload["choices"][0]["message"]
     # Reasoning models put the answer in content and their scratch work in a
     # separate field. Only the answer is shown; the scratch work is not an
@@ -875,6 +1091,7 @@ def retrieve(retriever, query):
     for f in facts:
         f["may_be"] = [n for n in notes if n["appellation"] in (f["subject"], f["object"])][:2]
     siblings = retriever.siblings(resolutions, query)
+    family = retriever.family(resolutions, query) if retriever.top_alias else {"lines": [], "path": []}
     found = retriever.passages(query)
     return {
         "query": query,
@@ -882,10 +1099,11 @@ def retrieve(retriever, query):
         "facts": facts,
         "coreference": notes,
         "siblings": siblings,
+        "family": family,
         "passages": found.get("passages", []),
         "retrieval_status": found.get("status"),
         "notice": found.get("notice", ""),
-        "context": build_context(resolutions, facts, found, notes, siblings),
+        "context": build_context(resolutions, facts, found, notes, siblings, family),
     }
 
 

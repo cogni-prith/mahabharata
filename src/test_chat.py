@@ -26,6 +26,25 @@ def test_misspelling(r):
         assert want in got, "%r did not reach %s, got %r" % (typo, want, got)
 
 
+def test_phonetic_spelling(r):
+    """Spellings edit distance cannot reach, because they are not typos. WRatio
+    gives "orjun" 73 against Arjuna and puts Kuni above Shakuni for "sokuni".
+    src/test_phonetic.py checks the key itself without build/."""
+    for typed, want in [("Orjun", "Arjuna"), ("Korno", "Karna"), ("Bheem", "Bhima"),
+                        ("Durjodhon", "Duryodhana"), ("Obhimonyu", "Abhimanyu"),
+                        ("Sokuni", "Shakuni")]:
+        got = {h["name"]: h["via"] for h in r.resolve("who killed " + typed)}
+        assert got.get(want) == "phonetic", "%r did not reach %s by sound, got %r" % (typed, want, got)
+    assert "Kuni" not in {h["name"] for h in r.resolve("tell me about sokuni")}
+
+
+def test_phonetic_leaves_english_alone(r):
+    """"part" keys like Partha and "born" like Barna. The guard keeps them words."""
+    got = [h for h in r.resolve("who was born to Kunti and what part did your sons play")
+           if h["via"] == "phonetic"]
+    assert not got, got
+
+
 def test_dropped_apostrophe(r):
     """"whos arjuns father" is the realistic typed question, and norm_surface
     only strips a possessive that kept its apostrophe."""

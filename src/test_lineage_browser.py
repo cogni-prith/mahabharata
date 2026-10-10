@@ -65,9 +65,26 @@ def main():
         text = ask('Who is Napoleon?')
         assert 'No match' in text, text
 
+        # "arjun" is now caught by the phonetic step, before edit distance.
         text = ask('who is the father of arjun')
-        assert 'Read "arjun" as Arjuna by spelling' in text and 'Pandu' in text, text
+        assert 'Read "arjun" as Arjuna by how it sounds' in text and 'Pandu' in text, text
         assert 'does not record which parent is the father' in text
+
+        # Spellings edit distance cannot reach: Bengali o for a, ee for i, j for y.
+        text = ask('who is the father of Orjun')
+        assert 'Read "Orjun" as Arjuna by how it sounds' in text and 'Pandu' in text, text
+        text = ask('who is Bheem')
+        assert 'Read "Bheem" as Bhima by how it sounds' in text, text
+        text = ask('How is Korno related to Durjodhon?')
+        assert 'as Karna' in text and 'as Duryodhana' in text, text
+        assert 'Karna (Kaurava) as separate people' in text, text
+        # Sound never makes a choice the spelling would not: still a set.
+        text = ask('Who is Chitrosen?')
+        assert 'Which one?' in text and 'Chitrasena (son of Karna)' in text, text
+        # English words whose key collides with a name are left alone.
+        text = ask('who was born to Kunti')
+        assert 'Barna' not in text, text
+        ask('who is the father of arjun')  # back to Arjuna's tree for the click below
 
         # Selecting a person in the drawing refocuses on them.
         page.locator('#lineage-svg [data-lineage-node="Pandu"]').click()

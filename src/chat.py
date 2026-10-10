@@ -37,6 +37,7 @@ from rapidfuzz import fuzz, process
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from phase2_entities import norm_surface
+from indic_phonetic import indic_key, phonetic_key
 
 ROOT = Path(__file__).resolve().parents[1]
 # The reviewed set, not the raw extractor output. `src/review_viewer_graph.py`
@@ -78,6 +79,18 @@ MIN_MENTIONS = 10
 # Returning all of them retrieves both sets of records; returning one would be
 # picking a referent, which is the choice this project does not make.
 FUZZY_KEEP = 3
+# Edit distance cannot reach a name spelled the way a Bengali or Hindi speaker
+# writes it. "Orjun" scores 73 against Arjuna and "Korno" does not have Karna in
+# its top three, while "sokuni" scores 90 against Kuni and "vishma" 90 against
+# Havishmat, both wrong. src/indic_phonetic.py reduces every such spelling to one
+# key, so the phonetic step runs before the fuzzy one. A shared key is a lead
+# for retrieval, never a merge: Yudhisthira and Yudhishthira share one and come
+# back as two entities, exactly as they do under the fuzzy match.
+#
+# When the key itself is not an exact hit, it is compared by plain edit ratio as
+# a last resort, after the WRatio pass has found nothing. Plain ratio, not
+# WRatio: WRatio rewards substrings, which is how "bhim" lands on Abhimanyu.
+PHONETIC_CUTOFF = 88
 # How many epithets of a resolved entity to pull records from. Sorted by
 # apposition confidence, so the best-evidenced come first. Bounded because the
 # facts they bring are leads, not the answer, and must not crowd out the
@@ -207,6 +220,17 @@ class Retriever:
         self.appellations = {}
         for a in self.app.appellation.unique():
             self.appellations.setdefault(norm_surface(a), a)
+        # Phonetic keys over the same floored name list, so the mention floor
+        # that keeps "Tell" out of exact and fuzzy matching keeps it out here
+        # too. Within a key, the spelling the corpus uses most comes first.
+        self.by_key = {}
+        for n in self.by_norm.values():
+            self.by_key.setdefault(indic_key(n), []).append(n)
+        for names in self.by_key.values():
+            names.sort(key=lambda n: -self.counts[n])
+        self.appellations_by_key = {}
+        for a in self.appellations.values():
+            self.appellations_by_key.setdefault(indic_key(a), []).append(a)
         # The reverse index: given an entity, which appellations name it. Asked
         # for Arjuna's father the graph looked empty, and the father was there
         # the whole time under his epithets. bornTo Pandu is stated seven times
@@ -284,6 +308,26 @@ class Retriever:
                 self._expand(add, self.appellations[tok], 100.0)
 
         matched = {r["surface"] for r in found}
+        # Sound before spelling. Runs only on tokens that matched nothing
+        # exactly, and phonetic_key refuses short tokens and English words
+        # whose key happens to collide with a name ("part" and Partha).
+        for tok in tokens:
+            if tok in matched:
+                continue
+            key = phonetic_key(tok)
+            if not key:
+                continue
+            names = self.by_key.get(key, [])[:FUZZY_KEEP]
+            for name in names:
+                add({"name": name, "via": "phonetic", "resolved": True,
+                     "score": 100.0, "surface": tok, "key": key})
+            if not names:
+                for a in self.appellations_by_key.get(key, [])[:1]:
+                    self._expand(add, a, 100.0)
+                    names = [a]
+            if names:
+                matched.add(tok)
+
         for tok in tokens:
             if tok in matched:
                 continue
@@ -298,6 +342,17 @@ class Retriever:
                                      score_cutoff=CUTOFF)
             if hit:
                 self._expand(add, self.appellations[hit[0]], float(hit[1]))
+                continue
+            # Last resort: a typo on top of a spelling variant, "Joydrath" for
+            # Jayadratha. Compared key to key, so the variant part costs nothing.
+            key = phonetic_key(tok)
+            if key:
+                for k, score, _ in process.extract(key, self.by_key.keys(), scorer=fuzz.ratio,
+                                                   score_cutoff=PHONETIC_CUTOFF,
+                                                   limit=FUZZY_KEEP):
+                    for name in self.by_key[k][:FUZZY_KEEP]:
+                        add({"name": name, "via": "phonetic", "resolved": True,
+                             "score": float(score), "surface": tok, "key": k})
 
         # Now the other direction. Every name resolved above may also be
         # written under epithets, and the records filed under those epithets
@@ -549,6 +604,8 @@ def build_context(resolutions, facts, retrieval, notes=()):
         for surface, group in variants.items():
             for r in group:
                 note = ("exact match" if r["via"] == "exact"
+                        else "sound match on %r, score %.0f" % (surface, r["score"])
+                        if r["via"] == "phonetic"
                         else "spelling match on %r, score %.0f" % (surface, r["score"]))
                 out.append("  %s (%s)" % (r["name"], note))
             if len(group) > 1:

@@ -85,8 +85,8 @@
           badge(r.status)+badge('1 of '+r.candidates)+'</div></article>').join(''):'')+
         (resolved.length?'<h3 class="chat-section">Resolved</h3>'+resolved.map(r=>
           '<article class="chat-fact"><div class="chat-triple"><b>'+esc(r.name)+'</b></div><div class="chat-meta">'+
-          badge(r.via==='exact'?'exact name':'spelling match on "'+r.surface+'"')+
-          (r.via==='fuzzy'?badge('score '+Math.round(r.score)):'')+'</div></article>').join(''):'')||
+          badge(r.via==='exact'?'exact name':r.via==='phonetic'?'sound match on "'+r.surface+'"':'spelling match on "'+r.surface+'"')+
+          (r.via==='fuzzy'||(r.via==='phonetic'&&r.score<100)?badge('score '+Math.round(r.score)):'')+'</div></article>').join(''):'')||
         '<p class="chat-empty">No name in this question matched the graph.</p>';
       if ((latest.coreference||[]).length) box.insertAdjacentHTML('beforeend',
         '<h3 class="chat-section">May be the same person</h3>'+

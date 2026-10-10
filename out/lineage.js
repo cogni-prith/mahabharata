@@ -45,6 +45,8 @@
     }
     return row[b.length];
   }
+  let SOUND=null;
+  const soundKeys=()=>SOUND||(SOUND=D.nodes.map(n=>[n.id,window.IndicPhonetic.key(base(n.id))]));
   /* Never a silent choice. One exact label wins; several qualified labels
      ("Chitrasena (Kaurava)", "Chitrasena (son of Karna)") come back as a set. */
   function resolve(term) {
@@ -55,6 +57,20 @@
     // A lone qualified match is still offered, not taken: "Bhimasena" reaching
     // "Bhimasena (ancestor)" would silently answer about the wrong man.
     if (related.length) return {candidates:related};
+    // Sound before spelling. "Orjun", "Bheem" and "Korno" sit two or more edits
+    // from Arjuna, Bhima and Karna, beyond what the distance check below allows,
+    // and they are not typos: they are how a Bengali or Hindi speaker spells the
+    // name. indic-phonetic.js gives every such spelling one key. Same rule as
+    // above: a lone match is offered as a reading, several come back as a set.
+    const k=window.IndicPhonetic&&window.IndicPhonetic.phoneticKey(t);
+    if (k) {
+      const heard=soundKeys().filter(([,key])=>key===k).map(([id])=>id);
+      // As with an exact name: one unqualified label is read, and the qualified
+      // ones ("Karna (Kaurava)") are listed beside it as separate people.
+      const plain=heard.filter(id=>!id.includes('('));
+      if (plain.length===1) return {id:plain[0],via:'sound',surface:term,others:heard.filter(id=>id!==plain[0])};
+      if (heard.length) return {candidates:heard};
+    }
     if (t.length<5) return null;
     const scored=D.nodes.map(n=>[n.id,lev(t,base(n.id))]).filter(([,d])=>d<=Math.floor(t.length/4)).sort((a,b)=>a[1]-b[1]);
     if (!scored.length) return null;
@@ -129,6 +145,7 @@
     sets.forEach(s=>notes.push('"'+s.surface+'" matches several people in the table and none is chosen for you: '+s.candidates.join(', ')+'. Pick one.'));
     people.forEach(p=>{
       if (p.via==='spelling') notes.push('Read "'+p.surface+'" as '+p.id+' by spelling.');
+      if (p.via==='sound') notes.push('Read "'+p.surface+'" as '+p.id+' by how it sounds.');
       if (p.others.length) notes.push(p.id+' is shown. The table also has '+p.others.join(', ')+' as separate people, and nothing here says they are the same person.');
     });
     if (!people.length) {

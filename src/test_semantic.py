@@ -42,7 +42,10 @@ def main():
         db=Path(tmp)/'test.sqlite'
         write_database(db,passages,nodes,links,{})
         import sqlite3
-        with sqlite3.connect(db) as c:
+        from contextlib import closing
+        # sqlite3's own context manager commits but does not close, and Windows
+        # will not delete an open file when the temporary folder is cleaned up.
+        with closing(sqlite3.connect(db)) as c:
             assert c.execute('select count(*) from nodes').fetchone()[0] == len(nodes)
         export_rdf(Path(tmp)/'semantic.trig',passages,nodes,links)
         from pyshacl import validate

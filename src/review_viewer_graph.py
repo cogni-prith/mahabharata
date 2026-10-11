@@ -13,6 +13,28 @@ from phase4_relations import extract_sentence, load_coref, load_entities, write_
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def folder():
+    """The Phase 4f endpoint fold, or None when Phase 4f has not run.
+
+    Re-extraction reads the names as written, "Dhananjaya", while a folded
+    relations.parquet holds "Arjuna". Without the same fold the keys never
+    meet, and 373 of 478 folded rows were withheld as unsupported.
+    """
+    links = ROOT / "build/er/mention_links.csv"
+    if not ((ROOT / "build/relations_raw.parquet").exists() and links.exists()):
+        return None
+    from phase2b_confidence import endpoint_map
+    m = endpoint_map(pd.read_csv(links, dtype={"parva": str}))
+
+    def fold(row):
+        adh = row.get("adhyaya_ordinal")
+        ch = None if adh is None or pd.isna(adh) else "%s/%d" % (row["parva"], int(adh))
+        sid = int(row["sent_id"])
+        s, o = (m(row[k], row["parva"], sid, ch) for k in ("subject", "object"))
+        return None if s == o else {**row, "subject": s, "object": o}
+    return fold
+
+
 def review(frame):
     archived = [pd.read_parquet(path) for name in ("relation_candidates.parquet", "withheld_relations.parquet")
                 if (path := ROOT / "build" / name).exists()]
@@ -44,8 +66,13 @@ def review(frame):
 
     first = pd.DataFrame(sweep(None))
     table = nplink.build_table(first[first.status == "asserted"])
+    fold = folder()
     candidates = collections.defaultdict(list)
     for row in sweep(table):
+        if fold:
+            row = fold(row)
+            if row is None:
+                continue          # both ends are one person once folded, as in 4f
         candidates[(row["parva"], row["sent_id"], row["subject"], row["object"])].append(row)
     kept, rejected = [], []
     retyped = 0

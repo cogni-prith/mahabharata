@@ -505,11 +505,17 @@ class Retriever:
             known = (t in self.by_norm or t in self.appellations
                      or (self.top_alias and t in self.alias_by_norm))
             # The phonetic step below reaches most popular spellings (Bheem,
-            # Arjun) and says it did. The table and the dropped-a rule are for
-            # the ones it cannot reach (Balram, Karn).
+            # Arjun) and says it did. The table wins where sound lands on
+            # someone else or no one: "bhimsen" sounds like Bhimsena, a node
+            # with no facts, and Balram and Kansa are other names, not
+            # spellings. The dropped-a rule is for what sound cannot reach.
             key = None if known else phonetic_key(t)
-            if not known and not (key and self.by_key.get(key)):
-                t = SPELLINGS.get(t, t)
+            heard = self.by_key.get(key, []) if key else []
+            target = self.by_norm.get(SPELLINGS.get(t, ""))
+            if target and target not in heard:
+                t = SPELLINGS[t]
+                known = True
+            if not known and not heard:
                 known = (t in self.by_norm or t in self.appellations
                          or (self.top_alias and t in self.alias_by_norm))
                 # The popular form often drops the final a: Arjun, Karn, Bhishm.

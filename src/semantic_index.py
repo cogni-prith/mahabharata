@@ -160,6 +160,7 @@ def write_database(path,passages,nodes,links,metadata):
         db.executemany('INSERT INTO links VALUES(?,?,?,?,?,?,?)',[tuple(l[k] for k in ['id','subject','predicate','object','passage_id','score','status']) for l in links])
         db.executemany('INSERT INTO metadata VALUES(?,?)',[(k,json.dumps(v)) for k,v in metadata.items()])
         db.execute("INSERT INTO passage_fts(passage_fts) VALUES('rebuild')")
+    db.close()  # the with block commits but leaves the file open, and Windows refuses to rename an open file
     tmp.replace(path)
 
 

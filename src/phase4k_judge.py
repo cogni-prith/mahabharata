@@ -182,7 +182,8 @@ def load_direct():
 
 
 def collect(args):
-    """Sort the full run: yes -> candidate layer, cant_tell -> review, no -> log."""
+    """Sort the full run: yes -> candidate layer, cant_tell -> review, no -> log.
+    A yes that fails the praise or gender check counts as no."""
     rows = load_direct()
     recs = pd.DataFrame([json.loads(l) for l in (RUNS / (args.run + ".jsonl")).read_text(encoding="utf-8").splitlines()])
     rows = rows.merge(recs[["id", "prompt_id", "verdict", "referents", "span", "span_in_passage"]]
@@ -190,6 +191,13 @@ def collect(args):
     every = passages(rows)
     rows["praise"] = [praise(a, every[i]) or praise(b, every[i]) for i, a, b in zip(rows.id, rows.a, rows.b)]
     rows.loc[rows.praise & (rows.judge == "yes"), "judge"] = "no"
+    # The prompt leaves the parent's sex to the gender check (a mother who is
+    # a man, a father who is a woman), so it is applied here as in score().
+    gender = genders()
+    b_gender = rows.b.map(lambda x: gender.get(norm(x)))
+    want = rows.type.map(WANT)
+    rows["gender_ok"] = want.isna() | b_gender.isna() | (b_gender == want)
+    rows.loc[~rows.gender_ok & (rows.judge == "yes"), "judge"] = "no"
     rows["referents"] = rows.referents.map(lambda x: json.dumps(x, ensure_ascii=False) if isinstance(x, list) else "")
     missing = rows.judge.isna().sum()
     for name, part in (("candidates", rows[rows.judge == "yes"]),

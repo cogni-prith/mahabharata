@@ -30,4 +30,8 @@
 .ledge.is-focus{stroke-width:3}
 .lineage-key{display:inline-block;width:22px;height:0;border-top:2px dashed #b3a58a;vertical-align:middle;margin:0 4px 0 10px}
 .lineage-key.is-cited{border-top:2px solid #2f6b4f}
+.ledge.is-checked{stroke:#5b6fb5;stroke-width:1.5;stroke-dasharray:1.5 3;stroke-linecap:round}
+.lineage-key.is-checked{border-top:2px dotted #5b6fb5}
+.chat-badge.checked{background:#eef0fa;color:#3d4c8f;border-color:#c9cfee}
+#lineage-checked[aria-pressed="false"]{opacity:.55;text-decoration:line-through}
 @media(max-width:1150px){.lineage-layout{grid-template-columns:1fr}.lineage-qa{border-right:0;border-bottom:1px solid #d9e3df}#lineage-answer{height:420px}.lineage-stage{height:560px}}

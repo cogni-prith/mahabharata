@@ -16,6 +16,10 @@ verbatim text of a copyrighted translation.
 Run:  python src/phase4k_sample.py                  draw the sample, write the page
       python src/phase4k_sample.py --import FILE    store the exported judgements in
                                                    annotations/, report accuracy
+      python src/phase4k_sample.py --post-judge     fresh 50 from the judge's yes answers
+      python src/phase4k_sample.py --post-judge --import FILE
+      python src/phase4k_sample.py --review         every cant_tell, to rescue by hand
+      python src/phase4k_sample.py --review --import FILE
 """
 import argparse
 import json
@@ -31,6 +35,20 @@ JUDGED = "annotations/kinship_judged.csv"
 SEED = 20261007
 PER_GROUP = 75
 VERDICTS = ("correct", "wrong", "wrong_direction", "unsure")
+# After the judge (src/phase4k_judge.py): a fresh sample drawn only from the
+# direct relations it said yes to, with a new seed, so its precision is
+# measured on relations nobody has looked at before.
+CANDIDATES = "build/kinship_direct_candidates.parquet"
+POST_SAMPLE = "build/kinship_post_sample.csv"
+POST_PAGE = "build/kinship_post_check.html"
+POST_JUDGED = "annotations/kinship_post_judged.csv"
+POST_SEED = 20261026
+POST_N = 50
+# Every relation the judge could not settle, for a person to rescue by hand.
+REVIEW = "build/kinship_direct_review.parquet"
+REVIEW_SAMPLE = "build/kinship_review_sample.csv"
+REVIEW_PAGE = "build/kinship_review_check.html"
+REVIEW_JUDGED = "annotations/kinship_review_judged.csv"
 
 PHRASE = {
     "father": "{b} is the father of {a}",
@@ -61,6 +79,27 @@ def draw():
     return s
 
 
+def draw_post():
+    rel = pd.read_parquet(CANDIDATES).reset_index(drop=True)
+    # Not one already judged by hand in the first sample.
+    seen = pd.read_csv(SAMPLE)[["parva", "sent_id", "a", "b", "type", "evidence"]]
+    rel = rel.merge(seen.assign(seen=True), how="left").query("seen != True").drop(columns="seen")
+    picked = random.Random(POST_SEED).sample(list(rel.index), min(POST_N, len(rel)))
+    s = rel.loc[picked].reset_index(drop=True)
+    s = s.rename(columns={"id": "judge_id"})
+    s.insert(0, "id", ["P%03d" % (i + 1) for i in range(len(s))])
+    s["claim"] = [PHRASE[t].format(a=a, b=b) for t, a, b in zip(s.type, s.a, s.b)]
+    return s
+
+
+def draw_review():
+    s = pd.read_parquet(REVIEW).sort_values(["parva", "sent_id"]).reset_index(drop=True)
+    s = s.rename(columns={"id": "judge_id"})
+    s.insert(0, "id", ["R%03d" % (i + 1) for i in range(len(s))])
+    s["claim"] = [PHRASE[t].format(a=a, b=b) for t, a, b in zip(s.type, s.a, s.b)]
+    return s
+
+
 def context(sample):
     """The quote's sentence with the one before and after it, in the same chapter."""
     m = pd.read_parquet("build/mentions.parquet").drop_duplicates(["parva", "sent_id"])
@@ -84,31 +123,32 @@ def context(sample):
     return out
 
 
-def page(sample, ctx):
+def page(sample, ctx, key="kinship-check-v1", download="kinship_judged.csv"):
     items = []
     for r, c in zip(sample.itertuples(), ctx):
         items.append({"id": r.id, "claim": r.claim, "a": r.a, "b": r.b, "type": r.type,
                       "evidence": r.evidence, "via_hint": bool(r.via_hint), "parva": r.parva,
                       "sent_id": int(r.sent_id), **c})
     data = json.dumps(items, ensure_ascii=False).replace("</", "<\\/")
-    return TEMPLATE.replace("__DATA__", data)
+    return (TEMPLATE.replace("__DATA__", data).replace('"kinship-check-v1"', json.dumps(key))
+            .replace('"kinship_judged.csv"', json.dumps(download)))
 
 
-def import_judged(path):
+def import_judged(path, sample_path=SAMPLE, judged_path=JUDGED):
     j = pd.read_csv(path)
     missing = {"id", "verdict"} - set(j.columns)
     if missing:
         raise SystemExit("%s lacks columns %s. Use the page's Download button." % (path, sorted(missing)))
-    s = pd.read_csv(SAMPLE)
+    s = pd.read_csv(sample_path)
     j = s.merge(j[["id", "verdict"] + (["note"] if "note" in j.columns else [])], on="id", how="left")
     bad = j.verdict.notna() & ~j.verdict.isin(VERDICTS)
     if bad.any():
         raise SystemExit("unknown verdicts: %s" % sorted(j.verdict[bad].unique()))
-    os.makedirs(os.path.dirname(JUDGED), exist_ok=True)
-    j.to_csv(JUDGED, index=False)
+    os.makedirs(os.path.dirname(judged_path), exist_ok=True)
+    j.to_csv(judged_path, index=False)
     done = j[j.verdict.notna() & (j.verdict != "unsure")]
     print("stored %s: %d judged, %d unsure, %d not judged"
-          % (JUDGED, len(done), int((j.verdict == "unsure").sum()), int(j.verdict.isna().sum())))
+          % (judged_path, len(done), int((j.verdict == "unsure").sum()), int(j.verdict.isna().sum())))
     for name, g in [("direct", done[~done.via_hint]), ("via hint", done[done.via_hint]), ("all", done)]:
         if len(g):
             ok = (g.verdict == "correct").sum()
@@ -122,7 +162,32 @@ def import_judged(path):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--import", dest="imp", metavar="FILE", help="exported judgements CSV")
+    ap.add_argument("--post-judge", action="store_true",
+                    help="the fresh sample of %d from the judge's yes answers" % POST_N)
+    ap.add_argument("--review", action="store_true",
+                    help="every relation the judge answered cant_tell, to rescue by hand")
     args = ap.parse_args()
+    if args.review:
+        if args.imp:
+            import_judged(args.imp, REVIEW_SAMPLE, REVIEW_JUDGED)
+            return
+        sample = draw_review()
+        sample.to_csv(REVIEW_SAMPLE, index=False)
+        open(REVIEW_PAGE, "w", encoding="utf-8").write(
+            page(sample, context(sample), "kinship-review-check-v1", "kinship_review_judged.csv"))
+        print("review of %d from %s -> %s\npage -> %s" % (len(sample), REVIEW, REVIEW_SAMPLE, REVIEW_PAGE))
+        return
+    if args.post_judge:
+        if args.imp:
+            import_judged(args.imp, POST_SAMPLE, POST_JUDGED)
+            return
+        sample = draw_post()
+        sample.to_csv(POST_SAMPLE, index=False)
+        open(POST_PAGE, "w", encoding="utf-8").write(
+            page(sample, context(sample), "kinship-post-check-v1", "kinship_post_judged.csv"))
+        print("post-judge sample of %d from %s, seed %d -> %s\npage -> %s"
+              % (len(sample), CANDIDATES, POST_SEED, POST_SAMPLE, POST_PAGE))
+        return
     if args.imp:
         import_judged(args.imp)
         return

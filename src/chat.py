@@ -231,6 +231,7 @@ Facts:
 - SIBLINGS lists people who share a recorded parent. Asked about brothers or sisters, name every person in SIBLINGS, and call them brothers or sisters plainly.
 - For any family question, answer from FAMILY first. It already reaches two steps out: a person's parents and grandparents, and a person's children with each child's other parents, including divine fathers. A maternal grandparent is the mother's parent; a paternal grandparent is the father's parent. If FAMILY does not mark the side, say "grandparent through" that parent. Names in FAMILY are already merged, so never list one person twice under two names.
 - A link from the "curated family table" is from the project's hand-made family table and cites no passage. Use it, and mark it once in plain words, such as "(from the family table)". Put "family table" in the Source line for it.
+- A link marked "model-read" was read from that chapter by a language model and confirmed by a second one; such links are right about nine times in ten. Use it, and mark it once in plain words, such as "(read by a model from 01_Adi 63)". Prefer a link from the text or the family table when they disagree.
 - KINSHIP PATH is the shortest chain of family links between two people. Explain it in plain words, step by step, and name the relationship it adds up to only when the chain makes it plain (a parent's sibling's child is a cousin; a spouse's sibling is an in-law).
 - Facts marked predicted or proposed are a model's guesses; if you use one, say "possibly".
 - If the context does not answer the question, say so in one sentence and give the closest thing it does say.
@@ -441,7 +442,63 @@ class Retriever:
                     "kind": "divine" if par.lower() in DIVINE else "parent"}
             up.setdefault(child, {}).setdefault(par, link)
             down.setdefault(par, {}).setdefault(child, link)
+        # Phase 4k: direct kinship relations a language model read from one
+        # passage and a second model confirmed (src/phase4k_judge.py; 90% of a
+        # fresh hand-judged 50 were right). They come last, so a link the graph
+        # or the curated table already has is never replaced, and a parent the
+        # curated table contradicts is left out: the errors that remained were
+        # mostly a name pointing at someone else ("Krishna" for Draupadi).
+        for (par, child, kind, role), link in self._checked_kin(root).items():
+            if kind == "spouse":
+                spouse.setdefault(par, {}).setdefault(child, link)
+                spouse.setdefault(child, {}).setdefault(par, link)
+                continue
+            if child in curated_parents and par not in curated_parents[child]:
+                continue
+            link = dict(link, kind=kind, role=role)
+            up.setdefault(child, {}).setdefault(par, link)
+            down.setdefault(par, {}).setdefault(child, link)
         return up, down, spouse
+
+    def _checked_kin(self, root):
+        """{(parent, child, kind, role): link} from the judged Phase 4k files.
+
+        Spouse pairs come back as (a, b, "spouse", None). Sibling relations are
+        not used: the family links here are parents, children and spouses, and
+        siblings are already worked out from shared parents.
+        """
+        frames = []
+        yes = root / "build/kinship_direct_candidates.parquet"
+        if yes.exists():
+            frames.append(pd.read_parquet(yes))
+        # Relations the judge could not settle that a person then marked correct.
+        rescued = root / "annotations/kinship_review_judged.csv"
+        if rescued.exists():
+            r = pd.read_csv(rescued)
+            frames.append(r[r.verdict == "correct"])
+        if not frames:
+            return {}
+        rel = pd.concat(frames, ignore_index=True)
+        kinds = {"father": ("parent", "father"), "mother": ("parent", "mother"),
+                 "parent": ("parent", None), "adoptive_father": ("parent", "adoptive father"),
+                 "adoptive_mother": ("parent", "adoptive mother"),
+                 "divine_father": ("divine", None), "spouse": ("spouse", None)}
+        out = {}
+        for r in rel.sort_values("cited", ascending=False).itertuples():
+            if r.type not in kinds:
+                continue
+            # "b is the father of a": b is the parent, a the child.
+            par, child = self.canon(str(r.b)), self.canon(str(r.a))
+            if par == child or any(norm_surface(n) in self.alias_by_norm for n in (r.a, r.b)):
+                continue
+            kind, role = kinds[r.type]
+            key = (par, child, kind, role)
+            if key in out:
+                out[key]["support"] += 1
+                continue
+            out[key] = {"source": "checked", "support": 1,
+                        "cite": citation(r.parva, r.adhyaya_ordinal, r.cited)}
+        return out
 
     def _moved_init_tail(self, root, passages, index):
         # The reverse index: given an entity, which appellations name it. Asked
@@ -758,10 +815,12 @@ class Retriever:
     def role_of(self, parent, link):
         if link["kind"] == "divine":
             return "divine father"
-        return self.parent_roles.get(parent, "parent")
+        return link.get("role") or self.parent_roles.get(parent, "parent")
 
     @staticmethod
     def source_of(link):
+        if link["source"] == "checked":
+            return "model-read from text %s" % link["cite"]
         return "text %s" % link["cite"] if link["source"] == "text" else "curated family table"
 
     def family(self, resolutions, query=""):

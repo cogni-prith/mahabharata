@@ -19,6 +19,12 @@
   D.edges.forEach(e=>{push(parents,e.child,e.parent); push(children,e.parent,e.child); edge.set(e.parent+'\0'+e.child,e);});
   const textParents=new Map(), textChildren=new Map();
   D.graph_only.forEach(f=>{push(textParents,f.child,f); push(textChildren,f.parent,f);});
+  /* Model-read layer: parent links a language model read from one passage and
+     a second model confirmed (about nine in ten right on a hand-checked
+     sample). Shown apart from the table and the text, and switchable off. */
+  const checkedParents=new Map(), checkedChildren=new Map();
+  (D.checked_only||[]).forEach(f=>{push(checkedParents,f.child,f); push(checkedChildren,f.parent,f);});
+  let showChecked=true; try{showChecked=localStorage.getItem('lineage-checked')!=='off'}catch(e){}
   const up=n=>parents.get(n)||[], down=n=>children.get(n)||[];
   const color=n=>D.colors[byId.get(n)?.clan]||D.colors.other;
 
@@ -26,9 +32,13 @@
   let box=null, drag=null;
 
   /* ---------- provenance ---------- */
+  const modelRead=f=>badge('model-read '+f.role+', checked','checked')+
+    f.citations.map(c=>c==='uncited'?badge('no chapter','uncited'):badge(c.replace(/_/g,' '),'cited')).join('');
+  const checkedOnly=f=>badge('model-read, not in the table','checked')+modelRead(f);
   function cites(e) {
-    if (!e.text.length) return badge('curated, uncited','uncited');
-    return e.text.flatMap(f=>f.citations.map(c=>c==='uncited'?badge('in the text, no chapter','uncited'):badge(c.replace(/_/g,' '),'cited')))
+    const chk=showChecked&&e.checked&&e.checked.length?e.checked.map(modelRead).join(''):'';
+    if (!e.text.length) return badge('curated, uncited','uncited')+chk;
+    return chk+e.text.flatMap(f=>f.citations.map(c=>c==='uncited'?badge('in the text, no chapter','uncited'):badge(c.replace(/_/g,' '),'cited')))
       .concat(e.text.map(f=>badge(f.predicate+(f.support>1?', stated '+f.support+'x':''),'support'))).join('');
   }
   const textOnly=f=>badge('in the text, not in the table','unresolved')+badge(f.predicate,'support')+
@@ -170,8 +180,10 @@
       }
       return {title,body,notes,focus:x};
     }
-    const parentRows=n=>up(n).map(p=>row(p,cites(edge.get(p+'\0'+n)))).concat((textParents.get(n)||[]).map(f=>row(f.parent,textOnly(f))));
-    const childRows=n=>down(n).map(c=>row(c,cites(edge.get(n+'\0'+c)))).concat((textChildren.get(n)||[]).map(f=>row(f.child,textOnly(f))));
+    const parentRows=n=>up(n).map(p=>row(p,cites(edge.get(p+'\0'+n)))).concat((textParents.get(n)||[]).map(f=>row(f.parent,textOnly(f))))
+      .concat(showChecked?(checkedParents.get(n)||[]).map(f=>row(f.parent,checkedOnly(f))):[]);
+    const childRows=n=>down(n).map(c=>row(c,cites(edge.get(n+'\0'+c)))).concat((textChildren.get(n)||[]).map(f=>row(f.child,textOnly(f))))
+      .concat(showChecked?(checkedChildren.get(n)||[]).map(f=>row(f.child,checkedOnly(f))):[]);
     const generations=(dist,word)=>{
       const g=new Map(); dist.forEach((d,n)=>push(g,d,n));
       return [...g].sort((a,b)=>a[0]-b[0]).map(([d,ns])=>'<h3 class="chat-section">'+d+' generation'+(d>1?'s':'')+' '+word+'</h3>'+list(ns.map(n=>row(n,'')),'')).join('')||'<p class="chat-empty">None in the table.</p>';
@@ -218,9 +230,16 @@
       '<text text-anchor="middle" dy="4">'+esc(label)+'</text></g>';
   }
   function edgeSvg(e,a,b,cls='') {
-    const my=(a.y+b.y)/2;
-    return '<path class="ledge'+(e.text.length?' is-cited':'')+' '+cls+'" d="M'+a.x+','+(a.y+H/2)+' C'+a.x+','+my+' '+b.x+','+my+' '+b.x+','+(b.y-H/2)+'"><title>'+
-      esc(e.parent+' parent of '+e.child+(e.text.length?' / in the text':' / curated, uncited'))+'</title></path>';
+    const my=(a.y+b.y)/2, model=!e.text.length&&showChecked&&e.checked&&e.checked.length;
+    const kind=e.text.length?' / in the text':e.model?' / model-read, checked, not in the table':model?' / curated, also model-read':' / curated, uncited';
+    return '<path class="ledge'+(e.text.length?' is-cited':model||e.model?' is-checked':'')+' '+cls+'" d="M'+a.x+','+(a.y+H/2)+' C'+a.x+','+my+' '+b.x+','+my+' '+b.x+','+(b.y-H/2)+'"><title>'+
+      esc(e.parent+' parent of '+e.child+kind)+'</title></path>';
+  }
+  /* Model-read links between two people already drawn, parent above child. */
+  function checkedSvg(pos) {
+    if (!showChecked) return '';
+    return (D.checked_only||[]).filter(f=>pos.has(f.parent)&&pos.has(f.child)&&pos.get(f.parent).y<pos.get(f.child).y)
+      .map(f=>edgeSvg({parent:f.parent,child:f.child,text:[],model:true},pos.get(f.parent),pos.get(f.child),(f.parent===focus||f.child===focus)?'is-focus':'')).join('');
   }
   /* Rows by generation, each row ordered by the mean position of its links in
      the rows already placed, then packed left to right without overlap. */
@@ -253,6 +272,7 @@
     const pos=place(levels,n=>[...up(n),...down(n)],2);
     let svg='';
     D.edges.forEach(e=>{ if (pos.has(e.parent)&&pos.has(e.child)&&pos.get(e.parent).y<pos.get(e.child).y) svg+=edgeSvg(e,pos.get(e.parent),pos.get(e.child),(e.parent===focus||e.child===focus)?'is-focus':''); });
+    svg+=checkedSvg(pos);
     pos.forEach((p,n)=>svg+=nodeSvg(n,p.x,p.y,n===focus?'is-focus':sibs.includes(n)?'is-sibling':''));
     return {svg,box:frame(pos),caption:'Three generations up, two down, and everyone who shares a parent with '+focus+'.'};
   }
@@ -265,6 +285,7 @@
     const near=new Set([focus,...up(focus),...down(focus)]);
     let svg='';
     D.edges.forEach(e=>svg+=edgeSvg(e,whole.get(e.parent),whole.get(e.child),(e.parent===focus||e.child===focus)?'is-focus':''));
+    svg+=checkedSvg(whole);
     whole.forEach((p,n)=>svg+=nodeSvg(n,p.x,p.y,n===focus?'is-focus':near.has(n)?'':'is-far'));
     const f=whole.get(focus), full=frame(whole);
     return {svg,box:{x:f.x-700,y:f.y-380,w:1400,h:760},full,caption:D.nodes.length+' people in '+(Math.max(...D.nodes.map(n=>n.generation))+1)+' generations. Drag to pan, scroll to zoom.'};
@@ -275,6 +296,7 @@
     $('lineage-caption').textContent=r.caption;
     $('lineage-focus').textContent=focus;
     document.querySelectorAll('[data-lineage-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lineageView===view)));
+    $('lineage-checked')?.setAttribute('aria-pressed',String(showChecked));
   }
   const setBox=()=>$('lineage-svg').setAttribute('viewBox',[box.x,box.y,box.w,box.h].map(Math.round).join(' '));
   function zoom(k,cx=.5,cy=.5) {
@@ -322,6 +344,10 @@
     else if (t.dataset.lineageView) { view=t.dataset.lineageView; draw(); }
     else ({in:()=>zoom(.8),out:()=>zoom(1.25),fit}[t.dataset.lineageZoom])();
   },true);
+  $('lineage-checked')?.addEventListener('click',()=>{
+    showChecked=!showChecked; try{localStorage.setItem('lineage-checked',showChecked?'on':'off')}catch(e){}
+    if (latest) ask(latest.query,latest.focus===latest.query?latest.query:undefined); else draw();
+  });
   const svgEl=$('lineage-svg');
   svgEl.addEventListener('wheel',e=>{ e.preventDefault(); const r=svgEl.getBoundingClientRect(); zoom(e.deltaY>0?1.12:.89,(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height); },{passive:false});
   svgEl.addEventListener('pointerdown',e=>{ drag={x:e.clientX,y:e.clientY,box:{...box},moved:false}; });

@@ -18,6 +18,8 @@ Run:  python src/phase4k_sample.py                  draw the sample, write the p
                                                    annotations/, report accuracy
       python src/phase4k_sample.py --post-judge     fresh 50 from the judge's yes answers
       python src/phase4k_sample.py --post-judge --import FILE
+      python src/phase4k_sample.py --review         every cant_tell, to rescue by hand
+      python src/phase4k_sample.py --review --import FILE
 """
 import argparse
 import json
@@ -42,6 +44,11 @@ POST_PAGE = "build/kinship_post_check.html"
 POST_JUDGED = "annotations/kinship_post_judged.csv"
 POST_SEED = 20261026
 POST_N = 50
+# Every relation the judge could not settle, for a person to rescue by hand.
+REVIEW = "build/kinship_direct_review.parquet"
+REVIEW_SAMPLE = "build/kinship_review_sample.csv"
+REVIEW_PAGE = "build/kinship_review_check.html"
+REVIEW_JUDGED = "annotations/kinship_review_judged.csv"
 
 PHRASE = {
     "father": "{b} is the father of {a}",
@@ -81,6 +88,14 @@ def draw_post():
     s = rel.loc[picked].reset_index(drop=True)
     s = s.rename(columns={"id": "judge_id"})
     s.insert(0, "id", ["P%03d" % (i + 1) for i in range(len(s))])
+    s["claim"] = [PHRASE[t].format(a=a, b=b) for t, a, b in zip(s.type, s.a, s.b)]
+    return s
+
+
+def draw_review():
+    s = pd.read_parquet(REVIEW).sort_values(["parva", "sent_id"]).reset_index(drop=True)
+    s = s.rename(columns={"id": "judge_id"})
+    s.insert(0, "id", ["R%03d" % (i + 1) for i in range(len(s))])
     s["claim"] = [PHRASE[t].format(a=a, b=b) for t, a, b in zip(s.type, s.a, s.b)]
     return s
 
@@ -149,7 +164,19 @@ def main():
     ap.add_argument("--import", dest="imp", metavar="FILE", help="exported judgements CSV")
     ap.add_argument("--post-judge", action="store_true",
                     help="the fresh sample of %d from the judge's yes answers" % POST_N)
+    ap.add_argument("--review", action="store_true",
+                    help="every relation the judge answered cant_tell, to rescue by hand")
     args = ap.parse_args()
+    if args.review:
+        if args.imp:
+            import_judged(args.imp, REVIEW_SAMPLE, REVIEW_JUDGED)
+            return
+        sample = draw_review()
+        sample.to_csv(REVIEW_SAMPLE, index=False)
+        open(REVIEW_PAGE, "w", encoding="utf-8").write(
+            page(sample, context(sample), "kinship-review-check-v1", "kinship_review_judged.csv"))
+        print("review of %d from %s -> %s\npage -> %s" % (len(sample), REVIEW, REVIEW_SAMPLE, REVIEW_PAGE))
+        return
     if args.post_judge:
         if args.imp:
             import_judged(args.imp, POST_SAMPLE, POST_JUDGED)

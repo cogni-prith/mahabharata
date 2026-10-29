@@ -44,6 +44,38 @@ def kin_facts(names):
     return facts
 
 
+CHECKED_ROLE = {'father': 'father', 'mother': 'mother', 'parent': 'parent',
+                'adoptive_father': 'adoptive father', 'adoptive_mother': 'adoptive mother',
+                'divine_father': 'divine father'}
+
+
+def checked_facts(names):
+    """Phase 4k parent relations a model read and a second model confirmed
+    (build/kinship_direct_candidates.parquet, 90% right on a fresh hand-judged
+    50), plus judge-undecided ones a person then marked correct. Same exact-name
+    rule as the text facts. Kept apart from both the table and the text: the
+    page shows them as their own layer, which the reader can switch off."""
+    frames = []
+    if (ROOT / 'build/kinship_direct_candidates.parquet').exists():
+        frames.append(pd.read_parquet(ROOT / 'build/kinship_direct_candidates.parquet'))
+    rescued = ROOT / 'annotations/kinship_review_judged.csv'
+    if rescued.exists():
+        r = pd.read_csv(rescued)
+        frames.append(r[r.verdict == 'correct'])
+    if not frames:
+        return {}
+    rel = pd.concat(frames, ignore_index=True)
+    # "b is the father of a": b is the parent, a the child.
+    rel = rel[rel.type.isin(list(CHECKED_ROLE)) & (rel.a.isin(names) | rel.b.isin(names)) & (rel.a != rel.b)]
+    facts = {}
+    for (child, parent), g in rel.groupby(['a', 'b']):
+        cites = sorted({cite(r) for r in g.itertuples()}, key=lambda c: c == 'uncited')
+        roles = sorted({CHECKED_ROLE[t] for t in g.type})
+        facts[(child, parent)] = {'child': child, 'parent': parent, 'role': '/'.join(roles),
+                                  'support': len(g), 'citations': cites[:3]}
+    return facts
+
+
 def generations(parents, names):
     """Longest path from a root, so a child always sits below every parent."""
     depth, seen = {}, set()
@@ -116,18 +148,22 @@ def main():
     absent = sorted(m for m in clan if m not in {n.lower() for n in names})
 
     facts = kin_facts(names)
+    checked = checked_facts(names)
     edges = []
     for p, c in zip(rows.Parent, rows.Child):
         hit = [f for (s, _, o), f in facts.items() if s == c and o == p]
-        edges.append({'parent': p, 'child': c, 'text': hit})
+        edges.append({'parent': p, 'child': c, 'text': hit, 'checked': [checked[(c, p)]] if (c, p) in checked else []})
     lineage_pairs = {(e['child'], e['parent']) for e in edges}
     graph_only = [f for (s, _, o), f in facts.items() if (s, o) not in lineage_pairs]
+    text_pairs = lineage_pairs | {(f['child'], f['parent']) for f in graph_only}
+    checked_only = [f for k, f in checked.items() if k not in text_pairs]
 
     data = {
         'source': 'annotations/lineage/mahabharata_lineage.csv',
         'nodes': [{'id': n, 'generation': depth[n], 'clan': clan.get(n.lower(), 'other')} for n in names],
         'edges': edges,
         'graph_only': graph_only,
+        'checked_only': checked_only,
         'colors': config['colors'],
         'initial': [n for n in config['initial_nodes'] if n in names],
     }
@@ -150,7 +186,9 @@ def main():
         'under the same exact names. No appellation or spelling variant is followed.', '',
         '- corroborated: %d of %d (%.1f%%)' % (corroborated, len(edges), 100 * corroborated / len(edges)),
         '- curated only, no supporting triple: %d' % (len(edges) - corroborated),
-        '- asserted kin triples on lineage names that the table does not hold: %d' % len(graph_only), '',
+        '- asserted kin triples on lineage names that the table does not hold: %d' % len(graph_only),
+        '- table edges a model-read, judge-checked relation also states: %d' % sum(bool(e['checked']) for e in edges),
+        '- model-read, judge-checked parent links in neither the table nor the text: %d' % len(checked_only), '',
         '## Needs a human', '',
         'The table has one Parent column, so biological, legal and divine parents are not told apart. '
         'Children with more than two listed parents:', '',

@@ -48,3 +48,7 @@ node_modules/
 .codex/
 CLAUDE.md
 AGENTS.md
+
+# Hand verdicts that quote the copyrighted translation: local only.
+annotations/kinship_*judged.csv
+annotations/relations_judged_*.csv

@@ -60,7 +60,10 @@ for (const [relation,object] of [['bornTo','Krishna'],['rules','Chedi'],['rules'
 const slayers = c.execute('who killed Karna').edges.map(i=>K.entities[K.edges[i][2]]);
 assert(!slayers.includes('Nakula')&&!slayers.includes('Vrisha'), 'Pronoun errors must not survive as named killers');
 assert.deepEqual(c.displayEdges(c.execute('who killed Karna').edges,c.resolve('Karna')).map(i=>K.entities[K.edges[i][2]]), ['Arjuna']);
-assert(K.review.death_accounts?.Karna?.appellations.includes('Kiriti'));
+// Kiriti as Karna's slayer needs the note saying Kiriti is Arjuna, unless name
+// merging has already folded Kiriti into Arjuna.
+assert(K.review.death_accounts?.Karna?.appellations.includes('Kiriti') || !slayers.includes('Kiriti'),
+  'Kiriti as Karna\'s slayer needs the Arjuna note');
 assert(connection.path.length > 0);
 assert.equal(connection.path[0].from,c.resolve('Karna'));
 assert.equal(connection.path.at(-1).to,c.resolve('Arjuna'));

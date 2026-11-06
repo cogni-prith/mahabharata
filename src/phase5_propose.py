@@ -15,7 +15,7 @@ LLM output. That set does not exist and cannot be produced from this side. What
 is reported instead is a judged sample, labelled as such, which is a precision
 figure and not a calibration.
 """
-import collections, re, sys
+import collections, os, re, sys
 import pandas as pd
 import spacy
 
@@ -189,6 +189,14 @@ def main():
 
     divine = reclassify_divine(out)
     prop = pd.DataFrame(out)
+    # A proposal the asserted graph already holds is not a proposal: it would
+    # sit in both graphs (validate_outputs checks they stay apart).
+    if os.path.exists("build/relations.parquet"):
+        asserted = pd.read_parquet("build/relations.parquet", columns=["subject", "predicate", "object"])
+        known = set(zip(asserted.subject, asserted.predicate, asserted.object))
+        dup = [k in known for k in zip(prop.subject, prop.predicate, prop.object)]
+        print("dropped %d proposals already asserted" % sum(dup))
+        prop = prop[[not d for d in dup]].reset_index(drop=True)
     prop.to_parquet("build/proposed.parquet")
     write_ttl(prop, "out/proposed.ttl")
     report(prop, len(sents), combat, enemies, divine)

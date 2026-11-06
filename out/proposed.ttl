@@ -4,7 +4,6 @@
 # Proposed triples. Not asserted. Every node carries mbh:status
 # "proposed" and a score, and must be labelled `proposed` in any view.
 
-[] a mbh:Proposal ; mbh:status "proposed" ; mbh:subject <http://example.org/mbh/e/Ghatotkacha> ; mbh:predicate mbh:bornTo ; mbh:object <http://example.org/mbh/e/Hidimba> ; mbh:score "0.85"^^xsd:decimal ; mbh:pattern "gave_birth_to" ; mbh:citedAtChapterLevel "true"^^xsd:boolean ; mbh:inPassage <http://example.org/mbh/p/01_Adi/57> .
 [] a mbh:Proposal ; mbh:status "proposed" ; mbh:subject <http://example.org/mbh/e/Shuki> ; mbh:predicate mbh:bornTo ; mbh:object <http://example.org/mbh/e/Dhritarashtri> ; mbh:score "0.85"^^xsd:decimal ; mbh:pattern "gave_birth_to" ; mbh:citedAtChapterLevel "true"^^xsd:boolean ; mbh:inPassage <http://example.org/mbh/p/01_Adi/60> .
 [] a mbh:Proposal ; mbh:status "proposed" ; mbh:subject <http://example.org/mbh/e/Kadru> ; mbh:predicate mbh:bornTo ; mbh:object <http://example.org/mbh/e/Surasa> ; mbh:score "0.85"^^xsd:decimal ; mbh:pattern "gave_birth_to" ; mbh:citedAtChapterLevel "true"^^xsd:boolean ; mbh:inPassage <http://example.org/mbh/p/01_Adi/60> .
 [] a mbh:Proposal ; mbh:status "proposed" ; mbh:subject <http://example.org/mbh/e/Samyati> ; mbh:predicate mbh:bornTo ; mbh:object <http://example.org/mbh/e/Ashmaki> ; mbh:score "0.85"^^xsd:decimal ; mbh:pattern "gave_birth_to" ; mbh:citedAtChapterLevel "true"^^xsd:boolean ; mbh:inPassage <http://example.org/mbh/p/01_Adi/90> .

@@ -1,6 +1,6 @@
 # Output validation
 
-Automated, from `src/validate_outputs.py`. 25 checks, 1 failed.
+Automated, from `src/validate_outputs.py`. 25 checks, 0 failed.
 
 This checks the hard rules that are mechanically checkable. It cannot check
 whether a triple is true; that is what the precision samples are for.
@@ -8,14 +8,14 @@ whether a triple is true; that is what the precision samples are for.
 | check | result | detail |
 |---|---|---|
 | relations.ttl parses | pass | 17782 triples |
-| proposed.ttl parses | pass | 234 triples |
+| proposed.ttl parses | pass | 225 triples |
 | entities.ttl parses | pass | 12053 triples |
 | passages.ttl parses | pass | 13691 triples |
 | tellings.ttl parses | pass | 28260 triples |
-| no proposal appears in the asserted graph | **FAIL** | 1100 asserted, 25 proposed, 1 shared |
+| no proposal appears in the asserted graph | pass | 1100 asserted, 24 proposed, 0 shared |
 | no Proposal node in relations.ttl | pass | by rdf:type |
 | no Assertion node in proposed.ttl | pass | by rdf:type |
-| every proposal carries a score and status proposed | pass | 26 proposals |
+| every proposal carries a score and status proposed | pass | 25 proposals |
 | every chapter-cited assertion names a passage | pass | 0 without a passage |
 | every uncited assertion names no passage | pass | 0 carrying an address they should not have |
 | every cited passage exists in passages.ttl | pass | 1032 distinct references, 0 missing |
@@ -32,8 +32,4 @@ whether a triple is true; that is what the precision samples are for.
 | projection covers every embedded entity | pass | 570 coordinates, 570 entities |
 | both seeds recorded | pass | train 20260917, umap 20260917 |
 | below-gate flag present in every embedding artefact | pass | index, projection.json, projection.js |
-
-## Failures
-
-- no proposal appears in the asserted graph: 1100 asserted, 25 proposed, 1 shared
 

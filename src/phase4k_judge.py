@@ -113,10 +113,10 @@ class DailyLimit(Exception):
     pass
 
 
-def ask(text, key, model):
+def ask(text, key, model, system=None):
     body = json.dumps({"model": model, "temperature": 0, "reasoning_effort": "low",
                        "response_format": {"type": "json_object"},
-                       "messages": [{"role": "system", "content": PROMPT},
+                       "messages": [{"role": "system", "content": system or PROMPT},
                                     {"role": "user", "content": text}]}).encode()
     for attempt in range(8):
         req = urllib.request.Request(ENDPOINT, data=body, method="POST", headers={

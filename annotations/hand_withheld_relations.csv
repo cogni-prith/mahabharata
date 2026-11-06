@@ -1,0 +1,10 @@
+parva,sent_id,subject,predicate,object,reason,judged_by
+03_Aranyaka,15336,Dundubhi,instructedBy,Brahma,Judged wrong by hand: the passage does not say Brahma taught Dundubhi.,teacher check T02 (2026-11)
+04_Virata,1369,Duhshasana,instructedBy,Virata,Judged wrong by hand: the passage does not say Virata taught Duhshasana.,teacher check T03 (2026-11)
+05_Udyoga,3346,Dhritarashtra,instructedBy,Drona,Judged wrong by hand: the passage does not say Drona taught Dhritarashtra.,relations packet X122 (2026-10)
+12_Shanti,8292,Yudhishthira,instructedBy,Bhishma,Judged wrong by hand: this passage does not say Bhishma taught Yudhishthira.,relations packet X043 (2026-10)
+12_Shanti,25269,Narayana,instructedBy,Brahma,Judged wrong by hand: the passage does not say Brahma taught Narayana.,relations packet X135 (2026-10)
+12_Shanti,25270,Narayana,instructedBy,Svarochisha,Judged wrong by hand: the passage does not say Svarochisha taught Narayana.,relations packet X007 (2026-10)
+12_Shanti,25271,Narayana,instructedBy,Shankhapada,Judged wrong by hand: the passage does not say Shankhapada taught Narayana.,relations packet X027 (2026-10)
+12_Shanti,25282,Narayana,instructedBy,Brahma,Judged wrong by hand: the passage does not say Brahma taught Narayana.,relations packet X013 (2026-10)
+13_Anushasana,5544,Sharmina,instructedBy,Yama,Judged wrong by hand: the passage does not say Yama taught Sharmina.,teacher check T05 (2026-11)

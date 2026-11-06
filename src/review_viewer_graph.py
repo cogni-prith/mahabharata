@@ -35,6 +35,19 @@ def folder():
     return fold
 
 
+def hand_withheld():
+    """Relations a person judged wrong against the passage, keyed as in the graph.
+
+    The list names people and sentences only, so it can be committed; the
+    verdicts behind it stay in the local annotations files.
+    """
+    path = ROOT / "annotations/hand_withheld_relations.csv"
+    if not path.exists():
+        return {}
+    h = pd.read_csv(path, dtype={"parva": str})
+    return {(r.parva, int(r.sent_id), r.subject, r.predicate, r.object): r.reason for r in h.itertuples()}
+
+
 def review(frame):
     archived = [pd.read_parquet(path) for name in ("relation_candidates.parquet", "withheld_relations.parquet")
                 if (path := ROOT / "build" / name).exists()]
@@ -76,7 +89,13 @@ def review(frame):
         candidates[(row["parva"], row["sent_id"], row["subject"], row["object"])].append(row)
     kept, rejected = [], []
     retyped = 0
+    vetoed = hand_withheld()
     for r in frame.to_dict("records"):
+        veto = vetoed.get((r["parva"], int(r["sent_id"]), r["subject"], r["predicate"], r["object"]))
+        if veto:
+            rejected.append({**r, "status": "withheld", "reason": veto,
+                             "evidence": contexts.get((r["parva"], int(r["sent_id"])), {}).get("sentence", r["evidence"])})
+            continue
         if r["pattern"] == "vocative":
             kept.append(r)
             continue
